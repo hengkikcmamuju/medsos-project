@@ -20,29 +20,34 @@ export default async function handler(req, res) {
   body = body || {};
 
   try {
-    // 1. GET
+    // 1. GET: Ambil daftar tim dari tabel users
     if (req.method === 'GET') {
       const { data, error } = await supabase
-        .from('team_members')
-        .select('*')
+        .from('users')
+        .select('id, name, email, role, avatar, status')
         .order('created_at', { ascending: true });
 
       if (error) return res.status(400).json({ error: error.message });
-      return res.status(200).json(data || []);
+      
+      const formatted = (data || []).map(u => ({
+        ...u,
+        role: (u.role || 'creator').toUpperCase()
+      }));
+      return res.status(200).json(formatted);
     }
 
-    // 2. POST
+    // 2. POST: Tambah user baru ke tabel users
     if (req.method === 'POST') {
       const { data, error } = await supabase
-        .from('team_members')
+        .from('users')
         .insert([{
           id: body.id || ('USR-' + Date.now()),
           name: body.name,
           email: body.email,
-          role: body.role,
+          role: (body.role || 'creator').toLowerCase(),
           avatar: body.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
           password: body.password || '123456',
-          status: 'Aktif'
+          status: 'active'
         }])
         .select();
 
@@ -50,14 +55,18 @@ export default async function handler(req, res) {
       return res.status(201).json(data[0]);
     }
 
-    // 3. PUT
+    // 3. PUT: Update data user
     if (req.method === 'PUT') {
       const { id, name, email, role, avatar, password } = body;
-      const updates = { name, email, role, avatar };
+      const updates = {};
+      if (name) updates.name = name;
+      if (email) updates.email = email;
+      if (role) updates.role = role.toLowerCase();
+      if (avatar) updates.avatar = avatar;
       if (password) updates.password = password;
 
       const { data, error } = await supabase
-        .from('team_members')
+        .from('users')
         .update(updates)
         .eq('id', id)
         .select();
@@ -66,16 +75,10 @@ export default async function handler(req, res) {
       return res.status(200).json(data[0]);
     }
 
-    // 4. DELETE (Mendukung body.id dan query.id)
+    // 4. DELETE: Hapus user
     if (req.method === 'DELETE') {
       const id = body.id || req.query.id;
-      if (!id) return res.status(400).json({ error: 'ID anggota wajib disertakan' });
-
-      const { error } = await supabase
-        .from('team_members')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await supabase.from('users').delete().eq('id', id);
       if (error) return res.status(400).json({ error: error.message });
       return res.status(200).json({ success: true });
     }
