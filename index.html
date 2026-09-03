@@ -145,6 +145,35 @@
     </div>
   </div>
 
+  <!-- ==================== 4B. MODAL FULLSCREEN IMAGE LIGHTBOX (Z-[95]) ==================== -->
+  <div id="imageLightboxModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[95] hidden flex flex-col items-center justify-center p-4 sm:p-6 animate-in fade-in duration-150" onclick="closeImageLightbox()">
+    
+    <!-- Top Control Bar -->
+    <div class="w-full max-w-5xl flex items-center justify-between pb-3 text-white/90" onclick="event.stopPropagation()">
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 rounded-lg bg-white/10 text-white text-xs font-semibold backdrop-blur-sm border border-white/10 flex items-center gap-1.5">
+          <i class="ph-bold ph-image"></i> Pratinjau Foto Asli HD
+        </span>
+        <span id="lightboxDimensionsBadge" class="text-[11px] font-mono text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
+          Memuat dimensi...
+        </span>
+      </div>
+      
+      <button type="button" onclick="closeImageLightbox()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5 border border-white/10 shadow-lg active:scale-95">
+        <i class="ph-bold ph-x text-sm"></i> Tutup (ESC)
+      </button>
+    </div>
+
+    <!-- Image Display Container -->
+    <div class="relative max-w-5xl max-h-[82vh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50" onclick="event.stopPropagation()">
+      <img id="lightboxLargeImg" src="" alt="Pratinjau Foto Konten" onerror="this.src='https://placehold.co/800x800/1e293b/94a3b8?text=Gagal+Memuat+Foto'" class="max-w-full max-h-[80vh] w-auto h-auto object-contain select-none" />
+    </div>
+
+    <p class="text-[11px] text-white/60 mt-3 flex items-center gap-1 select-none">
+      <i class="ph-bold ph-info"></i> Klik area gelap di luar foto atau tekan <kbd class="px-1.5 py-0.5 rounded bg-white/15 text-white font-mono text-[10px] mx-1">ESC</kbd> untuk menutup
+    </p>
+  </div>
+
   <!-- ==================== 5. APLIKASI UTAMA (AUTHENTICATED) ==================== -->
   <div id="appContainer" class="flex-1 flex flex-col">
     
@@ -302,12 +331,23 @@
 
       <!-- VIEW 2: CALENDAR -->
       <section id="view-calendar" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div class="flex flex-wrap items-center justify-between mb-6 pb-4 border-b border-slate-100 gap-3">
           <div>
             <h2 class="text-lg font-bold text-slate-900">Jadwal Kalender Konten Terpadu</h2>
             <p class="text-xs text-slate-500">Distribusi postingan terjadwal & live sepanjang bulan (sinkron otomatis dari database)</p>
           </div>
-          <span id="calendarMonthBadge" class="text-xs font-semibold px-3 py-1 bg-slate-100 rounded-lg text-slate-600">Bulan Berjalan</span>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="changeCalendarMonth(-1)" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition" title="Bulan Sebelumnya">
+              <i class="ph-bold ph-caret-left"></i>
+            </button>
+            <span id="calendarMonthBadge" class="text-xs font-bold px-3 py-1.5 bg-slate-100 rounded-xl text-slate-800 min-w-[140px] text-center border border-slate-200">Memuat Bulan...</span>
+            <button type="button" onclick="changeCalendarMonth(1)" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition" title="Bulan Berikutnya">
+              <i class="ph-bold ph-caret-right"></i>
+            </button>
+            <button type="button" onclick="resetCalendarToToday()" class="px-2.5 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-[11px] font-bold border border-slate-200 transition">
+              Hari Ini
+            </button>
+          </div>
         </div>
         <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
           <span>MIN</span><span>SEN</span><span>SEL</span><span>RAB</span><span>KAM</span><span>JUM</span><span>SAB</span>
@@ -536,7 +576,7 @@
     </div>
   </div>
 
-  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW (DENGAN REVISI MEDIA DAN HAPUS ADMIN) -->
+  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW (DENGAN POP-UP LIGHTBOX) -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -545,8 +585,19 @@
       </div>
       <div class="p-6 space-y-4 text-xs">
         
+        <!-- Thumbnail Interaktif dengan Zoom Lightbox Trigger -->
         <div id="defaultMediaContainer" class="flex gap-4">
-          <img id="detailMediaImg" src="" class="w-32 h-32 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0 shadow-sm" />
+          <div class="relative group/thumb cursor-pointer flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm" onclick="openImageLightbox()" title="Klik untuk memperbesar foto resolusi penuh">
+            <img id="detailMediaImg" src="" onerror="this.src='https://placehold.co/600x600/f1f5f9/94a3b8?text=Foto+Tidak+Tersedia'" class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-200" />
+            <div class="absolute inset-0 bg-slate-950/45 opacity-0 group-hover/thumb:opacity-100 transition duration-150 flex flex-col items-center justify-center text-white gap-1">
+              <i class="ph-bold ph-magnifying-glass-plus text-2xl drop-shadow-md"></i>
+              <span class="text-[10px] font-extrabold tracking-wide drop-shadow-md">Perbesar Foto</span>
+            </div>
+            <div class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-bold flex items-center gap-0.5 backdrop-blur-xs">
+              <i class="ph-bold ph-arrows-out"></i>
+            </div>
+          </div>
+
           <div class="space-y-2 flex-1">
             <span id="detailStatusBadge" class="px-2.5 py-1 rounded-md text-[10px] font-bold">STATUS</span>
             <p id="detailCaption" class="text-slate-600 whitespace-pre-wrap max-h-28 overflow-y-auto custom-scrollbar"></p>
@@ -584,9 +635,12 @@
                 <p class="font-semibold text-slate-700">Klik untuk mengganti foto materi dengan resolusi optimal 1080px</p>
               </div>
               <div id="editPreviewContainer" class="hidden flex-col items-center gap-2">
-                <div class="relative">
+                <div class="relative group/editpreview cursor-pointer" onclick="openImageLightbox(document.getElementById('editPreviewImg').src)" title="Klik untuk memperbesar foto revisi">
                   <img id="editPreviewImg" src="" class="max-h-32 rounded-lg object-contain border border-slate-200 bg-white" />
-                  <button type="button" onclick="event.stopPropagation(); clearUploadedFile('edit')" class="absolute -top-2 -right-2 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px]">
+                  <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover/editpreview:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold gap-1">
+                    <i class="ph-bold ph-arrows-out"></i> Zoom
+                  </div>
+                  <button type="button" onclick="event.stopPropagation(); clearUploadedFile('edit')" class="absolute -top-2 -right-2 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] z-10 shadow-sm">
                     <i class="ph-bold ph-x"></i>
                   </button>
                 </div>
@@ -679,10 +733,14 @@
     let currentRole = 'ADMIN';
     let activePostId = null;
 
+    // State Kalender Dinamis
+    let calYear = new Date().getFullYear();
+    let calMonth = new Date().getMonth();
+
     let currentBrand = {
       handle: '@kcmamuju_244',
       name: 'BTN KC Mamuju',
-      bio: 'Official Social Media Portal. Informasi promo perumahan dan layanan operasional.'
+      bio: 'Official Social Media Portal. Informasi produk, promo perumahan, dan layanan operasional.'
     };
 
     let teamUsers = [
@@ -741,6 +799,74 @@
     document.getElementById('confirmActionBtn').addEventListener('click', () => {
       if (typeof confirmCallback === 'function') confirmCallback();
       closeConfirmModal();
+    });
+
+    // 3B. FULLSCREEN LIGHTBOX CONTROLLER
+    function openImageLightbox(specificSrc = null) {
+      const src = specificSrc || document.getElementById('detailMediaImg').src;
+      if (!src) return;
+
+      const lbImg = document.getElementById('lightboxLargeImg');
+      if (!lbImg) return;
+      lbImg.src = src;
+
+      // Baca resolusi asli gambar
+      const tempImg = new Image();
+      tempImg.onload = function() {
+        const badge = document.getElementById('lightboxDimensionsBadge');
+        if (badge) {
+          badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
+        }
+      };
+      tempImg.onerror = function() {
+        const badge = document.getElementById('lightboxDimensionsBadge');
+        if (badge) badge.textContent = 'Resolusi tidak terbaca';
+      };
+      tempImg.src = src;
+
+      const modal = document.getElementById('imageLightboxModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeImageLightbox() {
+      const modal = document.getElementById('imageLightboxModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    // Listener Keyboard Escape hierarkis untuk menutup pop-up aktif
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const lightbox = document.getElementById('imageLightboxModal');
+        if (lightbox && !lightbox.classList.contains('hidden')) {
+          closeImageLightbox();
+          return;
+        }
+        const confirmModal = document.getElementById('confirmActionModal');
+        if (confirmModal && !confirmModal.classList.contains('hidden')) {
+          closeConfirmModal();
+          return;
+        }
+        const logoutModal = document.getElementById('logoutModal');
+        if (logoutModal && !logoutModal.classList.contains('hidden')) {
+          closeLogoutModal();
+          return;
+        }
+        const detailModal = document.getElementById('detailModal');
+        if (detailModal && !detailModal.classList.contains('hidden')) {
+          closeDetailModal();
+          return;
+        }
+        const postModal = document.getElementById('postModal');
+        if (postModal && !postModal.classList.contains('hidden')) {
+          closePostModal();
+          return;
+        }
+        const userModal = document.getElementById('userModal');
+        if (userModal && !userModal.classList.contains('hidden')) {
+          closeUserModal();
+          return;
+        }
+      }
     });
 
     // 4. INSTAGRAM NATIVE IMAGE ENGINE (1080PX WIDTH OPTIMIZATION & RATIO DETECTOR)
@@ -958,6 +1084,7 @@
 
     function checkExistingSession() {
       loadBrandSettings();
+      fetchTeamFromApi(); // Muat data tim dari Supabase lebih awal untuk kesiapan data
       const savedUser = localStorage.getItem('postflow_session_user');
       const savedToken = localStorage.getItem('postflow_session_token');
 
@@ -1018,6 +1145,17 @@
         if (idx !== -1) {
           teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
         }
+        
+        // Sinkronkan sesi jika pengguna mengedit akunnya sendiri
+        if (currentUser && currentUser.id === editId) {
+          currentUser.name = name;
+          currentUser.email = email;
+          currentUser.role = role;
+          currentUser.avatar = avatar;
+          localStorage.setItem('postflow_session_user', JSON.stringify(currentUser));
+          initAuthenticatedUser();
+        }
+
         renderTeamTable();
         closeUserModal();
         showToast('Profil anggota tim berhasil diperbarui.', 'success');
@@ -1063,6 +1201,12 @@
     function deleteUser(userId) {
       if (teamUsers.length <= 1) {
         showToast('Minimal harus ada 1 anggota tim di dalam sistem.', 'warning');
+        return;
+      }
+
+      // Cegah admin menghapus akunnya sendiri yang sedang aktif
+      if (currentUser && currentUser.id === userId) {
+        showToast('Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.', 'warning');
         return;
       }
 
@@ -1198,8 +1342,11 @@
         if (!res.ok) throw new Error('Fetch status: ' + res.status);
         const data = await res.json();
         
-        if (Array.isArray(data)) {
-          posts = data.map(p => ({
+        // Kompatibilitas respons array langsung maupun objek { success: true, posts: [...] }
+        const rawPosts = Array.isArray(data) ? data : (data.posts && Array.isArray(data.posts) ? data.posts : null);
+
+        if (rawPosts) {
+          posts = rawPosts.map(p => ({
             ...p,
             status: (p.status === 'in_review') ? 'review' : (p.status || 'draft')
           }));
@@ -1364,8 +1511,10 @@
         });
 
         if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Gagal menghapus dari server.');
+          const errData = await res.json().catch(() => ({}));
+          const error = new Error(errData.error || 'Server menolak penghapusan postingan.');
+          error.isServerRejection = true;
+          throw error;
         }
 
         posts = posts.filter(p => p.id !== postId);
@@ -1375,13 +1524,17 @@
         closeDetailModal();
         showToast('Postingan berhasil dihapus secara permanen.', 'success');
       } catch (err) {
-        console.warn('Fallback offline deletion:', err.message);
-        posts = posts.filter(p => p.id !== postId);
-        renderKanban();
-        renderCalendar();
-        renderFeedPreview();
-        closeDetailModal();
-        showToast('Postingan dihapus dari tampilan lokal.', 'info');
+        if (err.isServerRejection) {
+          showToast(err.message, 'error');
+        } else {
+          console.warn('Fallback offline deletion:', err.message);
+          posts = posts.filter(p => p.id !== postId);
+          renderKanban();
+          renderCalendar();
+          renderFeedPreview();
+          closeDetailModal();
+          showToast('Postingan dihapus dari tampilan lokal.', 'info');
+        }
       }
     }
 
@@ -1453,9 +1606,10 @@
          post.status === 'review' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
          post.status === 'revision' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-slate-100 text-slate-800 border border-slate-200');
 
+      // Feedback revisi hanya ditampilkan pada status review atau revision
       const feedbackBox = document.getElementById('revisionFeedbackContainer');
       const feedbackText = document.getElementById('revisionFeedbackText');
-      if (post.revision_notes) {
+      if (post.revision_notes && (post.status === 'revision' || post.status === 'review')) {
         feedbackBox.classList.remove('hidden');
         feedbackText.textContent = post.revision_notes;
       } else {
@@ -1538,6 +1692,8 @@
     }
     function openPostModal() { 
       clearUploadedFile('post');
+      updateIgFormatHelperBadge('FEED', 'post');
+      document.getElementById('postTypeInput').value = 'FEED';
       document.getElementById('postModal').classList.remove('hidden'); 
     }
     function closePostModal() { document.getElementById('postModal').classList.add('hidden'); }
@@ -1550,66 +1706,66 @@
     function closeBrandModal() { document.getElementById('brandModal').classList.add('hidden'); }
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
-
-    // 12. TAB NAVIGATION (DESKTOP & MOBILE BOTTOM BAR)
-    function switchTab(tabId) {
-      if (tabId === 'users' && currentRole !== 'ADMIN') {
-        showToast('Akses Ditolak: Menu Tim & RBAC hanya dapat diakses oleh Administrator.', 'warning');
-        return;
+    // 13. KALENDER DINAMIS DENGAN NAVIGASI BULAN & PARSING ZONA WAKTU AMAN
+    function changeCalendarMonth(delta) {
+      calMonth += delta;
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
+      } else if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
       }
-
-      ['board', 'calendar', 'preview', 'ai', 'users'].forEach(t => {
-        const view = document.getElementById('view-' + t);
-        const btn = document.getElementById('tab-' + t);
-        const mBtn = document.getElementById('m-tab-' + t);
-
-        if (view) view.classList.toggle('hidden', t !== tabId);
-        
-        // Desktop Tab Styles
-        if (btn) {
-          if (t === tabId) {
-            btn.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm';
-          } else {
-            btn.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600';
-          }
-        }
-
-        // Mobile Bottom Bar Styles
-        if (mBtn) {
-          if (t === tabId) {
-            mBtn.className = 'flex flex-col items-center gap-1 text-rose-600';
-          } else {
-            mBtn.className = 'flex flex-col items-center gap-1 text-slate-500 hover:text-slate-900';
-          }
-        }
-      });
-
-      if (tabId === 'users') renderTeamTable();
-      if (tabId === 'calendar') renderCalendar();
-      if (tabId === 'preview') renderFeedPreview();
+      renderCalendar();
     }
 
-    // 13. KALENDER DINAMIS BERDASARKAN BULAN BERJALAN
+    function resetCalendarToToday() {
+      const now = new Date();
+      calYear = now.getFullYear();
+      calMonth = now.getMonth();
+      renderCalendar();
+    }
+
+    // Helper pembaca tanggal tanpa pergeseran zona waktu
+    function parseDatePartsSafe(dateStr) {
+      if (!dateStr) return null;
+      if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+        const parts = dateStr.substring(0, 10).split('-');
+        return {
+          year: parseInt(parts[0], 10),
+          month: parseInt(parts[1], 10) - 1, // 0-indexed
+          day: parseInt(parts[2], 10)
+        };
+      }
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return null;
+      return {
+        year: d.getFullYear(),
+        month: d.getMonth(),
+        day: d.getDate()
+      };
+    }
+
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
       grid.innerHTML = '';
 
       const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth(); // 0-indexed
+      const todayYear = now.getFullYear();
+      const todayMonth = now.getMonth();
       const todayDate = now.getDate();
 
       const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       const monthBadge = document.getElementById('calendarMonthBadge');
-      if (monthBadge) monthBadge.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      if (monthBadge) monthBadge.textContent = `${monthNames[calMonth]} ${calYear}`;
 
-      // Hari pertama dalam bulan ini (0 = Minggu, 1 = Senin, dst.)
-      const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
-      // Total hari dalam bulan ini
-      const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      // Hari pertama dalam bulan aktif (0 = Minggu, 1 = Senin, dst.)
+      const firstDayIndex = new Date(calYear, calMonth, 1).getDay();
+      // Total hari dalam bulan aktif
+      const totalDaysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
 
-      // Slot kosong awal bulan
+      // Slot kosong awal bulan (padding)
       for (let padding = 0; padding < firstDayIndex; padding++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = 'min-h-20 border border-slate-100/50 rounded-xl p-1.5 bg-slate-100/20';
@@ -1618,7 +1774,7 @@
 
       // Slot tanggal sesungguhnya
       for (let day = 1; day <= totalDaysInMonth; day++) {
-        const isToday = (day === todayDate);
+        const isToday = (day === todayDate && calMonth === todayMonth && calYear === todayYear);
         const cell = document.createElement('div');
         cell.className = `min-h-20 border ${isToday ? 'border-rose-400 ring-2 ring-rose-100 bg-rose-50/20' : 'border-slate-100 bg-slate-50/60'} rounded-xl p-1.5 text-left relative flex flex-col justify-between hover:border-rose-300 transition`;
         
@@ -1629,12 +1785,12 @@
           </div>
         `;
 
-        // Filter postingan yang terjadwal pada hari ini
+        // Filter postingan yang cocok dengan tanggal menggunakan pembacaan aman
         const matchingPosts = posts.filter(p => {
           const dateStr = p.scheduled_at || p.created_at;
-          if (!dateStr) return false;
-          const d = new Date(dateStr);
-          return !isNaN(d.getTime()) && d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+          const parsed = parseDatePartsSafe(dateStr);
+          if (!parsed) return false;
+          return parsed.day === day && parsed.month === calMonth && parsed.year === calYear;
         });
 
         if (matchingPosts.length > 0) {
@@ -1648,6 +1804,13 @@
               </div>
             `;
           });
+          if (matchingPosts.length > 2) {
+            postDiv.innerHTML += `
+              <div class="text-[7px] text-slate-400 font-bold text-center">
+                +${matchingPosts.length - 2} lainnya
+              </div>
+            `;
+          }
           cell.appendChild(postDiv);
         }
 
