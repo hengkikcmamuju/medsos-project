@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   body = body || {};
 
   try {
-    // 1. GET: Tarik semua pengguna dari Supabase
+    // 1. GET
     if (req.method === 'GET') {
       const { data, error } = await supabase
         .from('team_members')
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
       return res.status(200).json(data || []);
     }
 
-    // 2. POST: Tambah anggota tim baru
+    // 2. POST
     if (req.method === 'POST') {
       const { data, error } = await supabase
         .from('team_members')
@@ -41,6 +41,7 @@ export default async function handler(req, res) {
           email: body.email,
           role: body.role,
           avatar: body.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
+          password: body.password || '123456',
           status: 'Aktif'
         }])
         .select();
@@ -49,12 +50,15 @@ export default async function handler(req, res) {
       return res.status(201).json(data[0]);
     }
 
-    // 3. PUT: Edit nama, email, role, atau avatar anggota tim
+    // 3. PUT
     if (req.method === 'PUT') {
-      const { id, name, email, role, avatar } = body;
+      const { id, name, email, role, avatar, password } = body;
+      const updates = { name, email, role, avatar };
+      if (password) updates.password = password;
+
       const { data, error } = await supabase
         .from('team_members')
-        .update({ name, email, role, avatar })
+        .update(updates)
         .eq('id', id)
         .select();
 
@@ -62,9 +66,11 @@ export default async function handler(req, res) {
       return res.status(200).json(data[0]);
     }
 
-    // 4. DELETE: Hapus anggota tim
+    // 4. DELETE (Mendukung body.id dan query.id)
     if (req.method === 'DELETE') {
-      const { id } = body;
+      const id = body.id || req.query.id;
+      if (!id) return res.status(400).json({ error: 'ID anggota wajib disertakan' });
+
       const { error } = await supabase
         .from('team_members')
         .delete()
