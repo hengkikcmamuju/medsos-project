@@ -11,7 +11,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // Parse Body dengan Aman
   let body = req.body;
   if (typeof body === 'string') {
     try {
@@ -36,7 +34,7 @@ export default async function handler(req, res) {
   body = body || {};
 
   try {
-    // 1. GET: Ambil semua postingan
+    // 1. GET: Ambil daftar postingan
     if (req.method === 'GET') {
       const { data, error } = await supabase
         .from('posts')
@@ -47,8 +45,13 @@ export default async function handler(req, res) {
       return res.status(200).json(data || []);
     }
 
-    // 2. POST: Simpan postingan baru
+    // 2. POST: Simpan postingan baru (Wewenang: CREATOR & ADMIN)
     if (req.method === 'POST') {
+      const userRole = body.role || 'CREATOR';
+      if (userRole !== 'CREATOR' && userRole !== 'ADMIN') {
+        return res.status(403).json({ error: 'Akses Ditolak: Hanya Creator dan Admin yang dapat membuat postingan baru.' });
+      }
+
       let validScheduledAt = null;
       if (body.scheduled_at && !isNaN(new Date(body.scheduled_at).getTime())) {
         validScheduledAt = new Date(body.scheduled_at).toISOString();
@@ -62,10 +65,10 @@ export default async function handler(req, res) {
         media_url: body.media_url || '',
         platform: body.platform || 'instagram',
         type: body.type || 'FEED',
-        status: body.status || 'draft',
+        status: 'draft',
         author: body.author || 'Tim Kreatif',
         scheduled_at: validScheduledAt,
-        revision_notes: body.revision_notes || '',
+        revision_notes: '',
         metrics: { likes: 0, reach: 0, shares: 0, comments: 0 },
         created_at: new Date().toISOString()
       };
@@ -83,10 +86,18 @@ export default async function handler(req, res) {
       return res.status(201).json(data && data[0] ? data[0] : newPost);
     }
 
-    // 3. PUT: Update Status, Catatan Revisi, dan Materi Baru (Media & Caption)
+    // 3. PUT: Update Status / Revisi / Publish (Validasi RBAC Ketat)
     if (req.method === 'PUT') {
-      const { id, status, revision_notes, media_url, caption, title } = body;
+      const { id, status, revision_notes, media_url, caption, title, role } = body;
       if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
+
+      // Cek Wewenang Status
+      if (role === 'CREATOR' && status === 'published') {
+        return res.status(403).json({ error: 'Akses Ditolak: Creator tidak memiliki wewenang untuk menerbitkan postingan.' });
+      }
+      if ((role === 'REVIEWER' || role === 'CLIENT') && status === 'draft') {
+        return res.status(403).json({ error: 'Akses Ditolak: Reviewer/Client tidak dapat memindahkan postingan kembali ke draft.' });
+      }
 
       const updates = {};
       if (status !== undefined) updates.status = status;
