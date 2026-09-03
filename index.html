@@ -49,7 +49,6 @@
   <div id="loginScreen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       
-      <!-- Brand Banner -->
       <div class="p-8 text-center bg-gradient-to-b from-rose-50/70 to-white border-b border-slate-100">
         <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white text-3xl mx-auto shadow-lg shadow-rose-500/25 mb-4">
           <i class="ph-bold ph-instagram-logo"></i>
@@ -58,7 +57,6 @@
         <p class="text-xs text-slate-500 mt-1">Platform Workflow & Publishing Media Sosial Studio</p>
       </div>
 
-      <!-- Form Login -->
       <form id="loginForm" onsubmit="handleLogin(event)" class="p-8 space-y-4 text-xs">
         <div id="loginErrorMsg" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl font-semibold text-xs flex items-center gap-2">
           <i class="ph-bold ph-warning-circle text-base flex-shrink-0"></i>
@@ -82,7 +80,6 @@
           <p class="text-[10px] text-slate-400 mt-1">Default PIN pengujian: <span class="font-mono font-bold text-slate-600">123456</span></p>
         </div>
 
-        <!-- Quick Fill Tester Buttons -->
         <div class="pt-2 border-t border-slate-100">
           <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Login Cepat Peran:</span>
           <div class="grid grid-cols-2 gap-1.5">
@@ -108,7 +105,40 @@
     </div>
   </div>
 
-  <!-- ==================== 2. MAIN APPLICATION (AUTHENTICATED ONLY) ==================== -->
+  <!-- ==================== MODAL KONFIRMASI LOGOUT PROFESIONAL ==================== -->
+  <div id="logoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-6 text-center space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-2xl mx-auto shadow-sm">
+          <i class="ph-bold ph-sign-out"></i>
+        </div>
+        <div>
+          <h3 class="font-extrabold text-base text-slate-900">Konfirmasi Keluar Akun</h3>
+          <p class="text-xs text-slate-500 mt-1">Apakah Anda yakin ingin mengakhiri sesi kerja saat ini?</p>
+        </div>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-3 text-left">
+          <img id="logoutModalAvatar" src="" class="w-9 h-9 rounded-xl object-cover border border-slate-200" alt="Avatar" />
+          <div class="overflow-hidden">
+            <h4 id="logoutModalName" class="font-bold text-xs text-slate-800 truncate">Petugas</h4>
+            <p id="logoutModalEmail" class="text-[11px] text-slate-500 truncate">petugas@postflow.local</p>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Semua draf dan aktivitas yang telah disimpan di Supabase tetap aman dan dapat diakses kembali saat Anda login.
+        </p>
+        <div class="grid grid-cols-2 gap-2.5 pt-2">
+          <button type="button" onclick="closeLogoutModal()" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-xs">
+            Batal
+          </button>
+          <button type="button" onclick="confirmLogout()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition text-xs shadow-md shadow-rose-500/20 flex items-center justify-center gap-1.5">
+            <i class="ph-bold ph-check"></i> Ya, Keluar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. MAIN APPLICATION (AUTHENTICATED) ==================== -->
   <div id="appContainer" class="flex-1 flex flex-col">
     
     <!-- TOP NAVBAR -->
@@ -170,8 +200,8 @@
             <span>Ajukan Post</span>
           </button>
 
-          <!-- Logout Button -->
-          <button onclick="handleLogout()" title="Keluar dari Akun" class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition">
+          <!-- Logout Button with Professional Dialog Trigger -->
+          <button onclick="openLogoutModal()" title="Keluar dari Akun" class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition">
             <i class="ph-bold ph-sign-out text-base"></i>
           </button>
         </div>
@@ -263,14 +293,17 @@
         </div>
       </section>
 
-      <!-- VIEW 2: CALENDAR -->
+      <!-- VIEW 2: CALENDAR (DYNAMIC SUPABASE SYNC) -->
       <section id="view-calendar" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
           <div>
-            <h2 class="text-lg font-bold text-slate-900">Jadwal Kalender Konten</h2>
-            <p class="text-xs text-slate-500">Distribusi postingan terjadwal & live sepanjang bulan</p>
+            <h2 class="text-lg font-bold text-slate-900">Jadwal Kalender Konten Terpadu</h2>
+            <p class="text-xs text-slate-500">Distribusi postingan terjadwal & live sepanjang bulan (sinkron otomatis dari database)</p>
           </div>
-          <span class="text-xs font-semibold px-3 py-1 bg-slate-100 rounded-lg text-slate-600">September 2026</span>
+          <span class="text-xs font-semibold px-3 py-1 bg-slate-100 rounded-lg text-slate-600">Bulan Berjalan</span>
+        </div>
+        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
+          <span>MIN</span><span>SEN</span><span>SEL</span><span>RAB</span><span>KAM</span><span>JUM</span><span>SAB</span>
         </div>
         <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center"></div>
       </section>
@@ -441,7 +474,7 @@
     </div>
   </div>
 
-  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW (INTERACTIVE FORM) -->
+  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -564,6 +597,12 @@
     let currentRole = 'ADMIN';
     let activePostId = null;
 
+    let currentBrand = {
+      handle: '@kcmamuju_244',
+      name: 'BTN KC Mamuju',
+      bio: 'Official Social Media Portal. Informasi promo perumahan dan layanan operasional.'
+    };
+
     let teamUsers = [
       { id: 'USR-01', name: 'Dimas Admin', email: 'dimas@postflow.local', role: 'ADMIN', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', status: 'Aktif' },
       { id: 'USR-02', name: 'Bambang Reviewer', email: 'bambang@postflow.local', role: 'REVIEWER', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', status: 'Aktif' },
@@ -597,11 +636,8 @@
         });
 
         const result = await res.json();
-        if (!res.ok) {
-          throw new Error(result.error || 'Login gagal.');
-        }
+        if (!res.ok) throw new Error(result.error || 'Login gagal.');
 
-        // Simpan sesi login
         currentUser = result.user;
         localStorage.setItem('postflow_session_user', JSON.stringify(currentUser));
         localStorage.setItem('postflow_session_token', result.token);
@@ -616,16 +652,28 @@
       }
     }
 
-    function handleLogout() {
-      if (confirm('Apakah Anda yakin ingin keluar dari akun?')) {
-        localStorage.removeItem('postflow_session_user');
-        localStorage.removeItem('postflow_session_token');
-        currentUser = null;
-        document.getElementById('loginScreen').classList.remove('hidden');
-      }
+    function openLogoutModal() {
+      if (!currentUser) return;
+      document.getElementById('logoutModalName').textContent = currentUser.name || 'Petugas';
+      document.getElementById('logoutModalEmail').textContent = currentUser.email || '-';
+      document.getElementById('logoutModalAvatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
+      document.getElementById('logoutModal').classList.remove('hidden');
+    }
+
+    function closeLogoutModal() {
+      document.getElementById('logoutModal').classList.add('hidden');
+    }
+
+    function confirmLogout() {
+      closeLogoutModal();
+      localStorage.removeItem('postflow_session_user');
+      localStorage.removeItem('postflow_session_token');
+      currentUser = null;
+      document.getElementById('loginScreen').classList.remove('hidden');
     }
 
     function checkExistingSession() {
+      loadBrandSettings();
       const savedUser = localStorage.getItem('postflow_session_user');
       const savedToken = localStorage.getItem('postflow_session_token');
 
@@ -652,7 +700,6 @@
       applyRolePermissions();
       fetchPostsFromApi();
       fetchTeamFromApi();
-      renderCalendar();
       renderFeedPreview();
     }
 
@@ -730,7 +777,7 @@
         teamUsers = teamUsers.filter(u => u.id !== userId);
         renderTeamTable();
         try {
-          await fetch('/api/users', {
+          await fetch(`/api/users?id=${userId}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: userId })
@@ -846,14 +893,18 @@
         const data = await res.json();
         
         if (Array.isArray(data)) {
-          posts = data;
+          // Normalisasi status database lama ('in_review' -> 'review')
+          posts = data.map(p => ({
+            ...p,
+            status: (p.status === 'in_review') ? 'review' : (p.status || 'draft')
+          }));
           statusBadge.textContent = 'Supabase Terhubung (Live)';
           renderKanban();
           renderCalendar();
           renderFeedPreview();
         }
       } catch (err) {
-        console.warn('Fallback data:', err.message);
+        console.warn('Fallback data posts:', err.message);
         statusBadge.textContent = 'Supabase Offline (Lokal)';
       }
     }
@@ -975,8 +1026,8 @@
       const counts = { draft: 0, review: 0, revision: 0, published: 0 };
 
       posts.forEach(post => {
-        const status = post.status || 'draft';
-        if (counts[status] !== undefined) counts[status]++;
+        const rawStatus = (post.status === 'in_review') ? 'review' : (post.status || 'draft');
+        if (counts[rawStatus] !== undefined) counts[rawStatus]++;
 
         const card = document.createElement('div');
         card.className = 'bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-sm hover:shadow transition cursor-pointer space-y-2.5';
@@ -984,7 +1035,7 @@
 
         card.innerHTML = `
           <div class="flex gap-2.5">
-            <img src="${post.media_url}" class="w-12 h-12 rounded-lg object-cover bg-slate-100 flex-shrink-0" />
+            <img src="${post.media_url}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" class="w-12 h-12 rounded-lg object-cover bg-slate-100 flex-shrink-0" />
             <div class="overflow-hidden">
               <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase tracking-wider">${post.type || 'FEED'}</span>
               <h4 class="font-bold text-xs text-slate-900 truncate mt-1">${post.title}</h4>
@@ -1003,7 +1054,7 @@
           </div>
         `;
 
-        if (cols[status]) cols[status].appendChild(card);
+        if (cols[rawStatus]) cols[rawStatus].appendChild(card);
       });
 
       document.getElementById('count-draft').textContent = counts.draft;
@@ -1019,7 +1070,7 @@
 
       document.getElementById('detailModalTitle').textContent = post.title;
       document.getElementById('detailMediaImg').src = post.media_url;
-      document.getElementById('detailCaption').textContent = post.caption;
+      document.getElementById('detailCaption').textContent = post.caption || '(Tidak ada caption)';
       document.getElementById('detailAuthorText').textContent = `Dibuat oleh: ${post.author || 'Creator'}`;
 
       const badge = document.getElementById('detailStatusBadge');
@@ -1048,6 +1099,7 @@
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
+      // --- LOGIKA AKSI WORKFLOW SESUAI RBAC ---
       if (post.status === 'draft') {
         if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
@@ -1077,6 +1129,13 @@
         } else {
           actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu perbaikan materi dari Creator.</span>`;
         }
+      } else if (post.status === 'published') {
+        actions.innerHTML = `
+          <div class="w-full p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-center font-bold flex items-center justify-center gap-2">
+            <i class="ph-bold ph-check-circle text-base text-emerald-600"></i>
+            <span>Konten ini telah LIVE dan terbit di Media Sosial (@${currentBrand.handle.replace('@','')})</span>
+          </div>
+        `;
       }
 
       document.getElementById('detailModal').classList.remove('hidden');
@@ -1088,7 +1147,12 @@
     }
     function openPostModal() { document.getElementById('postModal').classList.remove('hidden'); }
     function closePostModal() { document.getElementById('postModal').classList.add('hidden'); }
-    function openBrandSettingsModal() { document.getElementById('brandModal').classList.remove('hidden'); }
+    function openBrandSettingsModal() {
+      document.getElementById('settingBrandHandle').value = currentBrand.handle;
+      document.getElementById('settingBrandName').value = currentBrand.name;
+      document.getElementById('settingBrandBio').value = currentBrand.bio;
+      document.getElementById('brandModal').classList.remove('hidden');
+    }
     function closeBrandModal() { document.getElementById('brandModal').classList.add('hidden'); }
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
@@ -1113,19 +1177,41 @@
         }
       });
       if (tabId === 'users') renderTeamTable();
+      if (tabId === 'calendar') renderCalendar();
+      if (tabId === 'preview') renderFeedPreview();
     }
 
-    // 7. KALENDER & PREVIEW
+    // 7. KALENDER DINAMIS (SINKRON DARI DATABASE SUPABASE)
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
       grid.innerHTML = '';
-      for (let i = 1; i <= 30; i++) {
+
+      for (let i = 1; i <= 31; i++) {
         const cell = document.createElement('div');
-        cell.className = 'h-16 border border-slate-100 rounded-lg p-1 text-left relative bg-slate-50/50';
+        cell.className = 'min-h-20 border border-slate-100 rounded-xl p-1.5 text-left relative bg-slate-50/60 flex flex-col justify-between hover:border-rose-200 transition';
         cell.innerHTML = `<span class="text-[10px] font-bold text-slate-400">${i}</span>`;
-        if (i === 3 || i === 15) {
-          cell.innerHTML += `<div class="mt-1 p-1 bg-rose-500 text-white rounded text-[8px] font-bold truncate">Post Live</div>`;
+
+        // Cari postingan yang tanggalnya cocok dengan hari ke-i
+        const matchingPosts = posts.filter(p => {
+          const dateStr = p.scheduled_at || p.created_at;
+          if (!dateStr) return false;
+          const d = new Date(dateStr);
+          return !isNaN(d.getDate()) && d.getDate() === i;
+        });
+
+        if (matchingPosts.length > 0) {
+          const postDiv = document.createElement('div');
+          postDiv.className = 'space-y-1 mt-1';
+          matchingPosts.slice(0, 2).forEach(mp => {
+            const isLive = mp.status === 'published';
+            postDiv.innerHTML += `
+              <div onclick="openDetailModal('${mp.id}')" class="p-1 rounded text-[8px] font-bold truncate cursor-pointer shadow-2xs ${isLive ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}">
+                ${mp.title}
+              </div>
+            `;
+          });
+          cell.appendChild(postDiv);
         }
         grid.appendChild(cell);
       }
@@ -1139,19 +1225,38 @@
       posts.forEach(p => {
         const img = document.createElement('img');
         img.src = p.media_url;
+        img.onerror = () => { img.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'; };
         img.className = 'w-full h-28 object-cover cursor-pointer hover:opacity-90';
+        img.onclick = () => openDetailModal(p.id);
         cont.appendChild(img);
       });
     }
 
+    // PERSISTENSI PENGATURAN PROFIL BRAND
+    function loadBrandSettings() {
+      const saved = localStorage.getItem('postflow_brand_settings');
+      if (saved) {
+        try {
+          currentBrand = JSON.parse(saved);
+        } catch (e) {}
+      }
+      applyBrandToUI();
+    }
+
     function saveBrandSettings() {
-      const handle = document.getElementById('settingBrandHandle').value;
-      const name = document.getElementById('settingBrandName').value;
-      const bio = document.getElementById('settingBrandBio').value;
-      document.getElementById('currentBrandHandle').textContent = handle;
-      document.getElementById('previewBrandName').textContent = name;
-      document.getElementById('previewBrandBio').textContent = bio;
+      currentBrand.handle = document.getElementById('settingBrandHandle').value.trim();
+      currentBrand.name = document.getElementById('settingBrandName').value.trim();
+      currentBrand.bio = document.getElementById('settingBrandBio').value.trim();
+
+      localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
+      applyBrandToUI();
       closeBrandModal();
+    }
+
+    function applyBrandToUI() {
+      document.getElementById('currentBrandHandle').textContent = currentBrand.handle;
+      document.getElementById('previewBrandName').textContent = currentBrand.name;
+      document.getElementById('previewBrandBio').textContent = currentBrand.bio;
     }
 
     function saveApiSettings() {
@@ -1175,7 +1280,7 @@
       switchTab('board');
     }
 
-    // INITIALIZATION: Periksa apakah sudah ada sesi login aktif
+    // INITIALIZATION: Periksa sesi login & sinkron database
     checkExistingSession();
   </script>
 </body>
