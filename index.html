@@ -277,7 +277,7 @@
 
   </main>
 
-  <!-- MODAL: FORM ANGGOTA TIM (4 ROLES) -->
+  <!-- MODAL: FORM ANGGOTA TIM -->
   <div id="userModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -357,7 +357,7 @@
     </div>
   </div>
 
-  <!-- MODAL: DETAIL & APPROVAL POST -->
+  <!-- MODAL: DETAIL, APPROVAL & FEEDBACK REVISI INTERAKTIF -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -365,6 +365,8 @@
         <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <div class="p-6 space-y-4 text-xs">
+        
+        <!-- Media & Info -->
         <div class="flex gap-4">
           <img id="detailMediaImg" src="" class="w-32 h-32 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0" />
           <div class="space-y-2 flex-1">
@@ -373,6 +375,23 @@
             <p class="text-[11px] text-slate-400" id="detailAuthorText">Penulis: -</p>
           </div>
         </div>
+
+        <!-- REVISION FEEDBACK BOX (Muncul jika ada revisi) -->
+        <div id="revisionFeedbackContainer" class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5 hidden">
+          <div class="flex items-center gap-1.5 text-rose-800 font-bold">
+            <i class="ph-bold ph-warning-circle text-sm"></i>
+            <span>Catatan Revisi dari Reviewer / Klien:</span>
+          </div>
+          <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
+        </div>
+
+        <!-- INPUT CATATAN REVISI KHUSUS APPROVER -->
+        <div id="revisionInputContainer" class="space-y-1.5 hidden">
+          <label class="block font-bold text-slate-700">Tulis Catatan / Poin Revisi (Sebelum Minta Revisi):</label>
+          <textarea id="revisionNotesInput" rows="2" class="w-full p-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30" placeholder="Contoh: Typo pada caption baris 2, tolong resolusi gambar diperjelas..."></textarea>
+        </div>
+
+        <!-- ACTION BUTTONS -->
         <div id="approvalActionContainer" class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-2"></div>
       </div>
     </div>
@@ -626,10 +645,10 @@
         caption: document.getElementById('postCaptionInput').value,
         status: 'draft',
         author: activeUser.name,
+        revision_notes: '',
         platform: 'instagram'
       };
 
-      // Optimistic UI Update
       posts.unshift(newPost);
       renderKanban();
       renderCalendar();
@@ -637,7 +656,6 @@
       closePostModal();
       document.getElementById('newPostForm').reset();
 
-      // Eksekusi POST ke Backend Supabase
       try {
         const res = await fetch('/api/posts', {
           method: 'POST',
@@ -653,25 +671,41 @@
       }
     }
 
-    async function updatePostStatus(postId, newStatus) {
+    // UPDATE STATUS DENGAN FITUR CATATAN REVISI
+    async function updatePostStatus(postId, newStatus, revisionNotes = null) {
       const p = posts.find(item => item.id === postId);
       if (p) {
         p.status = newStatus;
+        if (revisionNotes !== null) {
+          p.revision_notes = revisionNotes;
+        }
+
         renderKanban();
         renderCalendar();
         renderFeedPreview();
         closeDetailModal();
 
         try {
+          const payload = { id: postId, status: newStatus };
+          if (revisionNotes !== null) payload.revision_notes = revisionNotes;
+
           await fetch('/api/posts', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: postId, status: newStatus })
+            body: JSON.stringify(payload)
           });
         } catch (err) {
           console.error('Gagal update status di Supabase:', err);
         }
       }
+    }
+
+    function handleRequestRevision(postId) {
+      const notes = document.getElementById('revisionNotesInput').value.trim();
+      if (!notes) {
+        return alert('Harap tulis poin catatan revisi terlebih dahulu agar Creator mengetahui bagian yang harus diperbaiki.');
+      }
+      updatePostStatus(postId, 'revision', notes);
     }
 
     // 4. KANBAN & APPROVAL WORKFLOW
@@ -703,6 +737,12 @@
               <p class="text-[11px] text-slate-500 truncate">${post.caption}</p>
             </div>
           </div>
+          ${post.status === 'revision' && post.revision_notes ? `
+            <div class="p-1.5 bg-rose-50 border border-rose-100 rounded-md text-[10px] text-rose-700 truncate flex items-center gap-1">
+              <i class="ph-bold ph-note-pencil"></i>
+              <span class="truncate">Revisi: ${post.revision_notes}</span>
+            </div>
+          ` : ''}
           <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-50 pt-2">
             <span>${post.author ? post.author.split(' ')[0] : 'Creator'}</span>
             <span class="text-rose-600 font-semibold flex items-center gap-1">Detail <i class="ph-bold ph-caret-right"></i></span>
@@ -734,21 +774,37 @@
          post.status === 'review' ? 'bg-amber-100 text-amber-800' :
          post.status === 'revision' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-800');
 
+      // Tampilkan box catatan revisi jika ada
+      const feedbackBox = document.getElementById('revisionFeedbackContainer');
+      const feedbackText = document.getElementById('revisionFeedbackText');
+      if (post.revision_notes) {
+        feedbackBox.classList.remove('hidden');
+        feedbackText.textContent = post.revision_notes;
+      } else {
+        feedbackBox.classList.add('hidden');
+      }
+
+      // Input catatan revisi (hanya muncul di status 'review' bagi peninjau)
+      const inputContainer = document.getElementById('revisionInputContainer');
+      document.getElementById('revisionNotesInput').value = '';
+      inputContainer.classList.add('hidden');
+
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
-      // Hak Akses Persetujuan Adaptif untuk 4 Peran
+      // LOGIKA AKSI WORKFLOW ADAPTIF
       if (post.status === 'draft') {
         actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold">Ajukan untuk Review</button>`;
       } else if (post.status === 'review') {
         if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
-          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'revision')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Revisi</button>`;
+          inputContainer.classList.remove('hidden');
+          actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Revisi</button>`;
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold">Setujui & Publikasikan</button>`;
         } else {
           actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu persetujuan Reviewer / Admin / Client.</span>`;
         }
       } else if (post.status === 'revision') {
-        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 text-white rounded-xl font-bold">Kirim Ulang Revisi</button>`;
+        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold">Kirim Ulang Hasil Revisi</button>`;
       }
 
       document.getElementById('detailModal').classList.remove('hidden');
