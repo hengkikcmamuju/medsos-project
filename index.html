@@ -84,7 +84,7 @@
 
       <!-- Profile & Actions -->
       <div class="flex items-center gap-2">
-        <button onclick="openApiSettingsModal()" title="Pengaturan Integrasi Token API" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+        <button id="btnApiSettings" onclick="openApiSettingsModal()" title="Pengaturan Integrasi Token API" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
           <i class="ph-bold ph-plug text-indigo-500 text-sm"></i>
           <span class="hidden sm:inline">Integrasi API</span>
         </button>
@@ -97,8 +97,8 @@
           </select>
         </div>
 
-        <!-- Add Post Button -->
-        <button onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95">
+        <!-- Add Post Button (Creator & Admin only) -->
+        <button id="btnAddPost" onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95">
           <i class="ph-bold ph-plus text-sm"></i>
           <span>Ajukan Post</span>
         </button>
@@ -119,9 +119,14 @@
           <span>Akun Aktif:</span>
           <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200" id="currentBrandHandle">@kcmamuju_244</span>
         </div>
+        <span class="text-slate-300">|</span>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <span>Otoritas:</span>
+          <span class="font-bold px-2 py-0.5 rounded text-[10px]" id="currentRoleBadge">ADMIN</span>
+        </div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="openBrandSettingsModal()" class="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
+        <button id="btnBrandSettings" onclick="openBrandSettingsModal()" class="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
           <i class="ph-bold ph-pencil-simple"></i> Ubah Profil Akun
         </button>
       </div>
@@ -248,7 +253,7 @@
       </div>
     </section>
 
-    <!-- VIEW 5: TIM & RBAC (4 ROLES FULL CRUD) -->
+    <!-- VIEW 5: TIM & RBAC (HANYA ADMIN) -->
     <section id="view-users" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 gap-3">
         <div>
@@ -376,7 +381,7 @@
           </div>
         </div>
 
-        <!-- REVISION FEEDBACK BOX (Peringatan Catatan Revisi) -->
+        <!-- REVISION FEEDBACK BOX -->
         <div id="revisionFeedbackContainer" class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5 hidden">
           <div class="flex items-center gap-1.5 text-rose-800 font-bold">
             <i class="ph-bold ph-warning-circle text-sm"></i>
@@ -385,15 +390,19 @@
           <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
         </div>
 
-        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator Upload Ulang & Edit Teks) -->
+        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator & Admin) -->
         <div id="revisionEditFormContainer" class="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 hidden">
           <div class="flex items-center gap-1.5 text-amber-900 font-bold border-b border-amber-200/60 pb-2">
             <i class="ph-bold ph-pencil-simple-line text-sm text-amber-600"></i>
-            <span>Formulir Perbaikan Materi (Creator)</span>
+            <span>Formulir Perbaikan Materi</span>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Judul Konten:</label>
+            <input type="text" id="editTitleInput" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Ganti Tautan / URL Media Banner Baru:</label>
-            <input type="url" id="editMediaUrlInput" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500" placeholder="https://..." />
+            <input type="url" id="editMediaUrlInput" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500" />
           </div>
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Perbaiki Teks Caption & Hashtag:</label>
@@ -401,7 +410,7 @@
           </div>
         </div>
 
-        <!-- INPUT CATATAN REVISI KHUSUS PENINJAU (Reviewer / Client / Admin) -->
+        <!-- INPUT CATATAN REVISI KHUSUS PENINJAU -->
         <div id="revisionInputContainer" class="space-y-1.5 hidden">
           <label class="block font-bold text-slate-700">Tulis Poin Catatan Revisi (Sebelum Minta Revisi):</label>
           <textarea id="revisionNotesInput" rows="2" class="w-full p-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30" placeholder="Contoh: Typo pada kalimat pembuka, tolong gambar diperjelas..."></textarea>
@@ -475,6 +484,7 @@
     let posts = [];
     let currentRole = 'ADMIN';
     let currentUserId = 'USR-01';
+    let activePostId = null;
 
     // State 4 Peran Tim
     const DEFAULT_USERS = [
@@ -492,7 +502,56 @@
       renderUserSelector();
     }
 
-    // 2. MANAJEMEN TIM (CRUD & 4 ROLES)
+    // 2. KONTROL HAK AKSES (RBAC PERMISSIONS)
+    function applyRolePermissions() {
+      const btnAddPost = document.getElementById('btnAddPost');
+      const tabUsers = document.getElementById('tab-users');
+      const btnApi = document.getElementById('btnApiSettings');
+      const btnBrand = document.getElementById('btnBrandSettings');
+      const roleBadge = document.getElementById('currentRoleBadge');
+
+      // Update badge di banner
+      if (roleBadge) {
+        roleBadge.textContent = currentRole;
+        roleBadge.className = 'font-bold px-2 py-0.5 rounded text-[10px] ' +
+          (currentRole === 'ADMIN' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+           currentRole === 'REVIEWER' ? 'bg-teal-100 text-teal-800 border border-teal-200' :
+           currentRole === 'CREATOR' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+           'bg-amber-100 text-amber-800 border border-amber-200');
+      }
+
+      // Tombol Buat Post: Hanya CREATOR dan ADMIN
+      if (btnAddPost) {
+        btnAddPost.style.display = (currentRole === 'CREATOR' || currentRole === 'ADMIN') ? 'flex' : 'none';
+      }
+
+      // Tab Tim & RBAC: Hanya ADMIN
+      if (tabUsers) {
+        tabUsers.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
+        const viewUsers = document.getElementById('view-users');
+        if (currentRole !== 'ADMIN' && viewUsers && !viewUsers.classList.contains('hidden')) {
+          switchTab('board');
+        }
+      }
+
+      // Tombol API: Hanya ADMIN
+      if (btnApi) {
+        btnApi.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
+      }
+
+      // Tombol Ubah Profil Brand: Hanya ADMIN
+      if (btnBrand) {
+        btnBrand.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
+      }
+
+      // Re-render kanban & modal jika sedang dibuka
+      renderKanban();
+      if (activePostId) {
+        openDetailModal(activePostId);
+      }
+    }
+
+    // 3. MANAJEMEN TIM (CRUD)
     function renderTeamTable() {
       const tbody = document.getElementById('userTableBody');
       if (!tbody) return;
@@ -549,6 +608,7 @@
         document.getElementById('userAvatar').src = activeUser.avatar;
         currentRole = activeUser.role;
       }
+      applyRolePermissions();
     }
 
     function changeCurrentUser(userId) {
@@ -558,7 +618,7 @@
         document.getElementById('userAvatar').src = activeUser.avatar;
         currentRole = activeUser.role;
       }
-      renderKanban();
+      applyRolePermissions();
     }
 
     function openUserModal() {
@@ -625,7 +685,7 @@
       closeUserModal();
     }
 
-    // 3. SINKRONISASI POSTINGAN KE SUPABASE
+    // 4. SINKRONISASI POSTINGAN KE SUPABASE
     async function fetchPostsFromApi() {
       const statusBadge = document.getElementById('dbStatusBadge');
       try {
@@ -661,6 +721,7 @@
         caption: document.getElementById('postCaptionInput').value,
         status: 'draft',
         author: activeUser.name,
+        role: currentRole,
         revision_notes: '',
         platform: 'instagram'
       };
@@ -687,7 +748,7 @@
       }
     }
 
-    // UPDATE STATUS BIASA / APPROVE
+    // UPDATE STATUS BIASA / APPROVE (MENYERTAKAN PERAN/ROLE)
     async function updatePostStatus(postId, newStatus, revisionNotes = null) {
       const p = posts.find(item => item.id === postId);
       if (p) {
@@ -700,7 +761,7 @@
         closeDetailModal();
 
         try {
-          const payload = { id: postId, status: newStatus };
+          const payload = { id: postId, status: newStatus, role: currentRole };
           if (revisionNotes !== null) payload.revision_notes = revisionNotes;
 
           await fetch('/api/posts', {
@@ -714,7 +775,7 @@
       }
     }
 
-    // REQUEST REVISI OLEH REVIEWER
+    // REQUEST REVISI (REVIEWER / CLIENT / ADMIN)
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
       if (!notes) {
@@ -723,8 +784,9 @@
       updatePostStatus(postId, 'revision', notes);
     }
 
-    // SUBMIT ULANG REVISI OLEH CREATOR BESERTA PERBAIKAN MATERI
+    // SUBMIT ULANG REVISI (CREATOR / ADMIN)
     async function handleResubmitRevision(postId) {
+      const updatedTitle = document.getElementById('editTitleInput').value.trim();
       const updatedMedia = document.getElementById('editMediaUrlInput').value.trim();
       const updatedCaption = document.getElementById('editCaptionInput').value.trim();
 
@@ -734,7 +796,7 @@
 
       const p = posts.find(item => item.id === postId);
       if (p) {
-        // Update di state frontend
+        p.title = updatedTitle || p.title;
         p.media_url = updatedMedia;
         p.caption = updatedCaption;
         p.status = 'review'; // Pindah kembali ke kolom review
@@ -744,7 +806,6 @@
         renderFeedPreview();
         closeDetailModal();
 
-        // Update di database Supabase
         try {
           await fetch('/api/posts', {
             method: 'PUT',
@@ -752,6 +813,8 @@
             body: JSON.stringify({
               id: postId,
               status: 'review',
+              role: currentRole,
+              title: p.title,
               media_url: updatedMedia,
               caption: updatedCaption
             })
@@ -762,7 +825,7 @@
       }
     }
 
-    // 4. KANBAN & APPROVAL WORKFLOW
+    // 5. KANBAN & WORKFLOW DETAIL
     function renderKanban() {
       const cols = {
         draft: document.getElementById('column-draft'),
@@ -813,6 +876,7 @@
     }
 
     function openDetailModal(postId) {
+      activePostId = postId;
       const post = posts.find(p => p.id === postId);
       if (!post) return;
 
@@ -838,46 +902,57 @@
         feedbackBox.classList.add('hidden');
       }
 
-      // Input catatan revisi (untuk peninjau saat review)
+      // Input catatan revisi (khusus peninjau saat konten butuh approval)
       const inputContainer = document.getElementById('revisionInputContainer');
       document.getElementById('revisionNotesInput').value = '';
       inputContainer.classList.add('hidden');
 
-      // Form upload & edit perbaikan (untuk creator saat revisi)
+      // Form edit perbaikan materi revisi
       const editFormContainer = document.getElementById('revisionEditFormContainer');
       editFormContainer.classList.add('hidden');
 
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
-      // WORKFLOW ADAPTIF BERDASARKAN STATUS & ROLE
+      // --- LOGIKA AKSI WORKFLOW SESUAI RBAC ---
       if (post.status === 'draft') {
-        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
+        if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
+          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
+        } else {
+          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Konten draf internal (menunggu diajukan oleh Creator).</span>`;
+        }
       } else if (post.status === 'review') {
         if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
           inputContainer.classList.remove('hidden');
           actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Catatan Revisi</button>`;
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-check"></i> Setujui & Publikasikan</button>`;
         } else {
-          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu peninjauan dari Tim QC / Reviewer / Client.</span>`;
+          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu peninjauan dari Reviewer / Client / Admin.</span>`;
         }
       } else if (post.status === 'revision') {
-        // Tampilkan form edit perbaikan materi
-        editFormContainer.classList.remove('hidden');
-        document.getElementById('editMediaUrlInput').value = post.media_url;
-        document.getElementById('editCaptionInput').value = post.caption;
+        if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
+          editFormContainer.classList.remove('hidden');
+          document.getElementById('editTitleInput').value = post.title;
+          document.getElementById('editMediaUrlInput').value = post.media_url;
+          document.getElementById('editCaptionInput').value = post.caption;
 
-        actions.innerHTML += `
-          <button onclick="handleResubmitRevision('${post.id}')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl font-bold shadow-md shadow-amber-500/20 flex items-center gap-1.5">
-            <i class="ph-bold ph-paper-plane-tilt"></i> Simpan Materi & Kirim Ulang ke Reviewer
-          </button>
-        `;
+          actions.innerHTML += `
+            <button onclick="handleResubmitRevision('${post.id}')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl font-bold shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+              <i class="ph-bold ph-paper-plane-tilt"></i> Simpan Materi & Kirim Ulang ke Reviewer
+            </button>
+          `;
+        } else {
+          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu perbaikan dari Creator.</span>`;
+        }
       }
 
       document.getElementById('detailModal').classList.remove('hidden');
     }
 
-    function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
+    function closeDetailModal() {
+      activePostId = null;
+      document.getElementById('detailModal').classList.add('hidden');
+    }
     function openPostModal() { document.getElementById('postModal').classList.remove('hidden'); }
     function closePostModal() { document.getElementById('postModal').classList.add('hidden'); }
     function openBrandSettingsModal() { document.getElementById('brandModal').classList.remove('hidden'); }
@@ -885,8 +960,13 @@
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
-    // 5. NAVIGATION TABS
+    // 6. NAVIGATION TABS (GUARD CLAUSE RBAC)
     function switchTab(tabId) {
+      if (tabId === 'users' && currentRole !== 'ADMIN') {
+        alert('Akses Ditolak: Menu Tim & RBAC hanya dapat diakses oleh Administrator.');
+        return;
+      }
+
       ['board', 'calendar', 'preview', 'ai', 'users'].forEach(t => {
         const view = document.getElementById('view-' + t);
         const btn = document.getElementById('tab-' + t);
@@ -902,7 +982,7 @@
       if (tabId === 'users') renderTeamTable();
     }
 
-    // 6. CALENDAR & FEED PREVIEW
+    // 7. KALENDER & FEED PREVIEW
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
