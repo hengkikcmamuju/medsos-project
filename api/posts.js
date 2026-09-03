@@ -11,7 +11,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // Parse Body dengan Aman
   let body = req.body;
   if (typeof body === 'string') {
     try {
@@ -65,6 +63,7 @@ export default async function handler(req, res) {
         status: body.status || 'draft',
         author: body.author || 'Tim Kreatif',
         scheduled_at: validScheduledAt,
+        revision_notes: body.revision_notes || '',
         metrics: { likes: 0, reach: 0, shares: 0, comments: 0 },
         created_at: new Date().toISOString()
       };
@@ -82,12 +81,14 @@ export default async function handler(req, res) {
       return res.status(201).json(data && data[0] ? data[0] : newPost);
     }
 
-    // 3. PUT: Update Status / Approval
+    // 3. PUT: Update Status & Catatan Revisi
     if (req.method === 'PUT') {
-      const { id, status } = body;
+      const { id, status, revision_notes } = body;
       if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
 
-      const updates = { status };
+      const updates = {};
+      if (status !== undefined) updates.status = status;
+      if (revision_notes !== undefined) updates.revision_notes = revision_notes;
       if (status === 'published') {
         updates.published_at = new Date().toISOString();
       }
@@ -108,7 +109,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
-    console.error('Server execution error:', err);
+    console.error('Server error:', err);
     return res.status(500).json({ error: err.message || 'Internal Server Error' });
   }
 }
