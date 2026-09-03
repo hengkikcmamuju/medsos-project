@@ -93,11 +93,11 @@
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 py-1 px-2.5 rounded-xl text-xs">
           <img id="userAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-6 h-6 rounded-full object-cover border border-slate-300" alt="Avatar" />
           <select id="userRoleSelector" onchange="changeCurrentUser(this.value)" class="bg-transparent font-semibold text-slate-700 focus:outline-none cursor-pointer">
-            <!-- Populated Dynamically -->
+            <!-- Populated from Supabase API -->
           </select>
         </div>
 
-        <!-- Add Post Button (Creator & Admin only) -->
+        <!-- Add Post Button -->
         <button id="btnAddPost" onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95">
           <i class="ph-bold ph-plus text-sm"></i>
           <span>Ajukan Post</span>
@@ -257,8 +257,8 @@
     <section id="view-users" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 gap-3">
         <div>
-          <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC (4 Peran)</h2>
-          <p class="text-xs text-slate-500">Atur hak akses otorisasi untuk Admin, Reviewer, Creator, dan Client.</p>
+          <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC (Supabase Cloud)</h2>
+          <p class="text-xs text-slate-500">Kelola daftar anggota tim dan hak akses otorisasi yang tersimpan di cloud database.</p>
         </div>
         <button onclick="openUserModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
           <i class="ph-bold ph-user-plus text-sm"></i> Tambah Anggota
@@ -314,7 +314,7 @@
         </div>
         <div class="pt-2 flex justify-end gap-2">
           <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20">Simpan Anggota</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20">Simpan ke Supabase</button>
         </div>
       </form>
     </div>
@@ -486,7 +486,7 @@
     let currentUserId = 'USR-01';
     let activePostId = null;
 
-    // State 4 Peran Tim
+    // Fallback awal jika database tim masih kosong
     const DEFAULT_USERS = [
       { id: 'USR-01', name: 'Dimas Admin', email: 'dimas@postflow.local', role: 'ADMIN', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', status: 'Aktif' },
       { id: 'USR-02', name: 'Bambang Reviewer', email: 'bambang@postflow.local', role: 'REVIEWER', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', status: 'Aktif' },
@@ -494,15 +494,106 @@
       { id: 'USR-04', name: 'Rian Prakoso', email: 'rian@client.local', role: 'CLIENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', status: 'Aktif' }
     ];
 
-    let teamUsers = JSON.parse(localStorage.getItem('postflow_team_users')) || DEFAULT_USERS;
+    let teamUsers = [...DEFAULT_USERS];
 
-    function saveTeamState() {
-      localStorage.setItem('postflow_team_users', JSON.stringify(teamUsers));
-      renderTeamTable();
-      renderUserSelector();
+    // 2. SINKRONISASI TIM KE DATABASE SUPABASE VIA /api/users
+    async function fetchTeamFromApi() {
+      try {
+        const res = await fetch('/api/users');
+        if (!res.ok) throw new Error('Status: ' + res.status);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          teamUsers = data;
+        }
+      } catch (err) {
+        console.warn('Menggunakan fallback data tim lokal:', err.message);
+      } finally {
+        renderTeamTable();
+        renderUserSelector();
+        applyRolePermissions();
+      }
     }
 
-    // 2. KONTROL HAK AKSES (RBAC PERMISSIONS)
+    // SIMPAN / EDIT ANGGOTA TIM KE SUPABASE
+    async function handleSaveUser(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editUserId').value;
+      const name = document.getElementById('userNameInput').value.trim();
+      const email = document.getElementById('userEmailInput').value.trim();
+      const role = document.getElementById('userRoleInput').value;
+      const avatar = document.getElementById('userAvatarInput').value.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
+
+      if (editId) {
+        // Optimistic Update
+        const idx = teamUsers.findIndex(u => u.id === editId);
+        if (idx !== -1) {
+          teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
+        }
+        renderTeamTable();
+        renderUserSelector();
+        closeUserModal();
+
+        try {
+          await fetch('/api/users', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: editId, name, email, role, avatar })
+          });
+        } catch (err) {
+          console.error('Gagal update user ke Supabase:', err);
+        }
+      } else {
+        const newUser = {
+          id: 'USR-' + Date.now(),
+          name,
+          email,
+          role,
+          avatar,
+          status: 'Aktif'
+        };
+        teamUsers.push(newUser);
+        renderTeamTable();
+        renderUserSelector();
+        closeUserModal();
+
+        try {
+          await fetch('/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUser)
+          });
+        } catch (err) {
+          console.error('Gagal tambah user ke Supabase:', err);
+        }
+      }
+    }
+
+    // HAPUS ANGGOTA TIM DARI SUPABASE
+    async function deleteUser(userId) {
+      if (teamUsers.length <= 1) {
+        return alert('Minimal harus ada 1 anggota tim di dalam sistem.');
+      }
+      if (confirm('Yakin ingin menghapus anggota tim ini secara permanen dari Supabase?')) {
+        teamUsers = teamUsers.filter(u => u.id !== userId);
+        if (currentUserId === userId) {
+          currentUserId = teamUsers[0].id;
+        }
+        renderTeamTable();
+        renderUserSelector();
+
+        try {
+          await fetch('/api/users', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: userId })
+          });
+        } catch (err) {
+          console.error('Gagal hapus user di Supabase:', err);
+        }
+      }
+    }
+
+    // 3. KONTROL HAK AKSES (RBAC PERMISSIONS)
     function applyRolePermissions() {
       const btnAddPost = document.getElementById('btnAddPost');
       const tabUsers = document.getElementById('tab-users');
@@ -510,7 +601,6 @@
       const btnBrand = document.getElementById('btnBrandSettings');
       const roleBadge = document.getElementById('currentRoleBadge');
 
-      // Update badge di banner
       if (roleBadge) {
         roleBadge.textContent = currentRole;
         roleBadge.className = 'font-bold px-2 py-0.5 rounded text-[10px] ' +
@@ -520,12 +610,10 @@
            'bg-amber-100 text-amber-800 border border-amber-200');
       }
 
-      // Tombol Buat Post: Hanya CREATOR dan ADMIN
       if (btnAddPost) {
         btnAddPost.style.display = (currentRole === 'CREATOR' || currentRole === 'ADMIN') ? 'flex' : 'none';
       }
 
-      // Tab Tim & RBAC: Hanya ADMIN
       if (tabUsers) {
         tabUsers.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
         const viewUsers = document.getElementById('view-users');
@@ -534,24 +622,14 @@
         }
       }
 
-      // Tombol API: Hanya ADMIN
-      if (btnApi) {
-        btnApi.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
-      }
+      if (btnApi) btnApi.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
+      if (btnBrand) btnBrand.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
 
-      // Tombol Ubah Profil Brand: Hanya ADMIN
-      if (btnBrand) {
-        btnBrand.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
-      }
-
-      // Re-render kanban & modal jika sedang dibuka
       renderKanban();
-      if (activePostId) {
-        openDetailModal(activePostId);
-      }
+      if (activePostId) openDetailModal(activePostId);
     }
 
-    // 3. MANAJEMEN TIM (CRUD)
+    // 4. RENDER TABEL & SELECTOR TIM
     function renderTeamTable() {
       const tbody = document.getElementById('userTableBody');
       if (!tbody) return;
@@ -575,7 +653,7 @@
             <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${roleColor}">${user.role}</span>
           </td>
           <td class="py-3 px-4">
-            <span class="text-emerald-600 font-semibold flex items-center gap-1"><i class="ph-fill ph-circle text-[8px]"></i> ${user.status}</span>
+            <span class="text-emerald-600 font-semibold flex items-center gap-1"><i class="ph-fill ph-circle text-[8px]"></i> ${user.status || 'Aktif'}</span>
           </td>
           <td class="py-3 px-4 text-right">
             <button onclick="editUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-100 transition mr-1" title="Edit">
@@ -608,7 +686,6 @@
         document.getElementById('userAvatar').src = activeUser.avatar;
         currentRole = activeUser.role;
       }
-      applyRolePermissions();
     }
 
     function changeCurrentUser(userId) {
@@ -644,48 +721,7 @@
       document.getElementById('userModal').classList.remove('hidden');
     }
 
-    function deleteUser(userId) {
-      if (teamUsers.length <= 1) {
-        return alert('Minimal harus ada 1 anggota tim di dalam sistem.');
-      }
-      if (confirm('Yakin ingin menghapus anggota tim ini?')) {
-        teamUsers = teamUsers.filter(u => u.id !== userId);
-        if (currentUserId === userId) {
-          currentUserId = teamUsers[0].id;
-        }
-        saveTeamState();
-      }
-    }
-
-    function handleSaveUser(e) {
-      e.preventDefault();
-      const editId = document.getElementById('editUserId').value;
-      const name = document.getElementById('userNameInput').value;
-      const email = document.getElementById('userEmailInput').value;
-      const role = document.getElementById('userRoleInput').value;
-      const avatar = document.getElementById('userAvatarInput').value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
-
-      if (editId) {
-        const idx = teamUsers.findIndex(u => u.id === editId);
-        if (idx !== -1) {
-          teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
-        }
-      } else {
-        teamUsers.push({
-          id: 'USR-' + Date.now(),
-          name,
-          email,
-          role,
-          avatar,
-          status: 'Aktif'
-        });
-      }
-
-      saveTeamState();
-      closeUserModal();
-    }
-
-    // 4. SINKRONISASI POSTINGAN KE SUPABASE
+    // 5. SINKRONISASI POSTINGAN KE SUPABASE
     async function fetchPostsFromApi() {
       const statusBadge = document.getElementById('dbStatusBadge');
       try {
@@ -702,7 +738,7 @@
           renderFeedPreview();
         }
       } catch (err) {
-        console.warn('Fallback data:', err.message);
+        console.warn('Fallback data posts:', err.message);
         statusBadge.textContent = 'Supabase Offline (Lokal)';
       }
     }
@@ -748,7 +784,7 @@
       }
     }
 
-    // UPDATE STATUS BIASA / APPROVE (MENYERTAKAN PERAN/ROLE)
+    // UPDATE STATUS BIASA / APPROVE
     async function updatePostStatus(postId, newStatus, revisionNotes = null) {
       const p = posts.find(item => item.id === postId);
       if (p) {
@@ -775,16 +811,14 @@
       }
     }
 
-    // REQUEST REVISI (REVIEWER / CLIENT / ADMIN)
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
       if (!notes) {
-        return alert('Harap tulis poin catatan revisi terlebih dahulu agar Creator mengetahui bagian yang harus diperbaiki.');
+        return alert('Harap tulis poin catatan revisi terlebih dahulu.');
       }
       updatePostStatus(postId, 'revision', notes);
     }
 
-    // SUBMIT ULANG REVISI (CREATOR / ADMIN)
     async function handleResubmitRevision(postId) {
       const updatedTitle = document.getElementById('editTitleInput').value.trim();
       const updatedMedia = document.getElementById('editMediaUrlInput').value.trim();
@@ -799,7 +833,7 @@
         p.title = updatedTitle || p.title;
         p.media_url = updatedMedia;
         p.caption = updatedCaption;
-        p.status = 'review'; // Pindah kembali ke kolom review
+        p.status = 'review';
 
         renderKanban();
         renderCalendar();
@@ -825,7 +859,7 @@
       }
     }
 
-    // 5. KANBAN & WORKFLOW DETAIL
+    // 6. KANBAN & WORKFLOW DETAIL
     function renderKanban() {
       const cols = {
         draft: document.getElementById('column-draft'),
@@ -892,7 +926,6 @@
          post.status === 'review' ? 'bg-amber-100 text-amber-800' :
          post.status === 'revision' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-800');
 
-      // Feedback revisi box
       const feedbackBox = document.getElementById('revisionFeedbackContainer');
       const feedbackText = document.getElementById('revisionFeedbackText');
       if (post.revision_notes) {
@@ -902,19 +935,16 @@
         feedbackBox.classList.add('hidden');
       }
 
-      // Input catatan revisi (khusus peninjau saat konten butuh approval)
       const inputContainer = document.getElementById('revisionInputContainer');
       document.getElementById('revisionNotesInput').value = '';
       inputContainer.classList.add('hidden');
 
-      // Form edit perbaikan materi revisi
       const editFormContainer = document.getElementById('revisionEditFormContainer');
       editFormContainer.classList.add('hidden');
 
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
-      // --- LOGIKA AKSI WORKFLOW SESUAI RBAC ---
       if (post.status === 'draft') {
         if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
@@ -960,7 +990,7 @@
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
-    // 6. NAVIGATION TABS (GUARD CLAUSE RBAC)
+    // 7. NAVIGATION TABS
     function switchTab(tabId) {
       if (tabId === 'users' && currentRole !== 'ADMIN') {
         alert('Akses Ditolak: Menu Tim & RBAC hanya dapat diakses oleh Administrator.');
@@ -982,7 +1012,7 @@
       if (tabId === 'users') renderTeamTable();
     }
 
-    // 7. KALENDER & FEED PREVIEW
+    // 8. KALENDER & FEED PREVIEW
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
@@ -1042,9 +1072,8 @@
       switchTab('board');
     }
 
-    // INITIALIZATION
-    renderTeamTable();
-    renderUserSelector();
+    // INITIALIZATION (FETCH DARI SUPABASE CLOUD)
+    fetchTeamFromApi();
     fetchPostsFromApi();
     renderCalendar();
     renderFeedPreview();
