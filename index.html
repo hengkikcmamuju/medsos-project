@@ -43,9 +43,12 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-700">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-700 pb-16 md:pb-0">
 
-  <!-- ==================== 1. LOGIN OVERLAY (AUTH SCREEN) ==================== -->
+  <!-- Floating Toast Notifications -->
+  <div id="toastContainer" class="fixed bottom-20 md:bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- 1. LOGIN OVERLAY (AUTH SCREEN) -->
   <div id="loginScreen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       
@@ -67,7 +70,7 @@
           <label class="block font-bold text-slate-700 mb-1">Alamat Email Petugas</label>
           <div class="relative">
             <i class="ph-bold ph-envelope-simple absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-            <input type="email" id="loginEmail" required class="w-full pl-10 pr-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition" placeholder="nama@postflow.local" value="dimas@postflow.local" />
+            <input type="email" id="loginEmail" required class="w-full pl-10 pr-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition" placeholder="nama@instansi.com" autocomplete="email" />
           </div>
         </div>
 
@@ -75,37 +78,39 @@
           <label class="block font-bold text-slate-700 mb-1">Password / PIN Akses</label>
           <div class="relative">
             <i class="ph-bold ph-lock-key absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-            <input type="password" id="loginPassword" required class="w-full pl-10 pr-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition" placeholder="••••••" value="123456" />
-          </div>
-          <p class="text-[10px] text-slate-400 mt-1">Default PIN pengujian: <span class="font-mono font-bold text-slate-600">123456</span></p>
-        </div>
-
-        <div class="pt-2 border-t border-slate-100">
-          <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Login Cepat Peran:</span>
-          <div class="grid grid-cols-2 gap-1.5">
-            <button type="button" onclick="quickFill('dimas@postflow.local')" class="px-2 py-1.5 border border-slate-200 rounded-lg text-left hover:bg-slate-50 font-medium text-slate-600 truncate">
-              👑 Admin (Dimas)
-            </button>
-            <button type="button" onclick="quickFill('bambang@postflow.local')" class="px-2 py-1.5 border border-slate-200 rounded-lg text-left hover:bg-slate-50 font-medium text-slate-600 truncate">
-              🔍 Reviewer (Bambang)
-            </button>
-            <button type="button" onclick="quickFill('putri@postflow.local')" class="px-2 py-1.5 border border-slate-200 rounded-lg text-left hover:bg-slate-50 font-medium text-slate-600 truncate">
-              ✍️ Creator (Putri)
-            </button>
-            <button type="button" onclick="quickFill('rian@client.local')" class="px-2 py-1.5 border border-slate-200 rounded-lg text-left hover:bg-slate-50 font-medium text-slate-600 truncate">
-              🏢 Client (Rian)
-            </button>
+            <input type="password" id="loginPassword" required class="w-full pl-10 pr-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none transition" placeholder="Masukkan password atau PIN" autocomplete="current-password" />
           </div>
         </div>
 
-        <button type="submit" id="btnLoginSubmit" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold rounded-xl shadow-lg shadow-rose-500/25 transition active:scale-95 flex items-center justify-center gap-2 text-sm mt-4">
+        <button type="submit" id="btnLoginSubmit" class="w-full py-3 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold rounded-xl shadow-lg shadow-rose-500/25 transition active:scale-95 flex items-center justify-center gap-2 text-sm mt-4 cursor-pointer">
           <i class="ph-bold ph-sign-in"></i> Masuk Sekarang
         </button>
       </form>
     </div>
   </div>
 
-  <!-- ==================== MODAL KONFIRMASI LOGOUT PROFESIONAL ==================== -->
+  <!-- MODAL: KONFIRMASI AKSI UMUM -->
+  <div id="confirmActionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-6 text-center space-y-3">
+        <div id="confirmModalIconContainer" class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-2xl mx-auto shadow-sm">
+          <i id="confirmModalIcon" class="ph-bold ph-question"></i>
+        </div>
+        <h3 id="confirmModalTitle" class="font-extrabold text-base text-slate-900">Konfirmasi Aksi</h3>
+        <p id="confirmModalDesc" class="text-xs text-slate-500 leading-relaxed">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+        <div class="grid grid-cols-2 gap-2.5 pt-3">
+          <button type="button" onclick="closeConfirmModal()" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-xs cursor-pointer">
+            Batal
+          </button>
+          <button type="button" id="confirmModalOkBtn" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition text-xs shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+            Lanjutkan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: KONFIRMASI LOGOUT -->
   <div id="logoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
       <div class="p-6 text-center space-y-4">
@@ -127,10 +132,10 @@
           Semua draf dan aktivitas yang telah disimpan di Supabase tetap aman dan dapat diakses kembali saat Anda login.
         </p>
         <div class="grid grid-cols-2 gap-2.5 pt-2">
-          <button type="button" onclick="closeLogoutModal()" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-xs">
+          <button type="button" onclick="closeLogoutModal()" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-xs cursor-pointer">
             Batal
           </button>
-          <button type="button" onclick="confirmLogout()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition text-xs shadow-md shadow-rose-500/20 flex items-center justify-center gap-1.5">
+          <button type="button" onclick="confirmLogout()" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition text-xs shadow-md shadow-rose-500/20 flex items-center justify-center gap-1.5 cursor-pointer">
             <i class="ph-bold ph-check"></i> Ya, Keluar
           </button>
         </div>
@@ -138,7 +143,7 @@
     </div>
   </div>
 
-  <!-- ==================== 2. MAIN APPLICATION (AUTHENTICATED) ==================== -->
+  <!-- 2. MAIN APPLICATION (AUTHENTICATED) -->
   <div id="appContainer" class="flex-1 flex flex-col">
     
     <!-- TOP NAVBAR -->
@@ -159,28 +164,28 @@
           </div>
         </div>
 
-        <!-- Navigation Tabs -->
+        <!-- Desktop Navigation Tabs -->
         <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-sm font-medium text-slate-600">
-          <button id="tab-board" onclick="switchTab('board')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm">
+          <button id="tab-board" onclick="switchTab('board')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm cursor-pointer">
             <i class="ph-bold ph-kanban"></i> Board
           </button>
-          <button id="tab-calendar" onclick="switchTab('calendar')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <button id="tab-calendar" onclick="switchTab('calendar')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 cursor-pointer">
             <i class="ph-bold ph-calendar"></i> Kalender
           </button>
-          <button id="tab-preview" onclick="switchTab('preview')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <button id="tab-preview" onclick="switchTab('preview')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 cursor-pointer">
             <i class="ph-bold ph-device-mobile"></i> Feed Preview
           </button>
-          <button id="tab-ai" onclick="switchTab('ai')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <button id="tab-ai" onclick="switchTab('ai')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 cursor-pointer">
             <i class="ph-bold ph-magic-wand text-amber-500"></i> AI Studio
           </button>
-          <button id="tab-users" onclick="switchTab('users')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <button id="tab-users" onclick="switchTab('users')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 cursor-pointer">
             <i class="ph-bold ph-users-three text-indigo-500"></i> Tim & RBAC
           </button>
         </nav>
 
         <!-- Profile & Authenticated Controls -->
         <div class="flex items-center gap-2">
-          <button id="btnApiSettings" onclick="openApiSettingsModal()" title="Pengaturan Integrasi Token API" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+          <button id="btnApiSettings" onclick="openApiSettingsModal()" title="Pengaturan Integrasi Token API" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition cursor-pointer">
             <i class="ph-bold ph-plug text-indigo-500 text-sm"></i>
             <span class="hidden sm:inline">Integrasi API</span>
           </button>
@@ -195,13 +200,13 @@
           </div>
 
           <!-- Add Post Button (Creator & Admin only) -->
-          <button id="btnAddPost" onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95">
+          <button id="btnAddPost" onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95 cursor-pointer">
             <i class="ph-bold ph-plus text-sm"></i>
-            <span>Ajukan Post</span>
+            <span class="hidden sm:inline">Ajukan Post</span>
           </button>
 
-          <!-- Logout Button with Professional Dialog Trigger -->
-          <button onclick="openLogoutModal()" title="Keluar dari Akun" class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition">
+          <!-- Logout Button -->
+          <button onclick="openLogoutModal()" title="Keluar dari Akun" class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-400 transition cursor-pointer">
             <i class="ph-bold ph-sign-out text-base"></i>
           </button>
         </div>
@@ -228,7 +233,7 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button id="btnBrandSettings" onclick="openBrandSettingsModal()" class="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
+          <button id="btnBrandSettings" onclick="openBrandSettingsModal()" class="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1 cursor-pointer">
             <i class="ph-bold ph-pencil-simple"></i> Ubah Profil Akun
           </button>
         </div>
@@ -293,14 +298,14 @@
         </div>
       </section>
 
-      <!-- VIEW 2: CALENDAR (DYNAMIC SUPABASE SYNC) -->
+      <!-- VIEW 2: CALENDAR -->
       <section id="view-calendar" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-lg font-bold text-slate-900">Jadwal Kalender Konten Terpadu</h2>
             <p class="text-xs text-slate-500">Distribusi postingan terjadwal & live sepanjang bulan (sinkron otomatis dari database)</p>
           </div>
-          <span class="text-xs font-semibold px-3 py-1 bg-slate-100 rounded-lg text-slate-600">Bulan Berjalan</span>
+          <span id="calendarMonthLabel" class="text-xs font-semibold px-3 py-1 bg-slate-100 rounded-lg text-slate-600">Bulan Berjalan</span>
         </div>
         <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
           <span>MIN</span><span>SEN</span><span>SEL</span><span>RAB</span><span>KAM</span><span>JUM</span><span>SAB</span>
@@ -330,7 +335,7 @@
             <h4 class="font-bold text-sm text-slate-900" id="previewBrandName">BTN KC Mamuju</h4>
             <p class="text-xs text-slate-600 whitespace-pre-line" id="previewBrandBio">Official Social Media Portal. Informasi produk, promo perumahan, dan layanan operasional.</p>
           </div>
-          <div id="feedGridContainer" class="grid grid-cols-3 gap-0.5 bg-slate-100"></div>
+          <div id="feedGridContainer" class="grid grid-cols-3 gap-0.5 bg-slate-100 min-h-[220px]"></div>
         </div>
       </section>
 
@@ -346,13 +351,13 @@
           <label class="block text-xs font-semibold text-slate-700 mb-1">Topik atau Ide Pokok Konten</label>
           <textarea id="aiPromptInput" rows="3" class="w-full text-xs p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Contoh: Promo KPR bunga ringan edisi payday bank BTN..."></textarea>
         </div>
-        <button onclick="generateAiDraft()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+        <button onclick="generateAiDraft()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer">
           <i class="ph-bold ph-sparkle text-amber-400"></i> Generate Draf Otomatis
         </button>
         <div id="aiOutputContainer" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
           <h4 class="text-xs font-bold text-slate-800">Hasil Rekomendasi AI:</h4>
           <p id="aiOutputText" class="text-xs text-slate-600 whitespace-pre-wrap"></p>
-          <button onclick="useAiDraft()" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
+          <button onclick="useAiDraft()" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 cursor-pointer">
             <i class="ph-bold ph-arrow-right"></i> Gunakan Sebagai Draf Post
           </button>
         </div>
@@ -365,7 +370,7 @@
             <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC (Supabase Cloud)</h2>
             <p class="text-xs text-slate-500">Kelola daftar anggota tim dan hak akses otorisasi yang tersimpan di cloud database.</p>
           </div>
-          <button onclick="openUserModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+          <button onclick="openUserModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition cursor-pointer">
             <i class="ph-bold ph-user-plus text-sm"></i> Tambah Anggota
           </button>
         </div>
@@ -386,16 +391,39 @@
       </section>
 
     </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 py-2 px-3 z-40 flex items-center justify-around shadow-lg">
+      <button id="mob-tab-board" onclick="switchTab('board')" class="flex flex-col items-center gap-0.5 text-rose-600 font-bold cursor-pointer">
+        <i class="ph-bold ph-kanban text-lg"></i>
+        <span class="text-[9px]">Board</span>
+      </button>
+      <button id="mob-tab-calendar" onclick="switchTab('calendar')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <i class="ph-bold ph-calendar text-lg"></i>
+        <span class="text-[9px]">Kalender</span>
+      </button>
+      <button id="mob-tab-preview" onclick="switchTab('preview')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <i class="ph-bold ph-device-mobile text-lg"></i>
+        <span class="text-[9px]">Preview</span>
+      </button>
+      <button id="mob-tab-ai" onclick="switchTab('ai')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <i class="ph-bold ph-magic-wand text-lg text-amber-500"></i>
+        <span class="text-[9px]">AI</span>
+      </button>
+      <button id="mob-tab-users" onclick="switchTab('users')" class="flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer">
+        <i class="ph-bold ph-users-three text-lg text-indigo-500"></i>
+        <span class="text-[9px]">Tim</span>
+      </button>
+    </nav>
+
   </div>
 
-  <!-- ==================== MODAL DIALOGS ==================== -->
-
-  <!-- MODAL: FORM ANGGOTA TIM -->
+  <!-- MODAL: FORM ANGGOTA TIM (DENGAN PROTEKSI PASSWORD) -->
   <div id="userModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm text-slate-900" id="userModalTitle">Tambah Anggota Tim</h3>
-        <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+        <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <form id="teamUserForm" onsubmit="handleSaveUser(event)" class="p-6 space-y-4 text-xs">
         <input type="hidden" id="editUserId" value="" />
@@ -408,12 +436,13 @@
           <input type="email" id="userEmailInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="nama@instansi.com" />
         </div>
         <div>
-          <label class="block font-semibold text-slate-700 mb-1">Password / PIN Akses</label>
-          <input type="password" id="userPasswordInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" value="123456" />
+          <label class="block font-semibold text-slate-700 mb-1" id="userPasswordLabel">Password / PIN Akses</label>
+          <input type="password" id="userPasswordInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan password (min. 6 digit)" />
+          <p id="userPasswordHint" class="text-[10px] text-slate-400 mt-1 hidden">Kosongkan jika tidak ingin mengubah kata sandi lama.</p>
         </div>
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Peran / Hak Akses (Role)</label>
-          <select id="userRoleInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white font-medium">
+          <select id="userRoleInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white font-medium cursor-pointer">
             <option value="ADMIN">ADMIN (Lead & Publisher - Akses Penuh)</option>
             <option value="REVIEWER">REVIEWER (Internal QC & Approver)</option>
             <option value="CREATOR">CREATOR (Pembuat Konten Draf)</option>
@@ -425,8 +454,8 @@
           <input type="url" id="userAvatarInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" />
         </div>
         <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20">Simpan ke Supabase</button>
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Batal</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20 cursor-pointer">Simpan ke Supabase</button>
         </div>
       </form>
     </div>
@@ -437,7 +466,7 @@
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm text-slate-900">Ajukan Draf Postingan Baru</h3>
-        <button onclick="closePostModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+        <button onclick="closePostModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <form id="newPostForm" onsubmit="handleCreatePost(event)" class="p-6 space-y-4 text-xs">
         <div>
@@ -447,7 +476,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block font-semibold text-slate-700 mb-1">Tipe Format</label>
-            <select id="postTypeInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-white">
+            <select id="postTypeInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-white cursor-pointer">
               <option value="FEED">Instagram Feed</option>
               <option value="REELS">Instagram Reels</option>
               <option value="STORY">Instagram Story</option>
@@ -467,8 +496,8 @@
           <textarea id="postCaptionInput" rows="3" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Tulis deskripsi konten di sini..."></textarea>
         </div>
         <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closePostModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20">Simpan ke Supabase</button>
+          <button type="button" onclick="closePostModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Batal</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20 cursor-pointer">Simpan ke Supabase</button>
         </div>
       </form>
     </div>
@@ -479,12 +508,12 @@
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm text-slate-900" id="detailModalTitle">Detail Konten</h3>
-        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <div class="p-6 space-y-4 text-xs">
         
         <div id="defaultMediaContainer" class="flex gap-4">
-          <img id="detailMediaImg" src="" class="w-32 h-32 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0" />
+          <img id="detailMediaImg" src="" class="w-32 h-32 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" />
           <div class="space-y-2 flex-1">
             <span id="detailStatusBadge" class="px-2.5 py-1 rounded-md text-[10px] font-bold">STATUS</span>
             <p id="detailCaption" class="text-slate-600 whitespace-pre-wrap max-h-28 overflow-y-auto custom-scrollbar"></p>
@@ -501,7 +530,7 @@
           <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
         </div>
 
-        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator & Admin) -->
+        <!-- FORM INTERAKTIF PERBAIKAN REVISI -->
         <div id="revisionEditFormContainer" class="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 hidden">
           <div class="flex items-center gap-1.5 text-amber-900 font-bold border-b border-amber-200/60 pb-2">
             <i class="ph-bold ph-pencil-simple-line text-sm text-amber-600"></i>
@@ -538,7 +567,7 @@
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm text-slate-900">Ubah Profil Brand Medsos</h3>
-        <button onclick="closeBrandModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+        <button onclick="closeBrandModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <div class="p-6 space-y-3 text-xs">
         <div>
@@ -554,8 +583,8 @@
           <textarea id="settingBrandBio" rows="3" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none">Official Social Media Portal. Informasi promo perumahan dan layanan operasional.</textarea>
         </div>
         <div class="pt-2 flex justify-end gap-2">
-          <button onclick="closeBrandModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Tutup</button>
-          <button onclick="saveBrandSettings()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">Simpan Profil</button>
+          <button onclick="closeBrandModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Tutup</button>
+          <button onclick="saveBrandSettings()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold cursor-pointer">Simpan Profil</button>
         </div>
       </div>
     </div>
@@ -566,7 +595,7 @@
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm text-slate-900">Integrasi Token Meta API</h3>
-        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <div class="p-6 space-y-3 text-xs">
         <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800">
@@ -582,20 +611,19 @@
           <input type="password" id="settingMetaToken" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="EAAXxFakeTokenSimulated..." />
         </div>
         <div class="pt-2 flex justify-end gap-2">
-          <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Tutup</button>
-          <button onclick="saveApiSettings()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">Simpan Pengaturan</button>
+          <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer">Tutup</button>
+          <button onclick="saveApiSettings()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold cursor-pointer">Simpan Pengaturan</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // 1. DATA STATE & AUTH
     let posts = [];
     let currentUser = null;
     let currentRole = 'ADMIN';
     let activePostId = null;
+    let confirmCallback = null;
 
     let currentBrand = {
       handle: '@kcmamuju_244',
@@ -610,10 +638,67 @@
       { id: 'USR-04', name: 'Rian Prakoso', email: 'rian@client.local', role: 'CLIENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', status: 'Aktif' }
     ];
 
-    // 2. SISTEM LOGIN & SESI
-    function quickFill(email) {
-      document.getElementById('loginEmail').value = email;
-      document.getElementById('loginPassword').value = '123456';
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const bgColors = {
+        success: 'bg-emerald-600 text-white shadow-emerald-500/25',
+        error: 'bg-rose-600 text-white shadow-rose-500/25',
+        warning: 'bg-amber-500 text-white shadow-amber-500/25',
+        info: 'bg-slate-900 text-white shadow-slate-900/25'
+      };
+
+      const icons = {
+        success: 'ph-check-circle',
+        error: 'ph-x-circle',
+        warning: 'ph-warning-circle',
+        info: 'ph-info'
+      };
+
+      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl text-xs font-semibold shadow-lg transition-all duration-300 transform translate-y-2 opacity-0 ${bgColors[type] || bgColors.info}`;
+      toast.innerHTML = `<i class="ph-bold ${icons[type] || icons.info} text-base flex-shrink-0"></i><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function openConfirmModal(title, desc, onConfirm, icon = 'ph-question', isDanger = false) {
+      document.getElementById('confirmModalTitle').textContent = title;
+      document.getElementById('confirmModalDesc').textContent = desc;
+      const iconEl = document.getElementById('confirmModalIcon');
+      const iconContainer = document.getElementById('confirmModalIconContainer');
+      const okBtn = document.getElementById('confirmModalOkBtn');
+
+      iconEl.className = `ph-bold ${icon}`;
+      if (isDanger) {
+        iconContainer.className = 'w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 text-2xl mx-auto shadow-sm';
+        okBtn.className = 'w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition text-xs shadow-md flex items-center justify-center gap-1.5 cursor-pointer';
+      } else {
+        iconContainer.className = 'w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-2xl mx-auto shadow-sm';
+        okBtn.className = 'w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition text-xs shadow-md flex items-center justify-center gap-1.5 cursor-pointer';
+      }
+
+      confirmCallback = onConfirm;
+      okBtn.onclick = () => {
+        if (confirmCallback) confirmCallback();
+        closeConfirmModal();
+      };
+
+      document.getElementById('confirmActionModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      confirmCallback = null;
+      document.getElementById('confirmActionModal').classList.add('hidden');
     }
 
     async function handleLogin(e) {
@@ -642,6 +727,7 @@
         localStorage.setItem('postflow_session_user', JSON.stringify(currentUser));
         localStorage.setItem('postflow_session_token', result.token);
 
+        showToast(`Selamat datang kembali, ${currentUser.name}!`, 'success');
         initAuthenticatedUser();
       } catch (err) {
         errBox.classList.remove('hidden');
@@ -669,7 +755,10 @@
       localStorage.removeItem('postflow_session_user');
       localStorage.removeItem('postflow_session_token');
       currentUser = null;
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
       document.getElementById('loginScreen').classList.remove('hidden');
+      showToast('Sesi kerja Anda telah diakhiri dengan aman.', 'info');
     }
 
     function checkExistingSession() {
@@ -703,7 +792,6 @@
       renderFeedPreview();
     }
 
-    // 3. SINKRONISASI TIM VIA /api/users
     async function fetchTeamFromApi() {
       try {
         const res = await fetch('/api/users');
@@ -731,33 +819,50 @@
       if (editId) {
         const idx = teamUsers.findIndex(u => u.id === editId);
         if (idx !== -1) {
-          teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
+          teamUsers[idx] = { 
+            ...teamUsers[idx], 
+            name, 
+            email, 
+            role, 
+            avatar,
+            ...(password ? { password } : {})
+          };
         }
         renderTeamTable();
         closeUserModal();
+        showToast('Data anggota tim berhasil diperbarui.', 'success');
 
         try {
+          const payload = { id: editId, name, email, role, avatar };
+          if (password) payload.password = password;
+
           await fetch('/api/users', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: editId, name, email, role, avatar, password })
+            body: JSON.stringify(payload)
           });
         } catch (err) {
           console.error('Gagal update user:', err);
+          showToast('Gagal sinkronisasi update ke server.', 'error');
         }
       } else {
+        if (!password) {
+          showToast('Kata sandi awal wajib diisi untuk pengguna baru.', 'warning');
+          return;
+        }
         const newUser = {
           id: 'USR-' + Date.now(),
           name,
           email,
           role,
           avatar,
-          password: password || '123456',
+          password: password,
           status: 'Aktif'
         };
         teamUsers.push(newUser);
         renderTeamTable();
         closeUserModal();
+        showToast('Anggota tim baru berhasil ditambahkan.', 'success');
 
         try {
           await fetch('/api/users', {
@@ -767,31 +872,43 @@
           });
         } catch (err) {
           console.error('Gagal tambah user:', err);
+          showToast('Gagal menyimpan user baru ke server.', 'error');
         }
       }
     }
 
-    async function deleteUser(userId) {
-      if (teamUsers.length <= 1) return alert('Minimal harus ada 1 anggota tim di dalam sistem.');
-      if (confirm('Yakin ingin menghapus anggota tim ini secara permanen?')) {
-        teamUsers = teamUsers.filter(u => u.id !== userId);
-        renderTeamTable();
-        try {
-          await fetch(`/api/users?id=${userId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: userId })
-          });
-        } catch (err) {
-          console.error('Gagal hapus user:', err);
-        }
+    function deleteUser(userId) {
+      if (teamUsers.length <= 1) {
+        showToast('Minimal harus ada 1 anggota tim di dalam sistem.', 'warning');
+        return;
       }
+      openConfirmModal(
+        'Hapus Anggota Tim',
+        'Apakah Anda yakin ingin menghapus anggota tim ini secara permanen dari Supabase?',
+        async () => {
+          teamUsers = teamUsers.filter(u => u.id !== userId);
+          renderTeamTable();
+          showToast('Anggota tim telah dihapus.', 'info');
+          try {
+            await fetch(`/api/users?id=${userId}`, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: userId })
+            });
+          } catch (err) {
+            console.error('Gagal hapus user:', err);
+            showToast('Gagal menghapus dari database server.', 'error');
+          }
+        },
+        'ph-trash',
+        true
+      );
     }
 
-    // 4. KONTROL HAK AKSES (RBAC PERMISSIONS)
     function applyRolePermissions() {
       const btnAddPost = document.getElementById('btnAddPost');
       const tabUsers = document.getElementById('tab-users');
+      const mobTabUsers = document.getElementById('mob-tab-users');
       const btnApi = document.getElementById('btnApiSettings');
       const btnBrand = document.getElementById('btnBrandSettings');
       const roleBadge = document.getElementById('currentRoleBadge');
@@ -811,10 +928,14 @@
 
       if (tabUsers) {
         tabUsers.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
-        const viewUsers = document.getElementById('view-users');
-        if (currentRole !== 'ADMIN' && viewUsers && !viewUsers.classList.contains('hidden')) {
-          switchTab('board');
-        }
+      }
+      if (mobTabUsers) {
+        mobTabUsers.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
+      }
+
+      const viewUsers = document.getElementById('view-users');
+      if (currentRole !== 'ADMIN' && viewUsers && !viewUsers.classList.contains('hidden')) {
+        switchTab('board');
       }
 
       if (btnApi) btnApi.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
@@ -839,7 +960,7 @@
         tr.className = 'hover:bg-slate-50/80 transition';
         tr.innerHTML = `
           <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2.5">
-            <img src="${user.avatar}" class="w-7 h-7 rounded-full object-cover border border-slate-200" />
+            <img src="${user.avatar}" class="w-7 h-7 rounded-full object-cover border border-slate-200" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'" />
             <span>${user.name}</span>
           </td>
           <td class="py-3 px-4 text-slate-500">${user.email}</td>
@@ -850,10 +971,10 @@
             <span class="text-emerald-600 font-semibold flex items-center gap-1"><i class="ph-fill ph-circle text-[8px]"></i> ${user.status || 'Aktif'}</span>
           </td>
           <td class="py-3 px-4 text-right">
-            <button onclick="editUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-100 transition mr-1" title="Edit">
+            <button onclick="editUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-100 transition mr-1 cursor-pointer" title="Edit">
               <i class="ph-bold ph-pencil-simple text-sm"></i>
             </button>
-            <button onclick="deleteUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition" title="Hapus">
+            <button onclick="deleteUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition cursor-pointer" title="Hapus">
               <i class="ph-bold ph-trash text-sm"></i>
             </button>
           </td>
@@ -866,6 +987,9 @@
       document.getElementById('userModalTitle').textContent = 'Tambah Anggota Tim';
       document.getElementById('teamUserForm').reset();
       document.getElementById('editUserId').value = '';
+      document.getElementById('userPasswordInput').required = true;
+      document.getElementById('userPasswordLabel').textContent = 'Password / PIN Akses';
+      document.getElementById('userPasswordHint').classList.add('hidden');
       document.getElementById('userModal').classList.remove('hidden');
     }
 
@@ -880,10 +1004,16 @@
       document.getElementById('userEmailInput').value = user.email;
       document.getElementById('userRoleInput').value = user.role;
       document.getElementById('userAvatarInput').value = user.avatar;
+      
+      // Keamanan password: tidak wajib diisi saat edit
+      document.getElementById('userPasswordInput').value = '';
+      document.getElementById('userPasswordInput').required = false;
+      document.getElementById('userPasswordLabel').textContent = 'Ganti Password / PIN Baru (Opsional)';
+      document.getElementById('userPasswordHint').classList.remove('hidden');
+
       document.getElementById('userModal').classList.remove('hidden');
     }
 
-    // 5. POSTINGAN WORKFLOW KE SUPABASE
     async function fetchPostsFromApi() {
       const statusBadge = document.getElementById('dbStatusBadge');
       try {
@@ -893,7 +1023,6 @@
         const data = await res.json();
         
         if (Array.isArray(data)) {
-          // Normalisasi status database lama ('in_review' -> 'review')
           posts = data.map(p => ({
             ...p,
             status: (p.status === 'in_review') ? 'review' : (p.status || 'draft')
@@ -921,6 +1050,7 @@
         caption: document.getElementById('postCaptionInput').value,
         status: 'draft',
         author: currentUser ? currentUser.name : 'Creator',
+        author_id: currentUser ? currentUser.id : null,
         role: currentRole,
         revision_notes: '',
         platform: 'instagram'
@@ -932,6 +1062,7 @@
       renderFeedPreview();
       closePostModal();
       document.getElementById('newPostForm').reset();
+      showToast('Draf postingan berhasil dibuat dan disimpan.', 'success');
 
       try {
         await fetch('/api/posts', {
@@ -941,6 +1072,7 @@
         });
       } catch (err) {
         console.error('Koneksi POST gagal:', err);
+        showToast('Gagal sinkronisasi postingan ke server.', 'error');
       }
     }
 
@@ -955,6 +1087,14 @@
         renderFeedPreview();
         closeDetailModal();
 
+        const statusLabels = {
+          review: 'Konten diajukan ke tahap Approval.',
+          revision: 'Catatan revisi berhasil dikirim ke Creator.',
+          published: 'Postingan berhasil disetujui & tayang LIVE!',
+          draft: 'Status diubah ke Draf.'
+        };
+        showToast(statusLabels[newStatus] || 'Status postingan diperbarui.', 'success');
+
         try {
           const payload = { id: postId, status: newStatus, role: currentRole };
           if (revisionNotes !== null) payload.revision_notes = revisionNotes;
@@ -966,13 +1106,17 @@
           });
         } catch (err) {
           console.error('Gagal update status:', err);
+          showToast('Gagal memperbarui status ke database.', 'error');
         }
       }
     }
 
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
-      if (!notes) return alert('Harap tulis poin catatan revisi terlebih dahulu.');
+      if (!notes) {
+        showToast('Harap tulis poin catatan revisi terlebih dahulu.', 'warning');
+        return;
+      }
       updatePostStatus(postId, 'revision', notes);
     }
 
@@ -981,7 +1125,10 @@
       const updatedMedia = document.getElementById('editMediaUrlInput').value.trim();
       const updatedCaption = document.getElementById('editCaptionInput').value.trim();
 
-      if (!updatedMedia || !updatedCaption) return alert('Media URL dan Caption tidak boleh kosong.');
+      if (!updatedMedia || !updatedCaption) {
+        showToast('Media URL dan Caption tidak boleh kosong.', 'warning');
+        return;
+      }
 
       const p = posts.find(item => item.id === postId);
       if (p) {
@@ -994,6 +1141,7 @@
         renderCalendar();
         renderFeedPreview();
         closeDetailModal();
+        showToast('Materi hasil perbaikan berhasil dikirim ulang ke Reviewer!', 'success');
 
         try {
           await fetch('/api/posts', {
@@ -1010,6 +1158,7 @@
           });
         } catch (err) {
           console.error('Gagal memperbarui revisi:', err);
+          showToast('Gagal mengirim data perbaikan ke server.', 'error');
         }
       }
     }
@@ -1099,18 +1248,17 @@
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
-      // --- LOGIKA AKSI WORKFLOW SESUAI RBAC ---
       if (post.status === 'draft') {
         if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
-          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
+          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
         } else {
           actions.innerHTML += `<span class="text-xs text-slate-400 italic">Draf internal (menunggu diajukan oleh Creator).</span>`;
         }
       } else if (post.status === 'review') {
         if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
           inputContainer.classList.remove('hidden');
-          actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Catatan Revisi</button>`;
-          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-check"></i> Setujui & Publikasikan</button>`;
+          actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200 cursor-pointer">Minta Catatan Revisi</button>`;
+          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"><i class="ph-bold ph-check"></i> Setujui & Publikasikan</button>`;
         } else {
           actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu evaluasi Reviewer / Client / Admin.</span>`;
         }
@@ -1122,7 +1270,7 @@
           document.getElementById('editCaptionInput').value = post.caption;
 
           actions.innerHTML += `
-            <button onclick="handleResubmitRevision('${post.id}')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl font-bold shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+            <button onclick="handleResubmitRevision('${post.id}')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl font-bold shadow-md shadow-amber-500/20 flex items-center gap-1.5 cursor-pointer">
               <i class="ph-bold ph-paper-plane-tilt"></i> Simpan Materi & Kirim Ulang ke Reviewer
             </button>
           `;
@@ -1157,47 +1305,84 @@
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
-    // 6. NAVIGATION TABS
     function switchTab(tabId) {
       if (tabId === 'users' && currentRole !== 'ADMIN') {
-        alert('Akses Ditolak: Menu Tim & RBAC hanya dapat diakses oleh Administrator.');
+        showToast('Akses Ditolak: Menu Tim & RBAC hanya dapat diakses oleh Administrator.', 'error');
         return;
       }
 
       ['board', 'calendar', 'preview', 'ai', 'users'].forEach(t => {
         const view = document.getElementById('view-' + t);
-        const btn = document.getElementById('tab-' + t);
+        const btnDesktop = document.getElementById('tab-' + t);
+        const btnMobile = document.getElementById('mob-tab-' + t);
+
         if (view) view.classList.toggle('hidden', t !== tabId);
-        if (btn) {
+
+        // Desktop styling
+        if (btnDesktop) {
           if (t === tabId) {
-            btn.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm';
+            btnDesktop.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm cursor-pointer';
           } else {
-            btn.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600';
+            btnDesktop.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 cursor-pointer';
+          }
+        }
+
+        // Mobile styling
+        if (btnMobile) {
+          if (t === tabId) {
+            btnMobile.className = 'flex flex-col items-center gap-0.5 text-rose-600 font-bold cursor-pointer';
+          } else {
+            btnMobile.className = 'flex flex-col items-center gap-0.5 text-slate-400 hover:text-slate-700 cursor-pointer';
           }
         }
       });
+
       if (tabId === 'users') renderTeamTable();
       if (tabId === 'calendar') renderCalendar();
       if (tabId === 'preview') renderFeedPreview();
     }
 
-    // 7. KALENDER DINAMIS (SINKRON DARI DATABASE SUPABASE)
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
       grid.innerHTML = '';
 
-      for (let i = 1; i <= 31; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'min-h-20 border border-slate-100 rounded-xl p-1.5 text-left relative bg-slate-50/60 flex flex-col justify-between hover:border-rose-200 transition';
-        cell.innerHTML = `<span class="text-[10px] font-bold text-slate-400">${i}</span>`;
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const todayDate = now.getDate();
 
-        // Cari postingan yang tanggalnya cocok dengan hari ke-i
+      const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      const monthLabel = document.getElementById('calendarMonthLabel');
+      if (monthLabel) monthLabel.textContent = `${monthNames[month]} ${year}`;
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      // Padding hari kosong awal bulan
+      for (let x = 0; x < firstDayIndex; x++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'min-h-20 border border-slate-100/50 rounded-xl p-1.5 bg-slate-50/20 opacity-40';
+        grid.appendChild(emptyCell);
+      }
+
+      for (let i = 1; i <= totalDays; i++) {
+        const cell = document.createElement('div');
+        const isToday = (i === todayDate);
+        cell.className = `min-h-20 border rounded-xl p-1.5 text-left relative flex flex-col justify-between transition ${
+          isToday ? 'border-rose-400 bg-rose-50/30' : 'border-slate-100 bg-slate-50/60 hover:border-rose-200'
+        }`;
+
+        cell.innerHTML = `<span class="text-[10px] font-bold ${isToday ? 'text-rose-600' : 'text-slate-400'}">${i}</span>`;
+
         const matchingPosts = posts.filter(p => {
           const dateStr = p.scheduled_at || p.created_at;
           if (!dateStr) return false;
           const d = new Date(dateStr);
-          return !isNaN(d.getDate()) && d.getDate() === i;
+          return !isNaN(d.getTime()) && d.getDate() === i && d.getMonth() === month && d.getFullYear() === year;
         });
 
         if (matchingPosts.length > 0) {
@@ -1222,17 +1407,33 @@
       if (!cont) return;
       cont.innerHTML = '';
       document.getElementById('previewPostCount').textContent = posts.length;
+
+      if (posts.length === 0) {
+        cont.innerHTML = `
+          <div class="col-span-3 py-12 text-center text-slate-400 text-xs">
+            <i class="ph-bold ph-camera text-3xl mb-1 text-slate-300 block"></i>
+            Belum ada postingan diterbitkan
+          </div>
+        `;
+        return;
+      }
+
       posts.forEach(p => {
-        const img = document.createElement('img');
-        img.src = p.media_url;
-        img.onerror = () => { img.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'; };
-        img.className = 'w-full h-28 object-cover cursor-pointer hover:opacity-90';
-        img.onclick = () => openDetailModal(p.id);
-        cont.appendChild(img);
+        const itemWrap = document.createElement('div');
+        itemWrap.className = 'relative group aspect-square bg-slate-200 cursor-pointer overflow-hidden';
+        itemWrap.onclick = () => openDetailModal(p.id);
+
+        itemWrap.innerHTML = `
+          <img src="${p.media_url}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+          ${p.type === 'REELS' ? '<i class="ph-fill ph-video-camera absolute top-1.5 right-1.5 text-white text-xs drop-shadow"></i>' : ''}
+          <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-2">
+            <span class="flex items-center gap-1"><i class="ph-fill ph-heart"></i> 0</span>
+          </div>
+        `;
+        cont.appendChild(itemWrap);
       });
     }
 
-    // PERSISTENSI PENGATURAN PROFIL BRAND
     function loadBrandSettings() {
       const saved = localStorage.getItem('postflow_brand_settings');
       if (saved) {
@@ -1251,6 +1452,7 @@
       localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
       applyBrandToUI();
       closeBrandModal();
+      showToast('Profil brand berhasil diperbarui.', 'success');
     }
 
     function applyBrandToUI() {
@@ -1260,15 +1462,19 @@
     }
 
     function saveApiSettings() {
-      alert('Pengaturan token API berhasil disimpan!');
+      showToast('Pengaturan token API berhasil disimpan ke sesi!', 'success');
       closeApiModal();
     }
 
     function generateAiDraft() {
-      const p = document.getElementById('aiPromptInput').value;
-      if (!p) return alert('Masukkan ide konten terlebih dahulu');
+      const p = document.getElementById('aiPromptInput').value.trim();
+      if (!p) {
+        showToast('Masukkan ide konten terlebih dahulu pada kolom input.', 'warning');
+        return;
+      }
       document.getElementById('aiOutputContainer').classList.remove('hidden');
       document.getElementById('aiOutputText').textContent = `✨ ${p.toUpperCase()}\n\nDapatkan penawaran terbaik dan wujudkan impian Anda bersama kami hari ini! Kunjungi kantor layanan terdekat atau klik tautan di bio untuk informasi lengkap.\n\n#PromoSpesial #BankBTN #LayananTerbaik #SolusiKeuangan`;
+      showToast('Ide draf berhasil digenerate oleh AI!', 'success');
     }
 
     function useAiDraft() {
@@ -1278,9 +1484,9 @@
       document.getElementById('postCaptionInput').value = text;
       document.getElementById('postMediaUrlInput').value = 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800';
       switchTab('board');
+      showToast('Teks draf AI telah disalin ke formulir postingan.', 'info');
     }
 
-    // INITIALIZATION: Periksa sesi login & sinkron database
     checkExistingSession();
   </script>
 </body>
