@@ -59,7 +59,8 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-pink-500 selection:text-white">
 
-    <header class="bg-white/90 border-b border-slate-200/80 sticky top-0 z-40 backdrop-blur-md shadow-sm">
+    <!-- HEADER / NAVIGATION BAR -->
+    <header class="bg-white/95 border-b border-slate-200/90 sticky top-0 z-40 backdrop-blur-md shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Brand & Logo -->
@@ -82,28 +83,29 @@
                 <div class="hidden lg:flex items-center gap-2">
                     <div class="flex items-center bg-slate-100/90 px-3 py-1.5 rounded-2xl border border-slate-200 gap-2">
                         <span class="text-[11px] text-slate-500 font-semibold">Akun Aktif:</span>
-                        <span id="currentBrandBadge" class="text-xs font-bold text-pink-600">@kcmamuju_244</span>
+                        <span id="currentBrandBadge" class="text-xs font-bold text-pink-600">@brandkita_official</span>
                     </div>
-                    <button onclick="openApiSettingsModal()" class="px-3 py-1.5 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition shadow-sm" title="Pengaturan Integrasi & Token API Medsos">
-                        <i class="fa-solid fa-plug text-pink-500"></i>
+                    <button type="button" onclick="openApiSettingsModal()" class="px-3 py-1.5 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition shadow-xs" title="Pengaturan Integrasi & Token API Medsos">
+                        <i class="fa-solid fa-plug text-indigo-500"></i>
                         <span>Integrasi API</span>
                     </button>
                 </div>
 
+                <!-- Main Tabs Navigation -->
                 <div class="hidden md:flex items-center bg-slate-100/80 p-1 rounded-2xl border border-slate-200 gap-1">
-                    <button onclick="switchTab('kanban')" id="tab-kanban" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl bg-white text-pink-600 shadow-sm border border-slate-200/60 transition-all flex items-center gap-1.5">
+                    <button type="button" onclick="switchTab('kanban')" id="tab-kanban" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl bg-white text-pink-600 shadow-xs border border-slate-200/60 transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-table-columns"></i> Board
                     </button>
-                    <button onclick="switchTab('calendar')" id="tab-calendar" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+                    <button type="button" onclick="switchTab('calendar')" id="tab-calendar" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
                         <i class="fa-regular fa-calendar"></i> Kalender
                     </button>
-                    <button onclick="switchTab('grid')" id="tab-grid" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+                    <button type="button" onclick="switchTab('grid')" id="tab-grid" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
                         <i class="fa-brands fa-instagram"></i> Feed Preview
                     </button>
-                    <button onclick="switchTab('ai')" id="tab-ai" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+                    <button type="button" onclick="switchTab('ai')" id="tab-ai" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> AI Studio
                     </button>
-                    <button onclick="switchTab('users')" id="tab-users" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+                    <button type="button" onclick="switchTab('users')" id="tab-users" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
                         <i class="fa-solid fa-users-gear text-indigo-500"></i> Tim & RBAC
                     </button>
                 </div>
@@ -111,13 +113,13 @@
                 <!-- User Session & Action Controls -->
                 <div class="flex items-center gap-3">
                     <div class="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200">
-                        <img id="currentUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-7 h-7 rounded-xl object-cover border border-slate-300 shadow-xs">
+                        <img id="currentUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-7 h-7 rounded-xl object-cover border border-slate-300 shadow-xs" alt="User Avatar">
                         <select id="userSelectorDropdown" onchange="handleUserSwitch(this.value)" class="bg-transparent text-xs font-bold text-slate-700 cursor-pointer focus:outline-none pr-1">
                             <!-- Populated dynamically -->
                         </select>
                     </div>
 
-                    <button onclick="openCreateModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white ig-gradient hover:opacity-95 shadow-md shadow-pink-500/20 flex items-center gap-2 transition-all">
+                    <button type="button" onclick="openCreateModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white ig-gradient hover:opacity-95 shadow-md shadow-pink-500/20 flex items-center gap-2 transition-all cursor-pointer">
                         <i class="fa-solid fa-plus"></i>
                         <span class="hidden sm:inline">Ajukan Post</span>
                     </button>
@@ -126,6 +128,7 @@
         </div>
     </header>
 
+    <!-- MAIN CONTENT CONTAINER -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         <!-- Live Environment Status Banner -->
@@ -145,11 +148,11 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="openBrandSettingsModal()" class="text-xs bg-slate-50 hover:bg-slate-100 text-pink-700 font-bold px-3.5 py-2 rounded-xl border border-pink-200 transition-all flex items-center gap-1.5 shadow-xs">
+                <button type="button" onclick="openBrandSettingsModal()" class="text-xs bg-slate-50 hover:bg-slate-100 text-pink-700 font-bold px-3.5 py-2 rounded-xl border border-pink-200 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
                     <i class="fa-solid fa-id-card"></i> Ubah Profil Akun
                 </button>
-                <button onclick="openApiSettingsModal()" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-3.5 py-2 rounded-xl border border-slate-200 transition-all flex items-center gap-1.5">
-                    <i class="fa-solid fa-sliders text-pink-500"></i> Status & Token API
+                <button type="button" onclick="openApiSettingsModal()" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-3.5 py-2 rounded-xl border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-sliders text-indigo-500"></i> Status & Token API
                 </button>
             </div>
         </div>
@@ -230,13 +233,13 @@
                 <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
                     <div class="flex items-center gap-5 pb-6 border-b border-slate-100">
                         <div class="w-16 h-16 rounded-full p-[2.5px] ig-gradient shadow-sm">
-                            <img id="feedBrandAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-full h-full rounded-full object-cover bg-white p-0.5">
+                            <img id="feedBrandAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-full h-full rounded-full object-cover bg-white p-0.5" alt="Brand Logo">
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-3">
                                 <h3 class="text-base font-extrabold text-slate-900" id="feedBrandHandle">brandkita_official</h3>
                                 <span class="bg-pink-50 text-pink-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-pink-200">Verified Brand</span>
-                                <button onclick="openBrandSettingsModal()" class="text-slate-500 hover:text-slate-800 text-xs ml-auto font-medium" title="Edit Profil Medsos">
+                                <button type="button" onclick="openBrandSettingsModal()" class="text-slate-500 hover:text-slate-800 text-xs ml-auto font-medium cursor-pointer" title="Edit Profil Medsos">
                                     <i class="fa-solid fa-pen"></i> Edit Akun
                                 </button>
                             </div>
@@ -253,12 +256,12 @@
                     <div class="w-64 aspect-[9/16] bg-slate-950 rounded-3xl overflow-hidden relative shadow-xl border-4 border-slate-800 flex flex-col justify-between p-3.5">
                         <div class="flex items-center justify-between text-white z-10">
                             <div class="flex items-center gap-2">
-                                <img id="storyBrandAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-6 h-6 rounded-full border border-white object-cover">
+                                <img id="storyBrandAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-6 h-6 rounded-full border border-white object-cover" alt="Story Avatar">
                                 <span class="text-[11px] font-bold" id="storyBrandHandle">brandkita_official</span>
                             </div>
                             <span class="text-[10px] text-slate-300">Sponsored</span>
                         </div>
-                        <img id="storySimulatorImage" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800" class="absolute inset-0 w-full h-full object-cover opacity-85">
+                        <img id="storySimulatorImage" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800" class="absolute inset-0 w-full h-full object-cover opacity-85" alt="Story Background">
                         <div class="z-10 space-y-2">
                             <p class="text-[11px] text-white font-medium drop-shadow-md line-clamp-2" id="storySimulatorCaption">Swipe up untuk penawaran spesial!</p>
                             <div class="bg-white/20 backdrop-blur-md text-white text-center py-2 rounded-xl text-xs font-bold border border-white/30">
@@ -297,14 +300,14 @@
                             <option value="humorous">Casual, Gen-Z, & Santai</option>
                         </select>
                     </div>
-                    <button onclick="generateAiCopy()" id="btnGenerateAiCopy" class="w-full py-3 bg-gradient-to-r from-amber-500 to-pink-600 hover:opacity-95 text-white rounded-2xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all">
+                    <button type="button" onclick="generateAiCopy()" id="btnGenerateAiCopy" class="w-full py-3 bg-gradient-to-r from-amber-500 to-pink-600 hover:opacity-95 text-white rounded-2xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> Racik Caption Otomatis
                     </button>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Hasil Rekomendasi AI</label>
                         <textarea id="aiCopyResult" rows="5" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl p-3 text-slate-800 focus:bg-white focus:outline-none leading-relaxed custom-scrollbar" placeholder="Hasil racikan AI akan muncul di sini..."></textarea>
                     </div>
-                    <button onclick="applyAiCopyToNewPost()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all border border-slate-200">
+                    <button type="button" onclick="applyAiCopyToNewPost()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all border border-slate-200 cursor-pointer">
                         Gunakan di Form Postingan Baru <i class="fa-solid fa-arrow-right ml-1"></i>
                     </button>
                 </div>
@@ -324,6 +327,58 @@
                         <label class="block text-xs font-bold text-slate-700 mb-1">Prompt Visual Gambar</label>
                         <input type="text" id="aiImagePrompt" placeholder="Misal: Minimalist aesthetic cosmetic bottle on marble table 8k" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
                     </div>
+                    <button type="button" onclick="generateAiVisual()" id="btnGenerateAiVisual" class="w-full py-3 bg-gradient-to-r from-pink-600 to-indigo-600 hover:opacity-95 text-white rounded-2xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer">
+                        <i class="fa-solid fa-palette"></i> Generate Gambar AI
+                    </button>
+                    <div class="w-full aspect-video bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center relative">
+                        <img id="aiGeneratedImageTag" src="" alt="AI Visual" class="w-full h-full object-cover hidden">
+                        <div id="aiVisualPlaceholderText" class="text-center text-slate-400 p-4">
+                            <i class="fa-regular fa-image text-3xl mb-2 block"></i>
+                            <span class="text-xs font-medium">Gambar hasil racikan AI akan tampil di sini</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: TIM & RBAC (CRUD) -->
+        <div id="view-users" class="tab-view hidden space-y-4">
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-5">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-users-gear text-indigo-600"></i> Manajemen Tim & Role-Based Access Control
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5 font-medium">Pengaturan hak akses creator, reviewer, dan client viewer.</p>
+                    </div>
+                    <button type="button" onclick="openAddUserModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer">
+                        <i class="fa-solid fa-user-plus"></i> Tambah Anggota
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="text-[11px] uppercase bg-slate-50 text-slate-500 border-b border-slate-200 font-bold">
+                            <tr>
+                                <th class="py-3 px-4 rounded-l-xl">Nama Anggota</th>
+                                <th class="py-3 px-4">Email</th>
+                                <th class="py-3 px-4">Peran / Role</th>
+                                <th class="py-3 px-4">Kewenangan Sistem</th>
+                                <th class="py-3 px-4 text-center rounded-r-xl">Aksi (CRUD)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody" class="divide-y divide-slate-100 font-medium">
+                            <!-- Populated dynamically via renderUserTable() -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODALS SECTION -->
+
     <!-- MODAL 1: PENGATURAN PROFIL AKUN MEDSOS (IDENTITAS BRAND) -->
     <div id="modalBrandSettings" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
@@ -331,7 +386,7 @@
                 <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-id-card text-pink-600"></i> Profil & Identitas Akun Medsos
                 </h3>
-                <button onclick="closeBrandSettingsModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="closeBrandSettingsModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <p class="text-xs text-slate-500 font-medium">Ubah nama, handle, dan bio yang tampil pada feed preview serta template copywriting AI.</p>
@@ -361,8 +416,8 @@
                 </div>
 
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeBrandSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold ig-gradient text-white rounded-xl shadow-md shadow-pink-500/20 flex items-center gap-1.5">
+                    <button type="button" onclick="closeBrandSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold ig-gradient text-white rounded-xl shadow-md shadow-pink-500/20 flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan Profil
                     </button>
                 </div>
@@ -377,7 +432,7 @@
                 <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-plug text-indigo-600"></i> Pengaturan Integrasi & API Medsos
                 </h3>
-                <button onclick="closeApiSettingsModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="closeApiSettingsModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <!-- Status Kartu Mode -->
@@ -409,12 +464,12 @@
                 </div>
 
                 <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <button type="button" onclick="testSocialMediaConnection()" id="btnTestApiConnection" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl border border-indigo-200 transition">
+                    <button type="button" onclick="testSocialMediaConnection()" id="btnTestApiConnection" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl border border-indigo-200 transition cursor-pointer">
                         <i class="fa-solid fa-satellite-dish mr-1"></i> Uji Koneksi API
                     </button>
                     <div class="flex gap-2">
-                        <button type="button" onclick="closeApiSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
-                        <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition">
+                        <button type="button" onclick="closeApiSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
+                        <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition cursor-pointer">
                             <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Token
                         </button>
                     </div>
@@ -423,14 +478,14 @@
         </div>
     </div>
 
-    <!-- MODAL FORM: TAMBAH & EDIT USER (CRUD) -->
+    <!-- MODAL 3: TAMBAH & EDIT USER (CRUD TIM) -->
     <div id="modalUserForm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h3 id="modalUserFormTitle" class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-user-pen text-indigo-600"></i> Tambah Anggota Tim
                 </h3>
-                <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="closeUserModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form onsubmit="handleSaveUser(event)" class="space-y-3.5">
@@ -462,8 +517,8 @@
                 </div>
 
                 <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md shadow-indigo-600/20 flex items-center gap-1.5">
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan
                     </button>
                 </div>
@@ -479,11 +534,11 @@
                     <span id="detailStatusBadge" class="px-3 py-1 text-[10px] font-bold rounded-full uppercase">STATUS</span>
                     <h3 id="detailTitle" class="font-extrabold text-sm text-slate-900 truncate max-w-md">Detail Post</h3>
                 </div>
-                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-700 text-lg"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-12 flex-1 overflow-y-auto">
                 <div class="md:col-span-5 bg-slate-100 p-4 flex items-center justify-center border-r border-slate-200">
-                    <img id="detailImageMock" src="" class="rounded-2xl shadow-md max-h-80 object-cover w-full">
+                    <img id="detailImageMock" src="" class="rounded-2xl shadow-md max-h-80 object-cover w-full" alt="Post Media">
                 </div>
                 <div class="md:col-span-7 p-6 space-y-4 flex flex-col justify-between">
                     <div class="space-y-3">
@@ -513,8 +568,8 @@
             <p class="text-xs text-slate-500 font-medium">Berikan catatan perbaikan yang spesifik agar creator dapat menyempurnakan konten.</p>
             <textarea id="revisionNoteInput" rows="4" placeholder="Misal: Perbaiki typo pada CTA..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-slate-800 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button onclick="closeRevisionModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
-                <button onclick="submitRevision()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md shadow-rose-600/20">Kirim Feedback</button>
+                <button type="button" onclick="closeRevisionModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
+                <button type="button" onclick="submitRevision()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md shadow-rose-600/20 cursor-pointer">Kirim Feedback</button>
             </div>
         </div>
     </div>
@@ -524,7 +579,7 @@
         <div class="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
                 <h3 class="font-extrabold text-sm text-slate-900">Ajukan Postingan Baru</h3>
-                <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-1">
                 <div>
@@ -559,8 +614,8 @@
                 </div>
             </div>
             <div class="p-4 border-t border-slate-100 bg-slate-50/80 flex justify-end gap-2">
-                <button onclick="closeCreateModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-200 rounded-xl">Batal</button>
-                <button onclick="submitNewPost()" id="btnSubmitPost" class="px-5 py-2 text-xs font-bold rounded-xl ig-gradient text-white shadow-md shadow-pink-500/20">Kirim ke Reviewer</button>
+                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-200 rounded-xl cursor-pointer">Batal</button>
+                <button type="button" onclick="submitNewPost()" id="btnSubmitPost" class="px-5 py-2 text-xs font-bold rounded-xl ig-gradient text-white shadow-md shadow-pink-500/20 cursor-pointer">Kirim ke Reviewer</button>
             </div>
         </div>
     </div>
@@ -568,11 +623,12 @@
     <!-- Toast Notifications Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
+    <!-- JAVASCRIPT LOGIC & STATE ENGINE -->
     <script>
         const DEFAULT_BRAND = {
-            handle: 'brandkita_official',
-            name: 'BrandKita Official Store',
-            bio: 'Official Brand Social Media Feed & Aesthetics Layout.',
+            handle: 'kcmamuju_244',
+            name: 'KC Mamuju Official',
+            bio: 'Official Social Media Profile & Creative Studio Workflow.',
             avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
             igAccountId: ''
         };
@@ -587,7 +643,7 @@
         let currentBrand = DEFAULT_BRAND;
         try {
             const savedBrand = localStorage.getItem('postflow_brand_settings');
-            if (savedBrand) currentBrand = JSON.parse(savedBrand);
+            if (savedBrand) currentBrand = { ...DEFAULT_BRAND, ...JSON.parse(savedBrand) };
         } catch (e) {
             currentBrand = DEFAULT_BRAND;
         }
@@ -595,7 +651,7 @@
         let users = [];
         try {
             const savedUsers = localStorage.getItem('postflow_users_platinum');
-            users = savedUsers ? JSON.parse(savedUsers) : DEFAULT_SEED_USERS;
+            users = (savedUsers && JSON.parse(savedUsers).length) ? JSON.parse(savedUsers) : DEFAULT_SEED_USERS;
         } catch (e) {
             users = DEFAULT_SEED_USERS;
         }
@@ -604,30 +660,41 @@
         let posts = [];
         let activePostIdForRevision = null;
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        // Audio Context for feedback sound effects
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
         function triggerSoundFx(type = 'click') {
             try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
                 osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                gain.connect(ctx.destination);
 
                 if (type === 'publish') {
                     osc.type = 'sine';
-                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
-                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.frequency.setValueAtTime(440, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 0.3);
+                    osc.stop(ctx.currentTime + 0.3);
                 } else {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                    gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.frequency.setValueAtTime(600, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
                     osc.start();
-                    osc.stop(audioCtx.currentTime + 0.08);
+                    osc.stop(ctx.currentTime + 0.08);
                 }
             } catch (e) {}
         }
@@ -643,7 +710,9 @@
             renderUserTable();
         });
 
+        // MODAL 1: BRAND PROFILE SETTINGS
         function openBrandSettingsModal() {
+            triggerSoundFx('click');
             document.getElementById('settingBrandHandle').value = currentBrand.handle || '';
             document.getElementById('settingBrandName').value = currentBrand.name || '';
             document.getElementById('settingBrandBio').value = currentBrand.bio || '';
@@ -655,7 +724,26 @@
             document.getElementById('modalBrandSettings').classList.add('hidden');
         }
 
+        function handleSaveBrandSettings(e) {
+            e.preventDefault();
+            let handle = document.getElementById('settingBrandHandle').value.trim();
+            handle = handle.replace(/^@/, '');
+            const name = document.getElementById('settingBrandName').value.trim();
+            const bio = document.getElementById('settingBrandBio').value.trim();
+            const avatar = document.getElementById('settingBrandAvatar').value.trim() || DEFAULT_BRAND.avatar;
+
+            currentBrand = { ...currentBrand, handle, name, bio, avatar };
+            localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
+
+            applyBrandSettingsToUI();
+            closeBrandSettingsModal();
+            triggerSoundFx('click');
+            showToast(`Profil @${handle} berhasil disimpan!`, 'success');
+        }
+
+        // MODAL 2: API SETTINGS & INTEGRATIONS
         function openApiSettingsModal() {
+            triggerSoundFx('click');
             document.getElementById('apiSettingIgId').value = currentBrand.igAccountId || '';
             const savedToken = localStorage.getItem('postflow_meta_token') || '';
             document.getElementById('apiSettingMetaToken').value = savedToken;
@@ -708,53 +796,14 @@
             }
         }
 
-        function handleSaveBrandSettings(e) {
-            e.preventDefault();
-            let handle = document.getElementById('settingBrandHandle').value.trim();
-            handle = handle.replace(/^@/, '');
-            const name = document.getElementById('settingBrandName').value.trim();
-            const bio = document.getElementById('settingBrandBio').value.trim();
-            const avatar = document.getElementById('settingBrandAvatar').value.trim() || DEFAULT_BRAND.avatar;
-
-            currentBrand = { ...currentBrand, handle, name, bio, avatar };
-            localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
-
-            applyBrandSettingsToUI();
-            closeBrandSettingsModal();
-            triggerSoundFx('click');
-            showToast(`Profil @${handle} berhasil disimpan!`, 'success');
-        }
-
-        function closeBrandSettingsModal() {
-            document.getElementById('modalBrandSettings').classList.add('hidden');
-        }
-
-        function handleSaveBrandSettings(e) {
-            e.preventDefault();
-            let handle = document.getElementById('settingBrandHandle').value.trim();
-            handle = handle.replace(/^@/, '');
-            const name = document.getElementById('settingBrandName').value.trim();
-            const bio = document.getElementById('settingBrandBio').value.trim();
-            const avatar = document.getElementById('settingBrandAvatar').value.trim() || DEFAULT_BRAND.avatar;
-            const igAccountId = document.getElementById('settingBrandIgId').value.trim();
-
-            currentBrand = { handle, name, bio, avatar, igAccountId };
-            localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
-
-            applyBrandSettingsToUI();
-            closeBrandSettingsModal();
-            triggerSoundFx('click');
-            showToast(`Profil medsos @${handle} berhasil disimpan!`, 'success');
-        }
-
         function applyBrandSettingsToUI() {
-            const handleText = `@${currentBrand.handle || 'brandkita_official'}`;
+            const handleText = `@${currentBrand.handle || 'kcmamuju_244'}`;
             
             const badge = document.getElementById('currentBrandBadge');
             if (badge) badge.innerText = handleText;
 
             const feedHandle = document.getElementById('feedBrandHandle');
-            if (feedHandle) feedHandle.innerText = currentBrand.handle || 'brandkita_official';
+            if (feedHandle) feedHandle.innerText = currentBrand.handle || 'kcmamuju_244';
 
             const feedBio = document.getElementById('feedBrandBio');
             if (feedBio) feedBio.innerText = currentBrand.bio || 'Official Social Media Profile';
@@ -763,7 +812,7 @@
             if (feedAvatar) feedAvatar.src = currentBrand.avatar || DEFAULT_BRAND.avatar;
 
             const storyHandle = document.getElementById('storyBrandHandle');
-            if (storyHandle) storyHandle.innerText = currentBrand.handle || 'brandkita_official';
+            if (storyHandle) storyHandle.innerText = currentBrand.handle || 'kcmamuju_244';
 
             const storyAvatar = document.getElementById('storyBrandAvatar');
             if (storyAvatar) storyAvatar.src = currentBrand.avatar || DEFAULT_BRAND.avatar;
@@ -771,8 +820,14 @@
 
         async function loadInitialData() {
             try {
+                const savedLocal = localStorage.getItem('postflow_posts_local');
+                if (savedLocal) {
+                    posts = JSON.parse(savedLocal);
+                    return;
+                }
+
                 const postsRes = await fetch('/api/posts').then(r => r.json()).catch(() => null);
-                if (postsRes && postsRes.success) {
+                if (postsRes && postsRes.success && postsRes.posts && postsRes.posts.length) {
                     posts = postsRes.posts;
                 } else {
                     posts = getLocalSeedPosts();
@@ -780,6 +835,11 @@
             } catch (err) {
                 posts = getLocalSeedPosts();
             }
+            savePostsToLocal();
+        }
+
+        function savePostsToLocal() {
+            localStorage.setItem('postflow_posts_local', JSON.stringify(posts));
         }
 
         function getLocalSeedPosts() {
@@ -820,18 +880,21 @@
             ];
         }
 
+        // TAB SWITCHER
         function switchTab(tabId) {
             triggerSoundFx('click');
             document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-tab').forEach(el => {
-                el.classList.remove('bg-white', 'text-pink-600', 'shadow-sm', 'border', 'border-slate-200/60');
+                el.classList.remove('bg-white', 'text-pink-600', 'shadow-xs', 'border', 'border-slate-200/60');
                 el.classList.add('text-slate-600');
             });
 
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            const targetView = document.getElementById(`view-${tabId}`);
+            if (targetView) targetView.classList.remove('hidden');
+
             const btn = document.getElementById(`tab-${tabId}`);
             if (btn) {
-                btn.classList.add('bg-white', 'text-pink-600', 'shadow-sm', 'border', 'border-slate-200/60');
+                btn.classList.add('bg-white', 'text-pink-600', 'shadow-xs', 'border', 'border-slate-200/60');
                 btn.classList.remove('text-slate-600');
             }
 
@@ -840,6 +903,7 @@
             if (tabId === 'users') renderUserTable();
         }
 
+        // USER CONTEXT & RBAC
         function renderUserSelectorDropdown() {
             const dropdown = document.getElementById('userSelectorDropdown');
             if (!dropdown) return;
@@ -881,6 +945,7 @@
             }
         }
 
+        // KANBAN BOARD
         function renderKanban() {
             const cols = {
                 draft: document.getElementById('col-draft'),
@@ -898,7 +963,7 @@
 
                 card.innerHTML = `
                     <div class="flex gap-3">
-                        <img src="${post.mediaUrl}" class="w-14 h-14 rounded-xl object-cover group-hover:scale-105 transition-transform shadow-xs">
+                        <img src="${post.mediaUrl}" class="w-14 h-14 rounded-xl object-cover group-hover:scale-105 transition-transform shadow-xs" alt="Media">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-1.5 mb-0.5">
                                 <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-pink-600 border border-slate-200">${post.type || 'FEED'}</span>
@@ -922,6 +987,7 @@
             document.getElementById('badge-published').innerText = posts.filter(p => p.status === 'published').length;
         }
 
+        // CALENDAR
         function renderCalendar() {
             const grid = document.getElementById('calendarDaysGrid');
             if (!grid) return;
@@ -944,6 +1010,7 @@
             }
         }
 
+        // INSTAGRAM FEED PREVIEW
         function renderIgGrid() {
             const grid = document.getElementById('igFeedGrid');
             if (!grid) return;
@@ -964,7 +1031,7 @@
                     triggerSoundFx('click');
                 };
                 item.innerHTML = `
-                    <img src="${p.mediaUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <img src="${p.mediaUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Feed Item">
                     <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-3">
                         <span><i class="fa-solid fa-heart mr-1"></i> Live</span>
                     </div>
@@ -973,6 +1040,7 @@
             });
         }
 
+        // USER CRUD MANAGEMENT TABLE
         function renderUserTable() {
             const tbody = document.getElementById('userTableBody');
             if (!tbody) return;
@@ -990,7 +1058,7 @@
 
                 tr.innerHTML = `
                     <td class="py-3.5 px-4 flex items-center gap-3">
-                        <img src="${u.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-2xs">
+                        <img src="${u.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-2xs" alt="${u.name}">
                         <span class="font-bold text-slate-900">${u.name}</span>
                     </td>
                     <td class="py-3.5 px-4 font-mono text-[11px] text-slate-500">${u.email}</td>
@@ -1000,10 +1068,10 @@
                     <td class="py-3.5 px-4 text-[11px] text-slate-600 font-medium">${permText}</td>
                     <td class="py-3.5 px-4 text-center">
                         <div class="inline-flex items-center justify-center gap-1.5">
-                            <button onclick="openEditUserModal('${u.id}')" class="p-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white border border-indigo-200 rounded-xl transition" title="Edit Anggota">
+                            <button type="button" onclick="openEditUserModal('${u.id}')" class="p-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white border border-indigo-200 rounded-xl transition cursor-pointer" title="Edit Anggota">
                                 <i class="fa-solid fa-pen-to-square text-xs"></i>
                             </button>
-                            <button onclick="deleteUser('${u.id}')" class="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 rounded-xl transition" title="Hapus Anggota">
+                            <button type="button" onclick="deleteUser('${u.id}')" class="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 rounded-xl transition cursor-pointer" title="Hapus Anggota">
                                 <i class="fa-solid fa-trash text-xs"></i>
                             </button>
                         </div>
@@ -1014,6 +1082,7 @@
         }
 
         function openAddUserModal() {
+            triggerSoundFx('click');
             document.getElementById('modalUserFormTitle').innerHTML = '<i class="fa-solid fa-user-plus text-indigo-600"></i> Tambah Anggota Tim';
             document.getElementById('formUserId').value = '';
             document.getElementById('formUserName').value = '';
@@ -1024,6 +1093,7 @@
         }
 
         function openEditUserModal(userId) {
+            triggerSoundFx('click');
             const user = users.find(u => u.id === userId);
             if (!user) return;
 
@@ -1098,6 +1168,7 @@
             });
         }
 
+        // POST DETAILS & APPROVAL WORKFLOW
         function openDetailModal(postId) {
             triggerSoundFx('click');
             const post = posts.find(p => p.id === postId);
@@ -1137,8 +1208,8 @@
             } else if (canApprove) {
                 actions.innerHTML = `
                     <div class="flex gap-2">
-                        <button onclick="promptRevision('${post.id}')" class="flex-1 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl font-bold text-xs transition-colors">Minta Revisi</button>
-                        <button onclick="executeApproveAndPublish('${post.id}')" id="btnApproveAction" class="flex-1 py-3 ig-gradient text-white rounded-2xl font-bold text-xs shadow-md shadow-pink-500/20 hover:opacity-95 transition-all">Approve & Publish Live</button>
+                        <button type="button" onclick="promptRevision('${post.id}')" class="flex-1 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl font-bold text-xs transition-colors cursor-pointer">Minta Revisi</button>
+                        <button type="button" onclick="executeApproveAndPublish('${post.id}')" id="btnApproveAction" class="flex-1 py-3 ig-gradient text-white rounded-2xl font-bold text-xs shadow-md shadow-pink-500/20 hover:opacity-95 transition-all cursor-pointer">Approve & Publish Live</button>
                     </div>
                 `;
             } else {
@@ -1171,6 +1242,7 @@
                     post.status = 'published';
                     post.publishedAt = new Date().toISOString();
                 }
+                savePostsToLocal();
                 renderKanban();
                 renderIgGrid();
                 closeDetailModal();
@@ -1180,6 +1252,7 @@
             } catch (err) {
                 const post = posts.find(p => p.id === postId);
                 if (post) post.status = 'published';
+                savePostsToLocal();
                 renderKanban();
                 renderIgGrid();
                 closeDetailModal();
@@ -1213,6 +1286,7 @@
                 post.comments.push({ author: currentUser.name, note, createdAt: new Date().toISOString() });
             }
 
+            savePostsToLocal();
             renderKanban();
             closeRevisionModal();
             closeDetailModal();
@@ -1256,12 +1330,14 @@
             };
 
             posts.unshift(payload);
+            savePostsToLocal();
             renderKanban();
             closeCreateModal();
             triggerSoundFx('click');
             showToast('Draf diajukan ke antrean approval!', 'success');
         }
 
+        // AI STUDIO FEATURES
         async function generateAiCopy() {
             const topic = document.getElementById('aiTopicInput').value.trim();
             const tone = document.getElementById('aiToneSelect').value;
@@ -1372,6 +1448,7 @@
             }
         }
 
+        // UTILITY: TOASTS & CONFIRMATION
         function showToast(msg, type = 'info') {
             const c = document.getElementById('toastContainer');
             const t = document.createElement('div');
@@ -1394,8 +1471,8 @@
                     </h4>
                     <p class="text-xs text-slate-600 font-medium">${message}</p>
                     <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button id="btnCancelConfirm" class="px-3.5 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl">Batal</button>
-                        <button id="btnProceedConfirm" class="px-4 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md">Ya, Hapus</button>
+                        <button type="button" id="btnCancelConfirm" class="px-3.5 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
+                        <button type="button" id="btnProceedConfirm" class="px-4 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md cursor-pointer">Ya, Hapus</button>
                     </div>
                 </div>
             `;
