@@ -357,7 +357,7 @@
     </div>
   </div>
 
-  <!-- MODAL: DETAIL, APPROVAL & FEEDBACK REVISI INTERAKTIF -->
+  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW (INTERACTIVE FORM) -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -366,8 +366,8 @@
       </div>
       <div class="p-6 space-y-4 text-xs">
         
-        <!-- Media & Info -->
-        <div class="flex gap-4">
+        <!-- Media & Caption Default View -->
+        <div id="defaultMediaContainer" class="flex gap-4">
           <img id="detailMediaImg" src="" class="w-32 h-32 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0" />
           <div class="space-y-2 flex-1">
             <span id="detailStatusBadge" class="px-2.5 py-1 rounded-md text-[10px] font-bold">STATUS</span>
@@ -376,7 +376,7 @@
           </div>
         </div>
 
-        <!-- REVISION FEEDBACK BOX (Muncul jika ada revisi) -->
+        <!-- REVISION FEEDBACK BOX (Peringatan Catatan Revisi) -->
         <div id="revisionFeedbackContainer" class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5 hidden">
           <div class="flex items-center gap-1.5 text-rose-800 font-bold">
             <i class="ph-bold ph-warning-circle text-sm"></i>
@@ -385,13 +385,29 @@
           <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
         </div>
 
-        <!-- INPUT CATATAN REVISI KHUSUS APPROVER -->
-        <div id="revisionInputContainer" class="space-y-1.5 hidden">
-          <label class="block font-bold text-slate-700">Tulis Catatan / Poin Revisi (Sebelum Minta Revisi):</label>
-          <textarea id="revisionNotesInput" rows="2" class="w-full p-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30" placeholder="Contoh: Typo pada caption baris 2, tolong resolusi gambar diperjelas..."></textarea>
+        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator Upload Ulang & Edit Teks) -->
+        <div id="revisionEditFormContainer" class="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 hidden">
+          <div class="flex items-center gap-1.5 text-amber-900 font-bold border-b border-amber-200/60 pb-2">
+            <i class="ph-bold ph-pencil-simple-line text-sm text-amber-600"></i>
+            <span>Formulir Perbaikan Materi (Creator)</span>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Ganti Tautan / URL Media Banner Baru:</label>
+            <input type="url" id="editMediaUrlInput" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500" placeholder="https://..." />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Perbaiki Teks Caption & Hashtag:</label>
+            <textarea id="editCaptionInput" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+          </div>
         </div>
 
-        <!-- ACTION BUTTONS -->
+        <!-- INPUT CATATAN REVISI KHUSUS PENINJAU (Reviewer / Client / Admin) -->
+        <div id="revisionInputContainer" class="space-y-1.5 hidden">
+          <label class="block font-bold text-slate-700">Tulis Poin Catatan Revisi (Sebelum Minta Revisi):</label>
+          <textarea id="revisionNotesInput" rows="2" class="w-full p-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30" placeholder="Contoh: Typo pada kalimat pembuka, tolong gambar diperjelas..."></textarea>
+        </div>
+
+        <!-- ACTION BUTTONS CONTAINER -->
         <div id="approvalActionContainer" class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-2"></div>
       </div>
     </div>
@@ -671,14 +687,12 @@
       }
     }
 
-    // UPDATE STATUS DENGAN FITUR CATATAN REVISI
+    // UPDATE STATUS BIASA / APPROVE
     async function updatePostStatus(postId, newStatus, revisionNotes = null) {
       const p = posts.find(item => item.id === postId);
       if (p) {
         p.status = newStatus;
-        if (revisionNotes !== null) {
-          p.revision_notes = revisionNotes;
-        }
+        if (revisionNotes !== null) p.revision_notes = revisionNotes;
 
         renderKanban();
         renderCalendar();
@@ -700,12 +714,52 @@
       }
     }
 
+    // REQUEST REVISI OLEH REVIEWER
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
       if (!notes) {
         return alert('Harap tulis poin catatan revisi terlebih dahulu agar Creator mengetahui bagian yang harus diperbaiki.');
       }
       updatePostStatus(postId, 'revision', notes);
+    }
+
+    // SUBMIT ULANG REVISI OLEH CREATOR BESERTA PERBAIKAN MATERI
+    async function handleResubmitRevision(postId) {
+      const updatedMedia = document.getElementById('editMediaUrlInput').value.trim();
+      const updatedCaption = document.getElementById('editCaptionInput').value.trim();
+
+      if (!updatedMedia || !updatedCaption) {
+        return alert('Media URL dan Caption tidak boleh kosong.');
+      }
+
+      const p = posts.find(item => item.id === postId);
+      if (p) {
+        // Update di state frontend
+        p.media_url = updatedMedia;
+        p.caption = updatedCaption;
+        p.status = 'review'; // Pindah kembali ke kolom review
+
+        renderKanban();
+        renderCalendar();
+        renderFeedPreview();
+        closeDetailModal();
+
+        // Update di database Supabase
+        try {
+          await fetch('/api/posts', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: postId,
+              status: 'review',
+              media_url: updatedMedia,
+              caption: updatedCaption
+            })
+          });
+        } catch (err) {
+          console.error('Gagal memperbarui materi revisi di Supabase:', err);
+        }
+      }
     }
 
     // 4. KANBAN & APPROVAL WORKFLOW
@@ -774,7 +828,7 @@
          post.status === 'review' ? 'bg-amber-100 text-amber-800' :
          post.status === 'revision' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-800');
 
-      // Tampilkan box catatan revisi jika ada
+      // Feedback revisi box
       const feedbackBox = document.getElementById('revisionFeedbackContainer');
       const feedbackText = document.getElementById('revisionFeedbackText');
       if (post.revision_notes) {
@@ -784,27 +838,40 @@
         feedbackBox.classList.add('hidden');
       }
 
-      // Input catatan revisi (hanya muncul di status 'review' bagi peninjau)
+      // Input catatan revisi (untuk peninjau saat review)
       const inputContainer = document.getElementById('revisionInputContainer');
       document.getElementById('revisionNotesInput').value = '';
       inputContainer.classList.add('hidden');
 
+      // Form upload & edit perbaikan (untuk creator saat revisi)
+      const editFormContainer = document.getElementById('revisionEditFormContainer');
+      editFormContainer.classList.add('hidden');
+
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
-      // LOGIKA AKSI WORKFLOW ADAPTIF
+      // WORKFLOW ADAPTIF BERDASARKAN STATUS & ROLE
       if (post.status === 'draft') {
-        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold">Ajukan untuk Review</button>`;
+        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
       } else if (post.status === 'review') {
         if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
           inputContainer.classList.remove('hidden');
-          actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Revisi</button>`;
-          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold">Setujui & Publikasikan</button>`;
+          actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Catatan Revisi</button>`;
+          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5"><i class="ph-bold ph-check"></i> Setujui & Publikasikan</button>`;
         } else {
-          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu persetujuan Reviewer / Admin / Client.</span>`;
+          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu peninjauan dari Tim QC / Reviewer / Client.</span>`;
         }
       } else if (post.status === 'revision') {
-        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold">Kirim Ulang Hasil Revisi</button>`;
+        // Tampilkan form edit perbaikan materi
+        editFormContainer.classList.remove('hidden');
+        document.getElementById('editMediaUrlInput').value = post.media_url;
+        document.getElementById('editCaptionInput').value = post.caption;
+
+        actions.innerHTML += `
+          <button onclick="handleResubmitRevision('${post.id}')" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl font-bold shadow-md shadow-amber-500/20 flex items-center gap-1.5">
+            <i class="ph-bold ph-paper-plane-tilt"></i> Simpan Materi & Kirim Ulang ke Reviewer
+          </button>
+        `;
       }
 
       document.getElementById('detailModal').classList.remove('hidden');
