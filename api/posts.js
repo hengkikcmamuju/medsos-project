@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-user-role, Authorization');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
@@ -35,6 +35,10 @@ export default async function handler(req, res) {
   }
   body = body || {};
 
+  // Normalisasi Role secara case-insensitive dari berbagai sumber input
+  const rawRole = req.headers['x-user-role'] || body.role || (req.query && req.query.role) || '';
+  const userRole = String(rawRole).trim().toUpperCase();
+
   try {
     // 1. GET: Ambil daftar postingan
     if (req.method === 'GET') {
@@ -49,8 +53,8 @@ export default async function handler(req, res) {
 
     // 2. POST: Simpan postingan baru (Wewenang: CREATOR & ADMIN)
     if (req.method === 'POST') {
-      const userRole = body.role || 'CREATOR';
-      if (userRole !== 'CREATOR' && userRole !== 'ADMIN') {
+      const creatorRole = (userRole || 'CREATOR');
+      if (creatorRole !== 'CREATOR' && creatorRole !== 'ADMIN') {
         return res.status(403).json({ error: 'Akses Ditolak: Hanya Creator dan Admin yang dapat membuat postingan baru.' });
       }
 
@@ -90,14 +94,14 @@ export default async function handler(req, res) {
 
     // 3. PUT: Update Status / Revisi / Publish (Validasi RBAC Ketat)
     if (req.method === 'PUT') {
-      const { id, status, revision_notes, media_url, caption, title, role } = body;
+      const { id, status, revision_notes, media_url, caption, title } = body;
       if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
 
-      // Cek Wewenang Status
-      if (role === 'CREATOR' && status === 'published') {
+      // Cek Wewenang Status secara case-insensitive
+      if (userRole === 'CREATOR' && status === 'published') {
         return res.status(403).json({ error: 'Akses Ditolak: Creator tidak memiliki wewenang untuk menerbitkan postingan.' });
       }
-      if ((role === 'REVIEWER' || role === 'CLIENT') && status === 'draft') {
+      if ((userRole === 'REVIEWER' || userRole === 'CLIENT') && status === 'draft') {
         return res.status(403).json({ error: 'Akses Ditolak: Reviewer/Client tidak dapat memindahkan postingan kembali ke draft.' });
       }
 
@@ -127,11 +131,10 @@ export default async function handler(req, res) {
 
     // 4. DELETE: Hapus postingan (Khusus ADMIN & Hanya untuk postingan belum published)
     if (req.method === 'DELETE') {
-      const id = body.id || req.query.id;
-      const role = body.role || req.headers['x-user-role'];
+      const id = body.id || (req.query && req.query.id);
 
       if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
-      if (role !== 'ADMIN') {
+      if (userRole !== 'ADMIN') {
         return res.status(403).json({ error: 'Akses Ditolak: Hanya Administrator yang berwenang menghapus postingan.' });
       }
 
