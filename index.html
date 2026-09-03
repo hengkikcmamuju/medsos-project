@@ -1147,6 +1147,59 @@
           await fetch('/api/posts', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (err) {
+          console.error('Gagal update status:', err);
+          showToast('Gagal memperbarui status ke database.', 'error');
+        }
+      }
+    }
+
+    // FUNGSI KHUSUS ADMIN: HAPUS POSTINGAN YANG BELUM PUBLISH
+    function handleDeletePost(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      if (post.status === 'published') {
+        showToast('Postingan yang sudah terbit (published) tidak dapat dihapus.', 'warning');
+        return;
+      }
+
+      if (currentRole !== 'ADMIN') {
+        showToast('Hanya Administrator yang memiliki wewenang untuk menghapus postingan.', 'error');
+        return;
+      }
+
+      openConfirmModal(
+        'Hapus Draf Postingan',
+        `Apakah Anda yakin ingin menghapus konten "${post.title}" secara permanen dari database Supabase? Tindakan ini tidak dapat dibatalkan.`,
+        async () => {
+          posts = posts.filter(p => p.id !== postId);
+          renderKanban();
+          renderCalendar();
+          renderFeedPreview();
+          closeDetailModal();
+          showToast('Postingan berhasil dihapus secara permanen.', 'info');
+
+          try {
+            await fetch(`/api/posts?id=${postId}`, {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: postId, role: currentRole })
+            });
+          } catch (err) {
+            console.error('Gagal menghapus postingan di Supabase:', err);
+            showToast('Gagal menghapus postingan dari server database.', 'error');
+          }
+        },
+        'ph-trash',
+        true
+      );
+    }
+
+    function handleRequestRevision(postId) {
+      const notes = document.getElementById('revisionNotesInput').value.trim();
             body: JSON.stringify({
               id: postId,
               status: 'review',
@@ -1248,13 +1301,25 @@
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
+      // Tombol Hapus khusus ADMIN jika postingan BELUM published
+      let deleteBtnHtml = '';
+      if (currentRole === 'ADMIN' && post.status !== 'published') {
+        deleteBtnHtml = `
+          <button type="button" onclick="handleDeletePost('${post.id}')" class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold border border-rose-200 transition text-xs flex items-center gap-1.5 mr-auto cursor-pointer" title="Hapus postingan ini secara permanen">
+            <i class="ph-bold ph-trash text-sm"></i> Hapus Post
+          </button>
+        `;
+      }
+
       if (post.status === 'draft') {
+        actions.innerHTML = deleteBtnHtml;
         if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold flex items-center gap-1.5 cursor-pointer"><i class="ph-bold ph-paper-plane-tilt"></i> Ajukan untuk Review</button>`;
         } else {
           actions.innerHTML += `<span class="text-xs text-slate-400 italic">Draf internal (menunggu diajukan oleh Creator).</span>`;
         }
       } else if (post.status === 'review') {
+        actions.innerHTML = deleteBtnHtml;
         if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
           inputContainer.classList.remove('hidden');
           actions.innerHTML += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200 cursor-pointer">Minta Catatan Revisi</button>`;
@@ -1263,6 +1328,7 @@
           actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu evaluasi Reviewer / Client / Admin.</span>`;
         }
       } else if (post.status === 'revision') {
+        actions.innerHTML = deleteBtnHtml;
         if (currentRole === 'CREATOR' || currentRole === 'ADMIN') {
           editFormContainer.classList.remove('hidden');
           document.getElementById('editTitleInput').value = post.title;
