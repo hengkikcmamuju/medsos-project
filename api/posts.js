@@ -24,8 +24,19 @@ export default async function handler(req, res) {
     });
   }
 
+  // Parse Body dengan Aman
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      body = {};
+    }
+  }
+  body = body || {};
+
   try {
-    // 1. AMBIL SEMUA POST (GET)
+    // 1. GET: Ambil semua postingan
     if (req.method === 'GET') {
       const { data, error } = await supabase
         .from('posts')
@@ -36,18 +47,13 @@ export default async function handler(req, res) {
       return res.status(200).json(data || []);
     }
 
-    // Parse req.body jika berupa string
-    let body = req.body;
-    if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        // Biarkan tetap body jika gagal parse
-      }
-    }
-
-    // 2. SIMPAN POST BARU (POST)
+    // 2. POST: Simpan postingan baru
     if (req.method === 'POST') {
+      let validScheduledAt = null;
+      if (body.scheduled_at && !isNaN(new Date(body.scheduled_at).getTime())) {
+        validScheduledAt = new Date(body.scheduled_at).toISOString();
+      }
+
       const newPost = {
         id: body.id || ('POST-' + Date.now()),
         brand_id: body.brand_id || 'BRD-01',
@@ -58,7 +64,7 @@ export default async function handler(req, res) {
         type: body.type || 'FEED',
         status: body.status || 'draft',
         author: body.author || 'Tim Kreatif',
-        scheduled_at: body.scheduled_at ? new Date(body.scheduled_at).toISOString() : null,
+        scheduled_at: validScheduledAt,
         metrics: { likes: 0, reach: 0, shares: 0, comments: 0 },
         created_at: new Date().toISOString()
       };
@@ -73,13 +79,13 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: error.message });
       }
 
-      return res.status(201).json(data[0]);
+      return res.status(201).json(data && data[0] ? data[0] : newPost);
     }
 
-    // 3. UPDATE STATUS / APPROVAL (PUT)
+    // 3. PUT: Update Status / Approval
     if (req.method === 'PUT') {
       const { id, status } = body;
-      if (!id) return res.status(400).json({ error: 'Post ID diperlukan' });
+      if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
 
       const updates = { status };
       if (status === 'published') {
@@ -97,12 +103,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: error.message });
       }
 
-      return res.status(200).json(data[0]);
+      return res.status(200).json(data && data[0] ? data[0] : updates);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
-    console.error('Server error:', err);
+    console.error('Server execution error:', err);
     return res.status(500).json({ error: err.message || 'Internal Server Error' });
   }
 }
