@@ -11,6 +11,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -23,6 +24,7 @@ export default async function handler(req, res) {
     });
   }
 
+  // Parse Body dengan Aman
   let body = req.body;
   if (typeof body === 'string') {
     try {
@@ -121,6 +123,44 @@ export default async function handler(req, res) {
       }
 
       return res.status(200).json(data && data[0] ? data[0] : updates);
+    }
+
+    // 4. DELETE: Hapus postingan (Khusus ADMIN & Hanya untuk postingan belum published)
+    if (req.method === 'DELETE') {
+      const id = body.id || req.query.id;
+      const role = body.role || req.headers['x-user-role'];
+
+      if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
+      if (role !== 'ADMIN') {
+        return res.status(403).json({ error: 'Akses Ditolak: Hanya Administrator yang berwenang menghapus postingan.' });
+      }
+
+      // Pastikan status bukan 'published'
+      const { data: existingPost, error: checkErr } = await supabase
+        .from('posts')
+        .select('status')
+        .eq('id', id)
+        .single();
+
+      if (checkErr || !existingPost) {
+        return res.status(404).json({ error: 'Postingan tidak ditemukan di database.' });
+      }
+
+      if (existingPost.status === 'published') {
+        return res.status(403).json({ error: 'Postingan yang sudah terbit (published) tidak dapat dihapus.' });
+      }
+
+      const { error: deleteErr } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', id);
+
+      if (deleteErr) {
+        console.error('Supabase delete error:', deleteErr);
+        return res.status(400).json({ error: deleteErr.message });
+      }
+
+      return res.status(200).json({ success: true, message: 'Postingan berhasil dihapus secara permanen.' });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
