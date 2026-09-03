@@ -93,7 +93,7 @@
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 py-1 px-2.5 rounded-xl text-xs">
           <img id="userAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-6 h-6 rounded-full object-cover border border-slate-300" alt="Avatar" />
           <select id="userRoleSelector" onchange="changeCurrentUser(this.value)" class="bg-transparent font-semibold text-slate-700 focus:outline-none cursor-pointer">
-            <!-- Options populated dynamically -->
+            <!-- Populated Dynamically -->
           </select>
         </div>
 
@@ -212,7 +212,7 @@
           <div class="flex items-center justify-between mb-3">
             <img id="previewAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150" class="w-16 h-16 rounded-full border-2 border-rose-500 p-0.5 object-cover" />
             <div class="flex gap-4 text-center">
-              <div><span class="font-bold block text-sm" id="previewPostCount">3</span><span class="text-[10px] text-slate-500">Posts</span></div>
+              <div><span class="font-bold block text-sm" id="previewPostCount">0</span><span class="text-[10px] text-slate-500">Posts</span></div>
               <div><span class="font-bold block text-sm">4.2K</span><span class="text-[10px] text-slate-500">Followers</span></div>
               <div><span class="font-bold block text-sm">318</span><span class="text-[10px] text-slate-500">Following</span></div>
             </div>
@@ -248,12 +248,12 @@
       </div>
     </section>
 
-    <!-- VIEW 5: TIM & RBAC (FULLY DYNAMIC CRUD) -->
+    <!-- VIEW 5: TIM & RBAC (4 ROLES FULL CRUD) -->
     <section id="view-users" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 gap-3">
         <div>
-          <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC</h2>
-          <p class="text-xs text-slate-500">Kelola daftar anggota tim dan hak akses otorisasi postingan.</p>
+          <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC (4 Peran)</h2>
+          <p class="text-xs text-slate-500">Atur hak akses otorisasi untuk Admin, Reviewer, Creator, dan Client.</p>
         </div>
         <button onclick="openUserModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
           <i class="ph-bold ph-user-plus text-sm"></i> Tambah Anggota
@@ -270,16 +270,14 @@
               <th class="py-3 px-4 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody id="userTableBody" class="divide-y divide-slate-100">
-            <!-- Rendered by renderTeamTable() -->
-          </tbody>
+          <tbody id="userTableBody" class="divide-y divide-slate-100"></tbody>
         </table>
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL: FORM ANGGOTA TIM (TAMBAH / EDIT) -->
+  <!-- MODAL: FORM ANGGOTA TIM (4 ROLES) -->
   <div id="userModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -290,7 +288,7 @@
         <input type="hidden" id="editUserId" value="" />
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap</label>
-          <input type="text" id="userNameInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Dimas Wahyu" />
+          <input type="text" id="userNameInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Budi Santoso" />
         </div>
         <div>
           <label class="block font-semibold text-slate-700 mb-1">Alamat Email</label>
@@ -300,8 +298,9 @@
           <label class="block font-semibold text-slate-700 mb-1">Peran / Hak Akses (Role)</label>
           <select id="userRoleInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white font-medium">
             <option value="ADMIN">ADMIN (Lead & Publisher - Akses Penuh)</option>
+            <option value="REVIEWER">REVIEWER (Internal QC & Approver)</option>
             <option value="CREATOR">CREATOR (Pembuat Konten Draf)</option>
-            <option value="CLIENT">CLIENT (Pemberi Approval / Reviewer)</option>
+            <option value="CLIENT">CLIENT (Pemberi Approval Akhir)</option>
           </select>
         </div>
         <div>
@@ -442,11 +441,12 @@
     let currentRole = 'ADMIN';
     let currentUserId = 'USR-01';
 
-    // State Anggota Tim Dinamis (dengan persistensi lokal)
+    // State 4 Peran Tim
     const DEFAULT_USERS = [
-      { id: 'USR-01', name: 'Dimas Admin (Lead)', email: 'dimas@postflow.local', role: 'ADMIN', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', status: 'Aktif' },
-      { id: 'USR-02', name: 'Putri Rahayu (Creator)', email: 'putri@postflow.local', role: 'CREATOR', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', status: 'Aktif' },
-      { id: 'USR-03', name: 'Rian Prakoso (Client)', email: 'rian@client.local', role: 'CLIENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', status: 'Aktif' }
+      { id: 'USR-01', name: 'Dimas Admin', email: 'dimas@postflow.local', role: 'ADMIN', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', status: 'Aktif' },
+      { id: 'USR-02', name: 'Bambang Reviewer', email: 'bambang@postflow.local', role: 'REVIEWER', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', status: 'Aktif' },
+      { id: 'USR-03', name: 'Putri Rahayu', email: 'putri@postflow.local', role: 'CREATOR', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', status: 'Aktif' },
+      { id: 'USR-04', name: 'Rian Prakoso', email: 'rian@client.local', role: 'CLIENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', status: 'Aktif' }
     ];
 
     let teamUsers = JSON.parse(localStorage.getItem('postflow_team_users')) || DEFAULT_USERS;
@@ -457,7 +457,7 @@
       renderUserSelector();
     }
 
-    // 2. MANAJEMEN TIM (CRUD)
+    // 2. MANAJEMEN TIM (CRUD & 4 ROLES)
     function renderTeamTable() {
       const tbody = document.getElementById('userTableBody');
       if (!tbody) return;
@@ -465,7 +465,9 @@
 
       teamUsers.forEach(user => {
         const roleColor = user.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                          user.role === 'CREATOR' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-amber-50 text-amber-700 border-amber-200';
+                          user.role === 'REVIEWER' ? 'bg-teal-50 text-teal-700 border-teal-200' :
+                          user.role === 'CREATOR' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                          'bg-amber-50 text-amber-700 border-amber-200';
 
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-slate-50/80 transition';
@@ -569,13 +571,11 @@
       const avatar = document.getElementById('userAvatarInput').value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
 
       if (editId) {
-        // Update
         const idx = teamUsers.findIndex(u => u.id === editId);
         if (idx !== -1) {
           teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
         }
       } else {
-        // Create
         teamUsers.push({
           id: 'USR-' + Date.now(),
           name,
@@ -607,7 +607,7 @@
           renderFeedPreview();
         }
       } catch (err) {
-        console.warn('Fallback ke data lokal:', err.message);
+        console.warn('Fallback data:', err.message);
         statusBadge.textContent = 'Supabase Offline (Lokal)';
       }
     }
@@ -629,6 +629,7 @@
         platform: 'instagram'
       };
 
+      // Optimistic UI Update
       posts.unshift(newPost);
       renderKanban();
       renderCalendar();
@@ -636,14 +637,19 @@
       closePostModal();
       document.getElementById('newPostForm').reset();
 
+      // Eksekusi POST ke Backend Supabase
       try {
-        await fetch('/api/posts', {
+        const res = await fetch('/api/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newPost)
         });
+        if (!res.ok) {
+          const errData = await res.json();
+          console.error('Server menolak penyimpanan:', errData);
+        }
       } catch (err) {
-        console.error('Gagal kirim ke Supabase:', err);
+        console.error('Koneksi POST Supabase gagal:', err);
       }
     }
 
@@ -668,7 +674,7 @@
       }
     }
 
-    // 4. KANBAN & WORKFLOW DETAIL
+    // 4. KANBAN & APPROVAL WORKFLOW
     function renderKanban() {
       const cols = {
         draft: document.getElementById('column-draft'),
@@ -731,14 +737,15 @@
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
+      // Hak Akses Persetujuan Adaptif untuk 4 Peran
       if (post.status === 'draft') {
         actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold">Ajukan untuk Review</button>`;
       } else if (post.status === 'review') {
-        if (currentRole === 'ADMIN' || currentRole === 'CLIENT') {
+        if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'revision')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Revisi</button>`;
           actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold">Setujui & Publikasikan</button>`;
         } else {
-          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu persetujuan Admin / Klien.</span>`;
+          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu persetujuan Reviewer / Admin / Client.</span>`;
         }
       } else if (post.status === 'revision') {
         actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 text-white rounded-xl font-bold">Kirim Ulang Revisi</button>`;
@@ -755,7 +762,7 @@
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
-    // NAVIGATION TABS
+    // 5. NAVIGATION TABS
     function switchTab(tabId) {
       ['board', 'calendar', 'preview', 'ai', 'users'].forEach(t => {
         const view = document.getElementById('view-' + t);
@@ -772,7 +779,7 @@
       if (tabId === 'users') renderTeamTable();
     }
 
-    // CALENDAR & FEED
+    // 6. CALENDAR & FEED PREVIEW
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
@@ -812,7 +819,7 @@
     }
 
     function saveApiSettings() {
-      alert('Pengaturan token berhasil disimpan!');
+      alert('Pengaturan token API berhasil disimpan!');
       closeApiModal();
     }
 
