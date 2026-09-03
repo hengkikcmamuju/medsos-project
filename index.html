@@ -49,7 +49,7 @@
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
       
-      <!-- Brand & Status -->
+      <!-- Brand Logo -->
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
           <i class="ph-bold ph-instagram-logo"></i>
@@ -82,20 +82,18 @@
         </button>
       </nav>
 
-      <!-- Action & Profile -->
+      <!-- Profile & Actions -->
       <div class="flex items-center gap-2">
         <button onclick="openApiSettingsModal()" title="Pengaturan Integrasi Token API" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
           <i class="ph-bold ph-plug text-indigo-500 text-sm"></i>
           <span class="hidden sm:inline">Integrasi API</span>
         </button>
 
-        <!-- Current User Role Selector -->
+        <!-- Dynamic User Role Selector -->
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 py-1 px-2.5 rounded-xl text-xs">
           <img id="userAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-6 h-6 rounded-full object-cover border border-slate-300" alt="Avatar" />
           <select id="userRoleSelector" onchange="changeCurrentUser(this.value)" class="bg-transparent font-semibold text-slate-700 focus:outline-none cursor-pointer">
-            <option value="USR-01">Dimas Admin (Lead)</option>
-            <option value="USR-02">Putri Rahayu (Creator)</option>
-            <option value="USR-03">Rian Prakoso (Client)</option>
+            <!-- Options populated dynamically -->
           </select>
         </div>
 
@@ -203,7 +201,6 @@
     <!-- VIEW 3: FEED PREVIEW -->
     <section id="view-preview" class="hidden">
       <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
-        <!-- Mock Phone Header -->
         <div class="bg-slate-900 text-white px-6 pt-3 pb-2 flex justify-between items-center text-xs">
           <span>09:41</span>
           <div class="flex items-center gap-1.5">
@@ -211,7 +208,6 @@
             <i class="ph-bold ph-battery-full"></i>
           </div>
         </div>
-        <!-- Profile Header -->
         <div class="p-4 border-b border-slate-100">
           <div class="flex items-center justify-between mb-3">
             <img id="previewAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150" class="w-16 h-16 rounded-full border-2 border-rose-500 p-0.5 object-cover" />
@@ -224,7 +220,6 @@
           <h4 class="font-bold text-sm text-slate-900" id="previewBrandName">BTN KC Mamuju</h4>
           <p class="text-xs text-slate-600 whitespace-pre-line" id="previewBrandBio">Official Social Media Portal. Informasi produk, promo perumahan, dan layanan operasional.</p>
         </div>
-        <!-- Grid Media -->
         <div id="feedGridContainer" class="grid grid-cols-3 gap-0.5 bg-slate-100"></div>
       </div>
     </section>
@@ -253,13 +248,16 @@
       </div>
     </section>
 
-    <!-- VIEW 5: TIM & RBAC -->
+    <!-- VIEW 5: TIM & RBAC (FULLY DYNAMIC CRUD) -->
     <section id="view-users" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+      <div class="flex flex-wrap items-center justify-between pb-4 border-b border-slate-100 gap-3">
         <div>
           <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC</h2>
-          <p class="text-xs text-slate-500">Atur peran akses untuk Admin Lead, Creator, dan Client Approval.</p>
+          <p class="text-xs text-slate-500">Kelola daftar anggota tim dan hak akses otorisasi postingan.</p>
         </div>
+        <button onclick="openUserModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+          <i class="ph-bold ph-user-plus text-sm"></i> Tambah Anggota
+        </button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
@@ -268,37 +266,12 @@
               <th class="py-3 px-4">Nama Anggota</th>
               <th class="py-3 px-4">Email</th>
               <th class="py-3 px-4">Role Akses</th>
-              <th class="py-3 px-4 text-right">Status</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody id="userTableBody" class="divide-y divide-slate-100">
-            <tr>
-              <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
-                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-6 h-6 rounded-full" />
-                Dimas Admin (Lead)
-              </td>
-              <td class="py-3 px-4 text-slate-500">dimas@postflow.local</td>
-              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-bold border border-purple-200">ADMIN</span></td>
-              <td class="py-3 px-4 text-right"><span class="text-emerald-600 font-semibold">Aktif</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" class="w-6 h-6 rounded-full" />
-                Putri Rahayu
-              </td>
-              <td class="py-3 px-4 text-slate-500">putri@postflow.local</td>
-              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">CREATOR</span></td>
-              <td class="py-3 px-4 text-right"><span class="text-emerald-600 font-semibold">Aktif</span></td>
-            </tr>
-            <tr>
-              <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
-                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" class="w-6 h-6 rounded-full" />
-                Rian Prakoso
-              </td>
-              <td class="py-3 px-4 text-slate-500">rian@client.local</td>
-              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 font-bold border border-amber-200">CLIENT</span></td>
-              <td class="py-3 px-4 text-right"><span class="text-emerald-600 font-semibold">Aktif</span></td>
-            </tr>
+            <!-- Rendered by renderTeamTable() -->
           </tbody>
         </table>
       </div>
@@ -306,9 +279,46 @@
 
   </main>
 
+  <!-- MODAL: FORM ANGGOTA TIM (TAMBAH / EDIT) -->
+  <div id="userModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900" id="userModalTitle">Tambah Anggota Tim</h3>
+        <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <form id="teamUserForm" onsubmit="handleSaveUser(event)" class="p-6 space-y-4 text-xs">
+        <input type="hidden" id="editUserId" value="" />
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+          <input type="text" id="userNameInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Contoh: Dimas Wahyu" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Alamat Email</label>
+          <input type="email" id="userEmailInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="nama@instansi.com" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Peran / Hak Akses (Role)</label>
+          <select id="userRoleInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-white font-medium">
+            <option value="ADMIN">ADMIN (Lead & Publisher - Akses Penuh)</option>
+            <option value="CREATOR">CREATOR (Pembuat Konten Draf)</option>
+            <option value="CLIENT">CLIENT (Pemberi Approval / Reviewer)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">URL Avatar Foto</label>
+          <input type="url" id="userAvatarInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" />
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20">Simpan Anggota</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL: AJUKAN POST BARU -->
   <div id="postModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <h3 class="font-bold text-sm text-slate-900">Ajukan Draf Postingan Baru</h3>
         <button onclick="closePostModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
@@ -364,8 +374,6 @@
             <p class="text-[11px] text-slate-400" id="detailAuthorText">Penulis: -</p>
           </div>
         </div>
-        
-        <!-- Action Buttons (RBAC Adaptive) -->
         <div id="approvalActionContainer" class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-2"></div>
       </div>
     </div>
@@ -429,18 +437,166 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
-    // DATA GLOBAL
+    // 1. DATA STATE
     let posts = [];
-    let currentRole = 'ADMIN'; // ADMIN, CREATOR, CLIENT
-    let activePostId = null;
+    let currentRole = 'ADMIN';
+    let currentUserId = 'USR-01';
 
-    // 1. SINKRONISASI SUPABASE: LOAD DATA DARI /api/posts
+    // State Anggota Tim Dinamis (dengan persistensi lokal)
+    const DEFAULT_USERS = [
+      { id: 'USR-01', name: 'Dimas Admin (Lead)', email: 'dimas@postflow.local', role: 'ADMIN', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', status: 'Aktif' },
+      { id: 'USR-02', name: 'Putri Rahayu (Creator)', email: 'putri@postflow.local', role: 'CREATOR', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', status: 'Aktif' },
+      { id: 'USR-03', name: 'Rian Prakoso (Client)', email: 'rian@client.local', role: 'CLIENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', status: 'Aktif' }
+    ];
+
+    let teamUsers = JSON.parse(localStorage.getItem('postflow_team_users')) || DEFAULT_USERS;
+
+    function saveTeamState() {
+      localStorage.setItem('postflow_team_users', JSON.stringify(teamUsers));
+      renderTeamTable();
+      renderUserSelector();
+    }
+
+    // 2. MANAJEMEN TIM (CRUD)
+    function renderTeamTable() {
+      const tbody = document.getElementById('userTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      teamUsers.forEach(user => {
+        const roleColor = user.role === 'ADMIN' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                          user.role === 'CREATOR' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-amber-50 text-amber-700 border-amber-200';
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2.5">
+            <img src="${user.avatar}" class="w-7 h-7 rounded-full object-cover border border-slate-200" />
+            <span>${user.name}</span>
+          </td>
+          <td class="py-3 px-4 text-slate-500">${user.email}</td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${roleColor}">${user.role}</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="text-emerald-600 font-semibold flex items-center gap-1"><i class="ph-fill ph-circle text-[8px]"></i> ${user.status}</span>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="editUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-100 transition mr-1" title="Edit">
+              <i class="ph-bold ph-pencil-simple text-sm"></i>
+            </button>
+            <button onclick="deleteUser('${user.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition" title="Hapus">
+              <i class="ph-bold ph-trash text-sm"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderUserSelector() {
+      const selector = document.getElementById('userRoleSelector');
+      if (!selector) return;
+      selector.innerHTML = '';
+
+      teamUsers.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u.id;
+        opt.textContent = `${u.name} (${u.role})`;
+        if (u.id === currentUserId) opt.selected = true;
+        selector.appendChild(opt);
+      });
+
+      const activeUser = teamUsers.find(u => u.id === currentUserId) || teamUsers[0];
+      if (activeUser) {
+        document.getElementById('userAvatar').src = activeUser.avatar;
+        currentRole = activeUser.role;
+      }
+    }
+
+    function changeCurrentUser(userId) {
+      currentUserId = userId;
+      const activeUser = teamUsers.find(u => u.id === userId);
+      if (activeUser) {
+        document.getElementById('userAvatar').src = activeUser.avatar;
+        currentRole = activeUser.role;
+      }
+      renderKanban();
+    }
+
+    function openUserModal() {
+      document.getElementById('userModalTitle').textContent = 'Tambah Anggota Tim';
+      document.getElementById('teamUserForm').reset();
+      document.getElementById('editUserId').value = '';
+      document.getElementById('userModal').classList.remove('hidden');
+    }
+
+    function closeUserModal() {
+      document.getElementById('userModal').classList.add('hidden');
+    }
+
+    function editUser(userId) {
+      const user = teamUsers.find(u => u.id === userId);
+      if (!user) return;
+      document.getElementById('userModalTitle').textContent = 'Edit Anggota Tim';
+      document.getElementById('editUserId').value = user.id;
+      document.getElementById('userNameInput').value = user.name;
+      document.getElementById('userEmailInput').value = user.email;
+      document.getElementById('userRoleInput').value = user.role;
+      document.getElementById('userAvatarInput').value = user.avatar;
+      document.getElementById('userModal').classList.remove('hidden');
+    }
+
+    function deleteUser(userId) {
+      if (teamUsers.length <= 1) {
+        return alert('Minimal harus ada 1 anggota tim di dalam sistem.');
+      }
+      if (confirm('Yakin ingin menghapus anggota tim ini?')) {
+        teamUsers = teamUsers.filter(u => u.id !== userId);
+        if (currentUserId === userId) {
+          currentUserId = teamUsers[0].id;
+        }
+        saveTeamState();
+      }
+    }
+
+    function handleSaveUser(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editUserId').value;
+      const name = document.getElementById('userNameInput').value;
+      const email = document.getElementById('userEmailInput').value;
+      const role = document.getElementById('userRoleInput').value;
+      const avatar = document.getElementById('userAvatarInput').value || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
+
+      if (editId) {
+        // Update
+        const idx = teamUsers.findIndex(u => u.id === editId);
+        if (idx !== -1) {
+          teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
+        }
+      } else {
+        // Create
+        teamUsers.push({
+          id: 'USR-' + Date.now(),
+          name,
+          email,
+          role,
+          avatar,
+          status: 'Aktif'
+        });
+      }
+
+      saveTeamState();
+      closeUserModal();
+    }
+
+    // 3. SINKRONISASI POSTINGAN KE SUPABASE
     async function fetchPostsFromApi() {
       const statusBadge = document.getElementById('dbStatusBadge');
       try {
-        statusBadge.textContent = 'Memuat Data Supabase...';
+        statusBadge.textContent = 'Memuat Supabase...';
         const res = await fetch('/api/posts');
-        if (!res.ok) throw new Error('Gagal mengambil data posts');
+        if (!res.ok) throw new Error('Fetch status: ' + res.status);
         const data = await res.json();
         
         if (Array.isArray(data)) {
@@ -451,14 +607,15 @@
           renderFeedPreview();
         }
       } catch (err) {
-        console.warn('Fallback / Gagal load Supabase:', err.message);
+        console.warn('Fallback ke data lokal:', err.message);
         statusBadge.textContent = 'Supabase Offline (Lokal)';
       }
     }
 
-    // 2. SINKRONISASI SUPABASE: SIMPAN POST BARU
     async function handleCreatePost(e) {
       e.preventDefault();
+      const activeUser = teamUsers.find(u => u.id === currentUserId) || teamUsers[0];
+
       const newPost = {
         id: 'POST-' + Date.now(),
         brand_id: 'BRD-01',
@@ -468,11 +625,10 @@
         media_url: document.getElementById('postMediaUrlInput').value,
         caption: document.getElementById('postCaptionInput').value,
         status: 'draft',
-        author: 'Putri Rahayu (Creator)',
+        author: activeUser.name,
         platform: 'instagram'
       };
 
-      // Optimistic UI Update
       posts.unshift(newPost);
       renderKanban();
       renderCalendar();
@@ -480,7 +636,6 @@
       closePostModal();
       document.getElementById('newPostForm').reset();
 
-      // Kirim POST ke backend Vercel -> Supabase
       try {
         await fetch('/api/posts', {
           method: 'POST',
@@ -488,11 +643,10 @@
           body: JSON.stringify(newPost)
         });
       } catch (err) {
-        console.error('Gagal sinkronisasi post baru ke Supabase:', err);
+        console.error('Gagal kirim ke Supabase:', err);
       }
     }
 
-    // 3. SINKRONISASI SUPABASE: UPDATE STATUS POST
     async function updatePostStatus(postId, newStatus) {
       const p = posts.find(item => item.id === postId);
       if (p) {
@@ -502,7 +656,6 @@
         renderFeedPreview();
         closeDetailModal();
 
-        // Kirim PUT ke backend Vercel -> Supabase
         try {
           await fetch('/api/posts', {
             method: 'PUT',
@@ -515,7 +668,7 @@
       }
     }
 
-    // RENDER KANBAN
+    // 4. KANBAN & WORKFLOW DETAIL
     function renderKanban() {
       const cols = {
         draft: document.getElementById('column-draft'),
@@ -524,7 +677,7 @@
         published: document.getElementById('column-published')
       };
 
-      Object.values(cols).forEach(col => col.innerHTML = '');
+      Object.values(cols).forEach(col => { if (col) col.innerHTML = ''; });
       const counts = { draft: 0, review: 0, revision: 0, published: 0 };
 
       posts.forEach(post => {
@@ -559,9 +712,7 @@
       document.getElementById('count-published').textContent = counts.published;
     }
 
-    // MODAL DETAIL & APPROVAL WORKFLOW
     function openDetailModal(postId) {
-      activePostId = postId;
       const post = posts.find(p => p.id === postId);
       if (!post) return;
 
@@ -577,7 +728,6 @@
          post.status === 'review' ? 'bg-amber-100 text-amber-800' :
          post.status === 'revision' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-800');
 
-      // Setup tombol persetujuan berdasarkan Role
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
@@ -597,11 +747,7 @@
       document.getElementById('detailModal').classList.remove('hidden');
     }
 
-    function closeDetailModal() {
-      document.getElementById('detailModal').classList.add('hidden');
-    }
-
-    // MODAL CONTROL & TABS
+    function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
     function openPostModal() { document.getElementById('postModal').classList.remove('hidden'); }
     function closePostModal() { document.getElementById('postModal').classList.add('hidden'); }
     function openBrandSettingsModal() { document.getElementById('brandModal').classList.remove('hidden'); }
@@ -609,6 +755,7 @@
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
+    // NAVIGATION TABS
     function switchTab(tabId) {
       ['board', 'calendar', 'preview', 'ai', 'users'].forEach(t => {
         const view = document.getElementById('view-' + t);
@@ -622,17 +769,13 @@
           }
         }
       });
+      if (tabId === 'users') renderTeamTable();
     }
 
-    function changeCurrentUser(val) {
-      if (val === 'USR-01') currentRole = 'ADMIN';
-      if (val === 'USR-02') currentRole = 'CREATOR';
-      if (val === 'USR-03') currentRole = 'CLIENT';
-    }
-
-    // KALENDER & FEED PREVIEW HELPER
+    // CALENDAR & FEED
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
+      if (!grid) return;
       grid.innerHTML = '';
       for (let i = 1; i <= 30; i++) {
         const cell = document.createElement('div');
@@ -647,6 +790,7 @@
 
     function renderFeedPreview() {
       const cont = document.getElementById('feedGridContainer');
+      if (!cont) return;
       cont.innerHTML = '';
       document.getElementById('previewPostCount').textContent = posts.length;
       posts.forEach(p => {
@@ -672,7 +816,6 @@
       closeApiModal();
     }
 
-    // AI DRAFT SIMULATOR
     function generateAiDraft() {
       const p = document.getElementById('aiPromptInput').value;
       if (!p) return alert('Masukkan ide konten terlebih dahulu');
@@ -689,7 +832,9 @@
       switchTab('board');
     }
 
-    // INIT
+    // INITIALIZATION
+    renderTeamTable();
+    renderUserSelector();
     fetchPostsFromApi();
     renderCalendar();
     renderFeedPreview();
