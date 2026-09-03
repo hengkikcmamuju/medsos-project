@@ -11,6 +11,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -23,6 +24,7 @@ export default async function handler(req, res) {
     });
   }
 
+  // Parse Body dengan Aman
   let body = req.body;
   if (typeof body === 'string') {
     try {
@@ -81,14 +83,17 @@ export default async function handler(req, res) {
       return res.status(201).json(data && data[0] ? data[0] : newPost);
     }
 
-    // 3. PUT: Update Status & Catatan Revisi
+    // 3. PUT: Update Status, Catatan Revisi, dan Materi Baru (Media & Caption)
     if (req.method === 'PUT') {
-      const { id, status, revision_notes } = body;
+      const { id, status, revision_notes, media_url, caption, title } = body;
       if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
 
       const updates = {};
       if (status !== undefined) updates.status = status;
       if (revision_notes !== undefined) updates.revision_notes = revision_notes;
+      if (media_url !== undefined) updates.media_url = media_url;
+      if (caption !== undefined) updates.caption = caption;
+      if (title !== undefined) updates.title = title;
       if (status === 'published') {
         updates.published_at = new Date().toISOString();
       }
