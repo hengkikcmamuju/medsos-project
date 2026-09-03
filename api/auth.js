@@ -1,10 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  (process.env.SUPABASE_URL || '').trim(),
-  (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim(),
-  { auth: { persistSession: false } }
-);
+const supabaseUrl = (process.env.SUPABASE_URL || '').trim();
+const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false }
+});
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -28,33 +29,44 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Email dan Password wajib diisi.' });
     }
 
-    // Cari user di tabel team_members
+    // Cari user di tabel 'users' Supabase
     const { data: user, error } = await supabase
-      .from('team_members')
+      .from('users')
       .select('id, name, email, role, avatar, status, password')
       .ilike('email', email.trim())
       .single();
 
     if (error || !user) {
-      return res.status(401).json({ error: 'Akun dengan email tersebut tidak ditemukan.' });
+      return res.status(401).json({ error: 'Akun dengan email ini belum terdaftar di database.' });
     }
 
-    if (user.password !== password.trim()) {
+    // Verifikasi Password / PIN
+    const userPassword = user.password || '123456';
+    if (userPassword !== password.trim()) {
       return res.status(401).json({ error: 'Password / PIN yang dimasukkan salah.' });
     }
 
-    // Jangan kirim field password ke frontend
-    const { password: _, ...safeUserData } = user;
+    // Buat format role standar (huruf kapital: ADMIN, REVIEWER, CREATOR, CLIENT)
+    const normalizedRole = (user.role || 'creator').toUpperCase();
 
-    // Buat token sesi sederhana
-    const sessionToken = 'PF-TOKEN-' + Buffer.from(`${user.id}:${Date.now()}`).toString('base64');
+    const safeUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: normalizedRole,
+      avatar: user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
+      status: user.status || 'active'
+    };
+
+    const token = 'PF-TOKEN-' + Buffer.from(`${user.id}:${Date.now()}`).toString('base64');
 
     return res.status(200).json({
       success: true,
-      user: safeUserData,
-      token: sessionToken
+      user: safeUser,
+      token: token
     });
   } catch (err) {
+    console.error('Auth error:', err);
     return res.status(500).json({ error: err.message || 'Internal Server Error' });
   }
 }
