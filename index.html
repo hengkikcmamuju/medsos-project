@@ -1,1489 +1,698 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PostFlow Platinum - Clean Light Studio Edition</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#fdf2f8',
-                            100: '#fce7f3',
-                            500: '#ec4899',
-                            600: '#db2777',
-                            700: '#be185d',
-                            primary: '#E1306C'
-                        }
-                    }
-                }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PostFlow Platinum - Clean Light Edition</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
             }
+          }
         }
-    </script>
-    <style>
-        .ig-gradient {
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-        }
-        .ig-gradient-subtle {
-            background: linear-gradient(135deg, rgba(240, 148, 51, 0.1) 0%, rgba(220, 39, 67, 0.1) 50%, rgba(188, 24, 136, 0.1) 100%);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 9999px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-pink-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-700">
 
-    <!-- HEADER / NAVIGATION BAR -->
-    <header class="bg-white/95 border-b border-slate-200/90 sticky top-0 z-40 backdrop-blur-md shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Brand & Logo -->
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl ig-gradient flex items-center justify-center text-white shadow-md shadow-pink-500/20">
-                        <i class="fa-brands fa-instagram text-xl"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-extrabold text-lg tracking-tight text-slate-900">PostFlow</span>
-                            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-pink-50 text-pink-600 border border-pink-200">
-                                Studio Light
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 font-medium">Approval Workflow & Direct Publisher</p>
-                    </div>
-                </div>
-
-                <!-- Tombol Pengaturan Akun Medsos & Workspace -->
-                <div class="hidden lg:flex items-center gap-2">
-                    <div class="flex items-center bg-slate-100/90 px-3 py-1.5 rounded-2xl border border-slate-200 gap-2">
-                        <span class="text-[11px] text-slate-500 font-semibold">Akun Aktif:</span>
-                        <span id="currentBrandBadge" class="text-xs font-bold text-pink-600">@brandkita_official</span>
-                    </div>
-                    <button type="button" onclick="openApiSettingsModal()" class="px-3 py-1.5 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition shadow-xs" title="Pengaturan Integrasi & Token API Medsos">
-                        <i class="fa-solid fa-plug text-indigo-500"></i>
-                        <span>Integrasi API</span>
-                    </button>
-                </div>
-
-                <!-- Main Tabs Navigation -->
-                <div class="hidden md:flex items-center bg-slate-100/80 p-1 rounded-2xl border border-slate-200 gap-1">
-                    <button type="button" onclick="switchTab('kanban')" id="tab-kanban" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl bg-white text-pink-600 shadow-xs border border-slate-200/60 transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-table-columns"></i> Board
-                    </button>
-                    <button type="button" onclick="switchTab('calendar')" id="tab-calendar" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
-                        <i class="fa-regular fa-calendar"></i> Kalender
-                    </button>
-                    <button type="button" onclick="switchTab('grid')" id="tab-grid" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
-                        <i class="fa-brands fa-instagram"></i> Feed Preview
-                    </button>
-                    <button type="button" onclick="switchTab('ai')" id="tab-ai" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> AI Studio
-                    </button>
-                    <button type="button" onclick="switchTab('users')" id="tab-users" class="nav-tab px-3.5 py-1.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-users-gear text-indigo-500"></i> Tim & RBAC
-                    </button>
-                </div>
-
-                <!-- User Session & Action Controls -->
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-2 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200">
-                        <img id="currentUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-7 h-7 rounded-xl object-cover border border-slate-300 shadow-xs" alt="User Avatar">
-                        <select id="userSelectorDropdown" onchange="handleUserSwitch(this.value)" class="bg-transparent text-xs font-bold text-slate-700 cursor-pointer focus:outline-none pr-1">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
-
-                    <button type="button" onclick="openCreateModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white ig-gradient hover:opacity-95 shadow-md shadow-pink-500/20 flex items-center gap-2 transition-all cursor-pointer">
-                        <i class="fa-solid fa-plus"></i>
-                        <span class="hidden sm:inline">Ajukan Post</span>
-                    </button>
-                </div>
-            </div>
+  <!-- TOP NAVBAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Status -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
+          <i class="ph-bold ph-instagram-logo"></i>
         </div>
-    </header>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg tracking-tight text-slate-900">PostFlow</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">STUDIO LIGHT</span>
+          </div>
+          <p class="text-xs text-slate-500 hidden sm:block">Approval Workflow & Cloud Publisher</p>
+        </div>
+      </div>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-sm font-medium text-slate-600">
+        <button id="tab-board" onclick="switchTab('board')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm">
+          <i class="ph-bold ph-kanban"></i> Board
+        </button>
+        <button id="tab-calendar" onclick="switchTab('calendar')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <i class="ph-bold ph-calendar"></i> Kalender
+        </button>
+        <button id="tab-preview" onclick="switchTab('preview')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <i class="ph-bold ph-device-mobile"></i> Feed Preview
+        </button>
+        <button id="tab-ai" onclick="switchTab('ai')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <i class="ph-bold ph-magic-wand text-amber-500"></i> AI Studio
+        </button>
+        <button id="tab-users" onclick="switchTab('users')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
+          <i class="ph-bold ph-users-three text-indigo-500"></i> Tim & RBAC
+        </button>
+      </nav>
+
+      <!-- Action & Profile -->
+      <div class="flex items-center gap-2">
+        <button onclick="openApiSettingsModal()" title="Pengaturan Integrasi Token API" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
+          <i class="ph-bold ph-plug text-indigo-500 text-sm"></i>
+          <span class="hidden sm:inline">Integrasi API</span>
+        </button>
+
+        <!-- Current User Role Selector -->
+        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 py-1 px-2.5 rounded-xl text-xs">
+          <img id="userAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-6 h-6 rounded-full object-cover border border-slate-300" alt="Avatar" />
+          <select id="userRoleSelector" onchange="changeCurrentUser(this.value)" class="bg-transparent font-semibold text-slate-700 focus:outline-none cursor-pointer">
+            <option value="USR-01">Dimas Admin (Lead)</option>
+            <option value="USR-02">Putri Rahayu (Creator)</option>
+            <option value="USR-03">Rian Prakoso (Client)</option>
+          </select>
+        </div>
+
+        <!-- Add Post Button -->
+        <button onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95">
+          <i class="ph-bold ph-plus text-sm"></i>
+          <span>Ajukan Post</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUB-BANNER / INFO BAR -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="font-bold text-slate-700" id="dbStatusBadge">Supabase Terhubung</span>
+        </div>
+        <span class="text-slate-300">|</span>
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <span>Akun Aktif:</span>
+          <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200" id="currentBrandHandle">@kcmamuju_244</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openBrandSettingsModal()" class="text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
+          <i class="ph-bold ph-pencil-simple"></i> Ubah Profil Akun
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- VIEW 1: KANBAN BOARD -->
+    <section id="view-board" class="block space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <!-- Live Environment Status Banner -->
-        <div class="bg-white border border-slate-200/90 rounded-3xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-xs">
-            <div class="flex items-center gap-3.5">
-                <div class="w-10 h-10 rounded-2xl bg-pink-50 text-pink-600 border border-pink-100 flex items-center justify-center font-bold text-base shadow-xs">
-                    <i class="fa-solid fa-shield-halved" id="roleIcon"></i>
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h4 class="text-xs font-extrabold text-slate-900" id="roleBannerTitle">Mode Admin / Lead Aktif</h4>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sistem Terhubung
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-0.5 font-medium" id="roleBannerDesc">Akses penuh: Otorisasi publishing, manajemen anggota tim, dan konfigurasi medsos.</p>
-                </div>
-            </div>
+        <!-- COLUMN 1: DRAFT -->
+        <div class="bg-slate-100/70 border border-slate-200/80 rounded-2xl p-4 flex flex-col min-h-[600px]">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
             <div class="flex items-center gap-2">
-                <button type="button" onclick="openBrandSettingsModal()" class="text-xs bg-slate-50 hover:bg-slate-100 text-pink-700 font-bold px-3.5 py-2 rounded-xl border border-pink-200 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
-                    <i class="fa-solid fa-id-card"></i> Ubah Profil Akun
-                </button>
-                <button type="button" onclick="openApiSettingsModal()" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-3.5 py-2 rounded-xl border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-sliders text-indigo-500"></i> Status & Token API
-                </button>
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+              <h3 class="font-bold text-sm text-slate-700">DRAFT BARU</h3>
             </div>
+            <span id="count-draft" class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-600 text-xs font-bold">0</span>
+          </div>
+          <div id="column-draft" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
         </div>
 
-        <!-- VIEW: KANBAN BOARD -->
-        <div id="view-kanban" class="tab-view block space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                <!-- Col 1: Draft -->
-                <div class="bg-slate-100/70 rounded-3xl p-3.5 border border-slate-200">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <span class="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Draft Baru
-                        </span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-xs" id="badge-draft">0</span>
-                    </div>
-                    <div id="col-draft" class="space-y-3 min-h-[400px]"></div>
-                </div>
-
-                <!-- Col 2: In Review -->
-                <div class="bg-amber-50/60 rounded-3xl p-3.5 border border-amber-200/70">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <span class="font-bold text-xs uppercase tracking-wider text-amber-800 flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span> Butuh Approval
-                        </span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-amber-700 border border-amber-200 shadow-xs" id="badge-review">0</span>
-                    </div>
-                    <div id="col-review" class="space-y-3 min-h-[400px]"></div>
-                </div>
-
-                <!-- Col 3: Revision -->
-                <div class="bg-rose-50/60 rounded-3xl p-3.5 border border-rose-200/70">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <span class="font-bold text-xs uppercase tracking-wider text-rose-800 flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Perlu Revisi
-                        </span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-rose-700 border border-rose-200 shadow-xs" id="badge-revision">0</span>
-                    </div>
-                    <div id="col-revision" class="space-y-3 min-h-[400px]"></div>
-                </div>
-
-                <!-- Col 4: Published -->
-                <div class="bg-emerald-50/60 rounded-3xl p-3.5 border border-emerald-200/70">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <span class="font-bold text-xs uppercase tracking-wider text-emerald-800 flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Live on Social Media
-                        </span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white text-emerald-700 border border-emerald-200 shadow-xs" id="badge-published">0</span>
-                    </div>
-                    <div id="col-published" class="space-y-3 min-h-[400px]"></div>
-                </div>
+        <!-- COLUMN 2: REVIEW -->
+        <div class="bg-amber-50/40 border border-amber-200/60 rounded-2xl p-4 flex flex-col min-h-[600px]">
+          <div class="flex items-center justify-between pb-3 border-b border-amber-200/80 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <h3 class="font-bold text-sm text-amber-900">BUTUH APPROVAL</h3>
             </div>
+            <span id="count-review" class="px-2 py-0.5 rounded-full bg-white border border-amber-200 text-amber-700 text-xs font-bold">0</span>
+          </div>
+          <div id="column-review" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
         </div>
 
-        <!-- VIEW: CALENDAR -->
-        <div id="view-calendar" class="tab-view hidden space-y-4">
-            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-6 border-b border-slate-100">
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                            <i class="fa-regular fa-calendar-check text-pink-500"></i> Jadwal Publikasi Konten Terstruktur
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-0.5 font-medium">Pantau jadwal postingan berdasarkan kalender kampanye.</p>
-                    </div>
-                    <div class="text-xs font-bold text-slate-700 bg-slate-100 px-3.5 py-2 rounded-2xl border border-slate-200">
-                        September 2026
-                    </div>
-                </div>
-                <div class="grid grid-cols-7 gap-2 mt-4 text-center font-bold text-xs text-slate-500 pb-2 border-b border-slate-100">
-                    <div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div><div>MIN</div>
-                </div>
-                <div id="calendarDaysGrid" class="grid grid-cols-7 gap-2 mt-2"></div>
+        <!-- COLUMN 3: REVISION -->
+        <div class="bg-rose-50/40 border border-rose-200/60 rounded-2xl p-4 flex flex-col min-h-[600px]">
+          <div class="flex items-center justify-between pb-3 border-b border-rose-200/80 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+              <h3 class="font-bold text-sm text-rose-900">PERLU REVISI</h3>
             </div>
+            <span id="count-revision" class="px-2 py-0.5 rounded-full bg-white border border-rose-200 text-rose-700 text-xs font-bold">0</span>
+          </div>
+          <div id="column-revision" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
         </div>
 
-        <!-- VIEW: INSTAGRAM FEED PREVIEW -->
-        <div id="view-grid" class="tab-view hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-8 bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
-                    <div class="flex items-center gap-5 pb-6 border-b border-slate-100">
-                        <div class="w-16 h-16 rounded-full p-[2.5px] ig-gradient shadow-sm">
-                            <img id="feedBrandAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-full h-full rounded-full object-cover bg-white p-0.5" alt="Brand Logo">
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3">
-                                <h3 class="text-base font-extrabold text-slate-900" id="feedBrandHandle">brandkita_official</h3>
-                                <span class="bg-pink-50 text-pink-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-pink-200">Verified Brand</span>
-                                <button type="button" onclick="openBrandSettingsModal()" class="text-slate-500 hover:text-slate-800 text-xs ml-auto font-medium cursor-pointer" title="Edit Profil Medsos">
-                                    <i class="fa-solid fa-pen"></i> Edit Akun
-                                </button>
-                            </div>
-                            <p class="text-xs text-slate-600 mt-1 font-medium" id="feedBrandBio">Official Brand Social Media Feed & Aesthetics Layout.</p>
-                        </div>
-                    </div>
-                    <div id="igFeedGrid" class="grid grid-cols-3 gap-3 mt-6"></div>
-                </div>
-
-                <div class="lg:col-span-4 bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col items-center">
-                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-mobile-screen-button text-pink-500"></i> Reels & Story Simulator
-                    </h4>
-                    <div class="w-64 aspect-[9/16] bg-slate-950 rounded-3xl overflow-hidden relative shadow-xl border-4 border-slate-800 flex flex-col justify-between p-3.5">
-                        <div class="flex items-center justify-between text-white z-10">
-                            <div class="flex items-center gap-2">
-                                <img id="storyBrandAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-6 h-6 rounded-full border border-white object-cover" alt="Story Avatar">
-                                <span class="text-[11px] font-bold" id="storyBrandHandle">brandkita_official</span>
-                            </div>
-                            <span class="text-[10px] text-slate-300">Sponsored</span>
-                        </div>
-                        <img id="storySimulatorImage" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800" class="absolute inset-0 w-full h-full object-cover opacity-85" alt="Story Background">
-                        <div class="z-10 space-y-2">
-                            <p class="text-[11px] text-white font-medium drop-shadow-md line-clamp-2" id="storySimulatorCaption">Swipe up untuk penawaran spesial!</p>
-                            <div class="bg-white/20 backdrop-blur-md text-white text-center py-2 rounded-xl text-xs font-bold border border-white/30">
-                                Kunjungi Profil
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- COLUMN 4: PUBLISHED -->
+        <div class="bg-emerald-50/40 border border-emerald-200/60 rounded-2xl p-4 flex flex-col min-h-[600px]">
+          <div class="flex items-center justify-between pb-3 border-b border-emerald-200/80 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="font-bold text-sm text-emerald-900">LIVE / PUBLISHED</h3>
             </div>
+            <span id="count-published" class="px-2 py-0.5 rounded-full bg-white border border-emerald-200 text-emerald-700 text-xs font-bold">0</span>
+          </div>
+          <div id="column-published" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
         </div>
 
-        <!-- VIEW: AI STUDIO -->
-        <div id="view-ai" class="tab-view hidden space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- AI Copywriting -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
-                    <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-                        <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-feather"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900">Gemini AI Copywriting Engine</h3>
-                            <p class="text-xs text-slate-500 font-medium">Generate hook viral, copywriting persuasif, dan hashtag otomatis.</p>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Topik atau Ide Konten</label>
-                        <input type="text" id="aiTopicInput" placeholder="Misal: Promo Payday Serum Glowing Skin" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Tone of Voice</label>
-                        <select id="aiToneSelect" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2.5 text-slate-700 focus:bg-white focus:outline-none">
-                            <option value="persuasive">Persuasif & Hard Selling (Cocok untuk Promo)</option>
-                            <option value="storytelling">Storytelling & Relatable (Cocok untuk Reels)</option>
-                            <option value="educational">Edukatif & Informatif (Tips & Carousels)</option>
-                            <option value="humorous">Casual, Gen-Z, & Santai</option>
-                        </select>
-                    </div>
-                    <button type="button" onclick="generateAiCopy()" id="btnGenerateAiCopy" class="w-full py-3 bg-gradient-to-r from-amber-500 to-pink-600 hover:opacity-95 text-white rounded-2xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Racik Caption Otomatis
-                    </button>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Hasil Rekomendasi AI</label>
-                        <textarea id="aiCopyResult" rows="5" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl p-3 text-slate-800 focus:bg-white focus:outline-none leading-relaxed custom-scrollbar" placeholder="Hasil racikan AI akan muncul di sini..."></textarea>
-                    </div>
-                    <button type="button" onclick="applyAiCopyToNewPost()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all border border-slate-200 cursor-pointer">
-                        Gunakan di Form Postingan Baru <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                </div>
+      </div>
+    </section>
 
-                <!-- AI Visual Generator -->
-                <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
-                    <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-                        <div class="w-10 h-10 rounded-2xl bg-pink-50 text-pink-600 border border-pink-200 flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-image"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-900">Gemini Visual Concept Generator</h3>
-                            <p class="text-xs text-slate-500 font-medium">Buat ide visual konten produk menggunakan AI.</p>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Prompt Visual Gambar</label>
-                        <input type="text" id="aiImagePrompt" placeholder="Misal: Minimalist aesthetic cosmetic bottle on marble table 8k" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-3 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
-                    </div>
-                    <button type="button" onclick="generateAiVisual()" id="btnGenerateAiVisual" class="w-full py-3 bg-gradient-to-r from-pink-600 to-indigo-600 hover:opacity-95 text-white rounded-2xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer">
-                        <i class="fa-solid fa-palette"></i> Generate Gambar AI
-                    </button>
-                    <div class="w-full aspect-video bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center relative">
-                        <img id="aiGeneratedImageTag" src="" alt="AI Visual" class="w-full h-full object-cover hidden">
-                        <div id="aiVisualPlaceholderText" class="text-center text-slate-400 p-4">
-                            <i class="fa-regular fa-image text-3xl mb-2 block"></i>
-                            <span class="text-xs font-medium">Gambar hasil racikan AI akan tampil di sini</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- VIEW 2: CALENDAR -->
+    <section id="view-calendar" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Jadwal Kalender Konten</h2>
+          <p class="text-xs text-slate-500">Distribusi postingan terjadwal & live sepanjang bulan</p>
         </div>
+        <span class="text-xs font-semibold px-3 py-1 bg-slate-100 rounded-lg text-slate-600">September 2026</span>
+      </div>
+      <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center"></div>
+    </section>
 
-        <!-- VIEW: TIM & RBAC (CRUD) -->
-        <div id="view-users" class="tab-view hidden space-y-4">
-            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-5">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-4 border-b border-slate-100">
-                    <div>
-                        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-users-gear text-indigo-600"></i> Manajemen Tim & Role-Based Access Control
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-0.5 font-medium">Pengaturan hak akses creator, reviewer, dan client viewer.</p>
-                    </div>
-                    <button type="button" onclick="openAddUserModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs font-bold shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer">
-                        <i class="fa-solid fa-user-plus"></i> Tambah Anggota
-                    </button>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs text-slate-700">
-                        <thead class="text-[11px] uppercase bg-slate-50 text-slate-500 border-b border-slate-200 font-bold">
-                            <tr>
-                                <th class="py-3 px-4 rounded-l-xl">Nama Anggota</th>
-                                <th class="py-3 px-4">Email</th>
-                                <th class="py-3 px-4">Peran / Role</th>
-                                <th class="py-3 px-4">Kewenangan Sistem</th>
-                                <th class="py-3 px-4 text-center rounded-r-xl">Aksi (CRUD)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody" class="divide-y divide-slate-100 font-medium">
-                            <!-- Populated dynamically via renderUserTable() -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <!-- VIEW 3: FEED PREVIEW -->
+    <section id="view-preview" class="hidden">
+      <div class="max-w-md mx-auto bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl">
+        <!-- Mock Phone Header -->
+        <div class="bg-slate-900 text-white px-6 pt-3 pb-2 flex justify-between items-center text-xs">
+          <span>09:41</span>
+          <div class="flex items-center gap-1.5">
+            <i class="ph-bold ph-wifi-high"></i>
+            <i class="ph-bold ph-battery-full"></i>
+          </div>
         </div>
-
-    </main>
-
-    <!-- MODALS SECTION -->
-
-    <!-- MODAL 1: PENGATURAN PROFIL AKUN MEDSOS (IDENTITAS BRAND) -->
-    <div id="modalBrandSettings" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-id-card text-pink-600"></i> Profil & Identitas Akun Medsos
-                </h3>
-                <button type="button" onclick="closeBrandSettingsModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+        <!-- Profile Header -->
+        <div class="p-4 border-b border-slate-100">
+          <div class="flex items-center justify-between mb-3">
+            <img id="previewAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150" class="w-16 h-16 rounded-full border-2 border-rose-500 p-0.5 object-cover" />
+            <div class="flex gap-4 text-center">
+              <div><span class="font-bold block text-sm" id="previewPostCount">3</span><span class="text-[10px] text-slate-500">Posts</span></div>
+              <div><span class="font-bold block text-sm">4.2K</span><span class="text-[10px] text-slate-500">Followers</span></div>
+              <div><span class="font-bold block text-sm">318</span><span class="text-[10px] text-slate-500">Following</span></div>
             </div>
-
-            <p class="text-xs text-slate-500 font-medium">Ubah nama, handle, dan bio yang tampil pada feed preview serta template copywriting AI.</p>
-
-            <form onsubmit="handleSaveBrandSettings(event)" class="space-y-3.5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Username / Handle Instagram</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-xs font-bold">@</span>
-                        <input type="text" id="settingBrandHandle" required placeholder="kcmamuju_244" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Brand / Kantor / Bisnis</label>
-                    <input type="text" id="settingBrandName" required placeholder="Misal: KC Mamuju Official" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Bio / Deskripsi Profil</label>
-                    <textarea id="settingBrandBio" rows="3" placeholder="Deskripsi profil media sosial..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none leading-relaxed"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Foto Profil / Logo (HTTPS)</label>
-                    <input type="url" id="settingBrandAvatar" placeholder="https://images.unsplash.com/..." class="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none text-[11px]">
-                </div>
-
-                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeBrandSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold ig-gradient text-white rounded-xl shadow-md shadow-pink-500/20 flex items-center gap-1.5 cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk"></i> Simpan Profil
-                    </button>
-                </div>
-            </form>
+          </div>
+          <h4 class="font-bold text-sm text-slate-900" id="previewBrandName">BTN KC Mamuju</h4>
+          <p class="text-xs text-slate-600 whitespace-pre-line" id="previewBrandBio">Official Social Media Portal. Informasi produk, promo perumahan, dan layanan operasional.</p>
         </div>
+        <!-- Grid Media -->
+        <div id="feedGridContainer" class="grid grid-cols-3 gap-0.5 bg-slate-100"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: AI STUDIO -->
+    <section id="view-ai" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm max-w-2xl mx-auto space-y-4">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+          <i class="ph-bold ph-magic-wand text-amber-500"></i> AI Studio Copywriter
+        </h2>
+        <p class="text-xs text-slate-500">Buat draf caption & ide visual otomatis dengan model AI cerdas.</p>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Topik atau Ide Pokok Konten</label>
+        <textarea id="aiPromptInput" rows="3" class="w-full text-xs p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Contoh: Promo KPR bunga ringan edisi payday bank BTN..."></textarea>
+      </div>
+      <button onclick="generateAiDraft()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+        <i class="ph-bold ph-sparkle text-amber-400"></i> Generate Draf Otomatis
+      </button>
+      <div id="aiOutputContainer" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+        <h4 class="text-xs font-bold text-slate-800">Hasil Rekomendasi AI:</h4>
+        <p id="aiOutputText" class="text-xs text-slate-600 whitespace-pre-wrap"></p>
+        <button onclick="useAiDraft()" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
+          <i class="ph-bold ph-arrow-right"></i> Gunakan Sebagai Draf Post
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 5: TIM & RBAC -->
+    <section id="view-users" class="hidden bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Manajemen Anggota Tim & RBAC</h2>
+          <p class="text-xs text-slate-500">Atur peran akses untuk Admin Lead, Creator, dan Client Approval.</p>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 border-b border-slate-200 text-slate-600">
+            <tr>
+              <th class="py-3 px-4">Nama Anggota</th>
+              <th class="py-3 px-4">Email</th>
+              <th class="py-3 px-4">Role Akses</th>
+              <th class="py-3 px-4 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody" class="divide-y divide-slate-100">
+            <tr>
+              <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-6 h-6 rounded-full" />
+                Dimas Admin (Lead)
+              </td>
+              <td class="py-3 px-4 text-slate-500">dimas@postflow.local</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-bold border border-purple-200">ADMIN</span></td>
+              <td class="py-3 px-4 text-right"><span class="text-emerald-600 font-semibold">Aktif</span></td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" class="w-6 h-6 rounded-full" />
+                Putri Rahayu
+              </td>
+              <td class="py-3 px-4 text-slate-500">putri@postflow.local</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">CREATOR</span></td>
+              <td class="py-3 px-4 text-right"><span class="text-emerald-600 font-semibold">Aktif</span></td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" class="w-6 h-6 rounded-full" />
+                Rian Prakoso
+              </td>
+              <td class="py-3 px-4 text-slate-500">rian@client.local</td>
+              <td class="py-3 px-4"><span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 font-bold border border-amber-200">CLIENT</span></td>
+              <td class="py-3 px-4 text-right"><span class="text-emerald-600 font-semibold">Aktif</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: AJUKAN POST BARU -->
+  <div id="postModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900">Ajukan Draf Postingan Baru</h3>
+        <button onclick="closePostModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <form id="newPostForm" onsubmit="handleCreatePost(event)" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Judul Internal Konten</label>
+          <input type="text" id="postTitleInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Contoh: Promo Diskon 50%" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Tipe Format</label>
+            <select id="postTypeInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-white">
+              <option value="FEED">Instagram Feed</option>
+              <option value="REELS">Instagram Reels</option>
+              <option value="STORY">Instagram Story</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Target Publikasi</label>
+            <input type="date" id="postDateInput" class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">URL Media (Foto/Video Banner)</label>
+          <input type="url" id="postMediaUrlInput" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="https://images.unsplash.com/..." />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Caption & Hashtag</label>
+          <textarea id="postCaptionInput" rows="3" required class="w-full p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Tulis deskripsi konten di sini..."></textarea>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closePostModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20">Simpan ke Supabase</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <!-- MODAL 2: INTEGRASI & KONEKSI API MEDSOS (TEKNIS / PUBLISHER) -->
-    <div id="modalApiSettings" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-plug text-indigo-600"></i> Pengaturan Integrasi & API Medsos
-                </h3>
-                <button type="button" onclick="closeApiSettingsModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <!-- Status Kartu Mode -->
-            <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100 flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">Mode Saat Ini:</span>
-                    <span id="apiPublishingModeText" class="text-xs font-extrabold text-slate-800">Simulasi Aman (Sandbox Mode)</span>
-                </div>
-                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    <i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Siap Pakai
-                </span>
-            </div>
-
-            <form onsubmit="handleSaveApiSettings(event)" class="space-y-3.5">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        <i class="fa-brands fa-instagram text-pink-600 mr-1"></i> Instagram Business Account ID
-                    </label>
-                    <input type="text" id="apiSettingIgId" placeholder="Misal: 17841400293849182 (Kosongkan jika simulasi)" class="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    <p class="text-[10px] text-slate-400 mt-1">Diperoleh dari Facebook Developer Portal untuk akun profesional Anda.</p>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">
-                        <i class="fa-solid fa-key text-amber-500 mr-1"></i> Meta User Access Token
-                    </label>
-                    <input type="password" id="apiSettingMetaToken" placeholder="EAAGNO41s8b0BA..." class="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    <p class="text-[10px] text-slate-400 mt-1">Token dengan izin <code>instagram_content_publish</code>.</p>
-                </div>
-
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <button type="button" onclick="testSocialMediaConnection()" id="btnTestApiConnection" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-xl border border-indigo-200 transition cursor-pointer">
-                        <i class="fa-solid fa-satellite-dish mr-1"></i> Uji Koneksi API
-                    </button>
-                    <div class="flex gap-2">
-                        <button type="button" onclick="closeApiSettingsModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
-                        <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition cursor-pointer">
-                            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Token
-                        </button>
-                    </div>
-                </div>
-            </form>
+  <!-- MODAL: DETAIL & APPROVAL POST -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900" id="detailModalTitle">Detail Konten</h3>
+        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <div class="p-6 space-y-4 text-xs">
+        <div class="flex gap-4">
+          <img id="detailMediaImg" src="" class="w-32 h-32 rounded-xl object-cover border border-slate-200 bg-slate-100 flex-shrink-0" />
+          <div class="space-y-2 flex-1">
+            <span id="detailStatusBadge" class="px-2.5 py-1 rounded-md text-[10px] font-bold">STATUS</span>
+            <p id="detailCaption" class="text-slate-600 whitespace-pre-wrap max-h-28 overflow-y-auto custom-scrollbar"></p>
+            <p class="text-[11px] text-slate-400" id="detailAuthorText">Penulis: -</p>
+          </div>
         </div>
+        
+        <!-- Action Buttons (RBAC Adaptive) -->
+        <div id="approvalActionContainer" class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-2"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- MODAL 3: TAMBAH & EDIT USER (CRUD TIM) -->
-    <div id="modalUserForm" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 id="modalUserFormTitle" class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-user-pen text-indigo-600"></i> Tambah Anggota Tim
-                </h3>
-                <button type="button" onclick="closeUserModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <form onsubmit="handleSaveUser(event)" class="space-y-3.5">
-                <input type="hidden" id="formUserId" value="">
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="formUserName" required placeholder="Misal: Ahmad Fauzi" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email</label>
-                    <input type="email" id="formUserEmail" required placeholder="ahmad@brandkita.id" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Peran / Role Akses</label>
-                    <select id="formUserRole" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        <option value="admin">ADMIN (Akses Penuh, User & Token)</option>
-                        <option value="reviewer">REVIEWER (Review & Approve Live)</option>
-                        <option value="creator">CREATOR (Submit Draft & AI Studio)</option>
-                        <option value="client">CLIENT (Read Only Monitor)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Avatar / Foto Profil</label>
-                    <input type="url" id="formUserAvatar" placeholder="https://images.unsplash.com/..." class="w-full text-xs font-mono bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-slate-800 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none text-[11px]">
-                </div>
-
-                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk"></i> Simpan
-                    </button>
-                </div>
-            </form>
+  <!-- MODAL: PROFIL BRAND -->
+  <div id="brandModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900">Ubah Profil Brand Medsos</h3>
+        <button onclick="closeBrandModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <div class="p-6 space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Username Instagram (@handle)</label>
+          <input type="text" id="settingBrandHandle" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="@kcmamuju_244" />
         </div>
-    </div>
-
-    <!-- MODAL DETAIL POST -->
-    <div id="modalDetail" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
-                <div class="flex items-center gap-3">
-                    <span id="detailStatusBadge" class="px-3 py-1 text-[10px] font-bold rounded-full uppercase">STATUS</span>
-                    <h3 id="detailTitle" class="font-extrabold text-sm text-slate-900 truncate max-w-md">Detail Post</h3>
-                </div>
-                <button type="button" onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-700 text-lg cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-12 flex-1 overflow-y-auto">
-                <div class="md:col-span-5 bg-slate-100 p-4 flex items-center justify-center border-r border-slate-200">
-                    <img id="detailImageMock" src="" class="rounded-2xl shadow-md max-h-80 object-cover w-full" alt="Post Media">
-                </div>
-                <div class="md:col-span-7 p-6 space-y-4 flex flex-col justify-between">
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-slate-500">Author: <strong id="detailAuthor" class="text-slate-800"></strong></span>
-                            <span id="detailPostId" class="font-mono text-slate-400 text-[10px]"></span>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs leading-relaxed text-slate-800 whitespace-pre-line custom-scrollbar max-h-48 overflow-y-auto" id="detailCaptionMock"></div>
-                        
-                        <div id="detailCommentsSection" class="space-y-2 hidden">
-                            <span class="text-[11px] font-bold text-rose-600 uppercase tracking-wider block">Catatan Feedback / Revisi:</span>
-                            <div id="detailCommentsList" class="space-y-2 text-xs"></div>
-                        </div>
-                    </div>
-                    <div id="detailActionButtons" class="pt-4 border-t border-slate-100"></div>
-                </div>
-            </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Nama Brand / Bisnis</label>
+          <input type="text" id="settingBrandName" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="BTN KC Mamuju" />
         </div>
-    </div>
-
-    <!-- MODAL REVISI -->
-    <div id="modalRevisionPrompt" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 class="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-pen-ruler text-rose-600"></i> Minta Revisi Konten
-            </h3>
-            <p class="text-xs text-slate-500 font-medium">Berikan catatan perbaikan yang spesifik agar creator dapat menyempurnakan konten.</p>
-            <textarea id="revisionNoteInput" rows="4" placeholder="Misal: Perbaiki typo pada CTA..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl p-3.5 text-slate-800 focus:bg-white focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button type="button" onclick="closeRevisionModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
-                <button type="button" onclick="submitRevision()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md shadow-rose-600/20 cursor-pointer">Kirim Feedback</button>
-            </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Bio Profil</label>
+          <textarea id="settingBrandBio" rows="3" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none">Official Social Media Portal. Informasi promo perumahan dan layanan operasional.</textarea>
         </div>
-    </div>
-
-    <!-- MODAL CREATE POST -->
-    <div id="modalCreate" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
-                <h3 class="font-extrabold text-sm text-slate-900">Ajukan Postingan Baru</h3>
-                <button type="button" onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-700 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-1">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Judul Campaign</label>
-                    <input type="text" id="newPostTitle" placeholder="Misal: Promo Weekend Glowing Skin" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Platform Target</label>
-                        <select id="newPostPlatform" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2.5 text-slate-800 focus:bg-white focus:outline-none">
-                            <option value="instagram">Instagram</option>
-                            <option value="tiktok">TikTok</option>
-                            <option value="youtube">YouTube Shorts</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">Tipe Media</label>
-                        <select id="newPostType" class="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-2xl px-3 py-2.5 text-slate-800 focus:bg-white focus:outline-none">
-                            <option value="FEED">Feed Post (1:1 / 4:5)</option>
-                            <option value="REELS">Reels Video (9:16)</option>
-                            <option value="STORY">Story Post (9:16)</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">URL Media Gambar/Video (HTTPS Publik)</label>
-                    <input type="url" id="newPostImage" value="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-slate-900 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none font-mono text-[11px]">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Caption & Hashtag</label>
-                    <textarea id="newPostCaption" rows="4" placeholder="Tulis caption lengkap..." class="w-full text-xs bg-slate-50 border border-slate-200 rounded-2xl p-3 text-slate-800 focus:bg-white focus:ring-2 focus:ring-pink-500 focus:outline-none leading-relaxed"></textarea>
-                </div>
-            </div>
-            <div class="p-4 border-t border-slate-100 bg-slate-50/80 flex justify-end gap-2">
-                <button type="button" onclick="closeCreateModal()" class="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-200 rounded-xl cursor-pointer">Batal</button>
-                <button type="button" onclick="submitNewPost()" id="btnSubmitPost" class="px-5 py-2 text-xs font-bold rounded-xl ig-gradient text-white shadow-md shadow-pink-500/20 cursor-pointer">Kirim ke Reviewer</button>
-            </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button onclick="closeBrandModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Tutup</button>
+          <button onclick="saveBrandSettings()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold">Simpan Profil</button>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Toast Notifications Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+  <!-- MODAL: SETTING INTEGRASI API -->
+  <div id="apiModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900">Integrasi Token Meta API</h3>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <div class="p-6 space-y-3 text-xs">
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800">
+          <i class="ph-bold ph-check-circle text-base"></i>
+          <span>Database Supabase PostgreSQL Terkoneksi (Live).</span>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Instagram Business Account ID</label>
+          <input type="text" id="settingIgId" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="17841400000000000" />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Meta Graph User Access Token</label>
+          <input type="password" id="settingMetaToken" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="EAAXxFakeTokenSimulated..." />
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Tutup</button>
+          <button onclick="saveApiSettings()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">Simpan Pengaturan</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <!-- JAVASCRIPT LOGIC & STATE ENGINE -->
-    <script>
-        const DEFAULT_BRAND = {
-            handle: 'kcmamuju_244',
-            name: 'KC Mamuju Official',
-            bio: 'Official Social Media Profile & Creative Studio Workflow.',
-            avatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200',
-            igAccountId: ''
-        };
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // DATA GLOBAL
+    let posts = [];
+    let currentRole = 'ADMIN'; // ADMIN, CREATOR, CLIENT
+    let activePostId = null;
 
-        const DEFAULT_SEED_USERS = [
-            { id: 'USR-01', name: 'Dimas Admin (Lead)', email: 'admin@postflow.id', role: 'admin', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' },
-            { id: 'USR-02', name: 'Budi Santoso (Reviewer)', email: 'budi.manager@brandkita.id', role: 'reviewer', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' },
-            { id: 'USR-03', name: 'Putri Rahayu (Creator)', email: 'putri.creator@brandkita.id', role: 'creator', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
-            { id: 'USR-04', name: 'Sarah Client (Viewer)', email: 'sarah.client@partner.com', role: 'client', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100' }
-        ];
-
-        let currentBrand = DEFAULT_BRAND;
-        try {
-            const savedBrand = localStorage.getItem('postflow_brand_settings');
-            if (savedBrand) currentBrand = { ...DEFAULT_BRAND, ...JSON.parse(savedBrand) };
-        } catch (e) {
-            currentBrand = DEFAULT_BRAND;
+    // 1. SINKRONISASI SUPABASE: LOAD DATA DARI /api/posts
+    async function fetchPostsFromApi() {
+      const statusBadge = document.getElementById('dbStatusBadge');
+      try {
+        statusBadge.textContent = 'Memuat Data Supabase...';
+        const res = await fetch('/api/posts');
+        if (!res.ok) throw new Error('Gagal mengambil data posts');
+        const data = await res.json();
+        
+        if (Array.isArray(data)) {
+          posts = data;
+          statusBadge.textContent = 'Supabase Terhubung (Live)';
+          renderKanban();
+          renderCalendar();
+          renderFeedPreview();
         }
+      } catch (err) {
+        console.warn('Fallback / Gagal load Supabase:', err.message);
+        statusBadge.textContent = 'Supabase Offline (Lokal)';
+      }
+    }
 
-        let users = [];
-        try {
-            const savedUsers = localStorage.getItem('postflow_users_platinum');
-            users = (savedUsers && JSON.parse(savedUsers).length) ? JSON.parse(savedUsers) : DEFAULT_SEED_USERS;
-        } catch (e) {
-            users = DEFAULT_SEED_USERS;
-        }
+    // 2. SINKRONISASI SUPABASE: SIMPAN POST BARU
+    async function handleCreatePost(e) {
+      e.preventDefault();
+      const newPost = {
+        id: 'POST-' + Date.now(),
+        brand_id: 'BRD-01',
+        title: document.getElementById('postTitleInput').value,
+        type: document.getElementById('postTypeInput').value,
+        scheduled_at: document.getElementById('postDateInput').value || null,
+        media_url: document.getElementById('postMediaUrlInput').value,
+        caption: document.getElementById('postCaptionInput').value,
+        status: 'draft',
+        author: 'Putri Rahayu (Creator)',
+        platform: 'instagram'
+      };
 
-        let currentUser = users[0] || DEFAULT_SEED_USERS[0];
-        let posts = [];
-        let activePostIdForRevision = null;
+      // Optimistic UI Update
+      posts.unshift(newPost);
+      renderKanban();
+      renderCalendar();
+      renderFeedPreview();
+      closePostModal();
+      document.getElementById('newPostForm').reset();
 
-        // Audio Context for feedback sound effects
-        let audioCtx = null;
-        function getAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            return audioCtx;
-        }
-
-        function triggerSoundFx(type = 'click') {
-            try {
-                const ctx = getAudioContext();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
-                if (type === 'publish') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(440, ctx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.3);
-                } else {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(600, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.08);
-                }
-            } catch (e) {}
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            applyBrandSettingsToUI();
-            await loadInitialData();
-            renderUserSelectorDropdown();
-            updateUserContext();
-            renderKanban();
-            renderCalendar();
-            renderIgGrid();
-            renderUserTable();
+      // Kirim POST ke backend Vercel -> Supabase
+      try {
+        await fetch('/api/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newPost)
         });
+      } catch (err) {
+        console.error('Gagal sinkronisasi post baru ke Supabase:', err);
+      }
+    }
 
-        // MODAL 1: BRAND PROFILE SETTINGS
-        function openBrandSettingsModal() {
-            triggerSoundFx('click');
-            document.getElementById('settingBrandHandle').value = currentBrand.handle || '';
-            document.getElementById('settingBrandName').value = currentBrand.name || '';
-            document.getElementById('settingBrandBio').value = currentBrand.bio || '';
-            document.getElementById('settingBrandAvatar').value = currentBrand.avatar || '';
-            document.getElementById('modalBrandSettings').classList.remove('hidden');
+    // 3. SINKRONISASI SUPABASE: UPDATE STATUS POST
+    async function updatePostStatus(postId, newStatus) {
+      const p = posts.find(item => item.id === postId);
+      if (p) {
+        p.status = newStatus;
+        renderKanban();
+        renderCalendar();
+        renderFeedPreview();
+        closeDetailModal();
+
+        // Kirim PUT ke backend Vercel -> Supabase
+        try {
+          await fetch('/api/posts', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: postId, status: newStatus })
+          });
+        } catch (err) {
+          console.error('Gagal update status di Supabase:', err);
         }
+      }
+    }
 
-        function closeBrandSettingsModal() {
-            document.getElementById('modalBrandSettings').classList.add('hidden');
+    // RENDER KANBAN
+    function renderKanban() {
+      const cols = {
+        draft: document.getElementById('column-draft'),
+        review: document.getElementById('column-review'),
+        revision: document.getElementById('column-revision'),
+        published: document.getElementById('column-published')
+      };
+
+      Object.values(cols).forEach(col => col.innerHTML = '');
+      const counts = { draft: 0, review: 0, revision: 0, published: 0 };
+
+      posts.forEach(post => {
+        const status = post.status || 'draft';
+        if (counts[status] !== undefined) counts[status]++;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-sm hover:shadow transition cursor-pointer space-y-2.5';
+        card.onclick = () => openDetailModal(post.id);
+
+        card.innerHTML = `
+          <div class="flex gap-2.5">
+            <img src="${post.media_url}" class="w-12 h-12 rounded-lg object-cover bg-slate-100 flex-shrink-0" />
+            <div class="overflow-hidden">
+              <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase tracking-wider">${post.type || 'FEED'}</span>
+              <h4 class="font-bold text-xs text-slate-900 truncate mt-1">${post.title}</h4>
+              <p class="text-[11px] text-slate-500 truncate">${post.caption}</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-50 pt-2">
+            <span>${post.author ? post.author.split(' ')[0] : 'Creator'}</span>
+            <span class="text-rose-600 font-semibold flex items-center gap-1">Detail <i class="ph-bold ph-caret-right"></i></span>
+          </div>
+        `;
+
+        if (cols[status]) cols[status].appendChild(card);
+      });
+
+      document.getElementById('count-draft').textContent = counts.draft;
+      document.getElementById('count-review').textContent = counts.review;
+      document.getElementById('count-revision').textContent = counts.revision;
+      document.getElementById('count-published').textContent = counts.published;
+    }
+
+    // MODAL DETAIL & APPROVAL WORKFLOW
+    function openDetailModal(postId) {
+      activePostId = postId;
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      document.getElementById('detailModalTitle').textContent = post.title;
+      document.getElementById('detailMediaImg').src = post.media_url;
+      document.getElementById('detailCaption').textContent = post.caption;
+      document.getElementById('detailAuthorText').textContent = `Dibuat oleh: ${post.author || 'Creator'}`;
+
+      const badge = document.getElementById('detailStatusBadge');
+      badge.textContent = post.status.toUpperCase();
+      badge.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold ' + 
+        (post.status === 'published' ? 'bg-emerald-100 text-emerald-800' :
+         post.status === 'review' ? 'bg-amber-100 text-amber-800' :
+         post.status === 'revision' ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-800');
+
+      // Setup tombol persetujuan berdasarkan Role
+      const actions = document.getElementById('approvalActionContainer');
+      actions.innerHTML = '';
+
+      if (post.status === 'draft') {
+        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold">Ajukan untuk Review</button>`;
+      } else if (post.status === 'review') {
+        if (currentRole === 'ADMIN' || currentRole === 'CLIENT') {
+          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'revision')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Revisi</button>`;
+          actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold">Setujui & Publikasikan</button>`;
+        } else {
+          actions.innerHTML += `<span class="text-xs text-slate-400 italic">Menunggu persetujuan Admin / Klien.</span>`;
         }
+      } else if (post.status === 'revision') {
+        actions.innerHTML += `<button onclick="updatePostStatus('${post.id}', 'review')" class="px-4 py-2 bg-amber-500 text-white rounded-xl font-bold">Kirim Ulang Revisi</button>`;
+      }
 
-        function handleSaveBrandSettings(e) {
-            e.preventDefault();
-            let handle = document.getElementById('settingBrandHandle').value.trim();
-            handle = handle.replace(/^@/, '');
-            const name = document.getElementById('settingBrandName').value.trim();
-            const bio = document.getElementById('settingBrandBio').value.trim();
-            const avatar = document.getElementById('settingBrandAvatar').value.trim() || DEFAULT_BRAND.avatar;
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
 
-            currentBrand = { ...currentBrand, handle, name, bio, avatar };
-            localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
 
-            applyBrandSettingsToUI();
-            closeBrandSettingsModal();
-            triggerSoundFx('click');
-            showToast(`Profil @${handle} berhasil disimpan!`, 'success');
+    // MODAL CONTROL & TABS
+    function openPostModal() { document.getElementById('postModal').classList.remove('hidden'); }
+    function closePostModal() { document.getElementById('postModal').classList.add('hidden'); }
+    function openBrandSettingsModal() { document.getElementById('brandModal').classList.remove('hidden'); }
+    function closeBrandModal() { document.getElementById('brandModal').classList.add('hidden'); }
+    function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
+    function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
+
+    function switchTab(tabId) {
+      ['board', 'calendar', 'preview', 'ai', 'users'].forEach(t => {
+        const view = document.getElementById('view-' + t);
+        const btn = document.getElementById('tab-' + t);
+        if (view) view.classList.toggle('hidden', t !== tabId);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm';
+          } else {
+            btn.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600';
+          }
         }
+      });
+    }
 
-        // MODAL 2: API SETTINGS & INTEGRATIONS
-        function openApiSettingsModal() {
-            triggerSoundFx('click');
-            document.getElementById('apiSettingIgId').value = currentBrand.igAccountId || '';
-            const savedToken = localStorage.getItem('postflow_meta_token') || '';
-            document.getElementById('apiSettingMetaToken').value = savedToken;
-            
-            const modeText = document.getElementById('apiPublishingModeText');
-            if (currentBrand.igAccountId && savedToken) {
-                modeText.innerText = 'Mode Publikasi Nyata (Real Live Active)';
-                modeText.className = 'text-xs font-extrabold text-emerald-600';
-            } else {
-                modeText.innerText = 'Simulasi Aman (Sandbox Mode)';
-                modeText.className = 'text-xs font-extrabold text-slate-800';
-            }
-            document.getElementById('modalApiSettings').classList.remove('hidden');
+    function changeCurrentUser(val) {
+      if (val === 'USR-01') currentRole = 'ADMIN';
+      if (val === 'USR-02') currentRole = 'CREATOR';
+      if (val === 'USR-03') currentRole = 'CLIENT';
+    }
+
+    // KALENDER & FEED PREVIEW HELPER
+    function renderCalendar() {
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 30; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'h-16 border border-slate-100 rounded-lg p-1 text-left relative bg-slate-50/50';
+        cell.innerHTML = `<span class="text-[10px] font-bold text-slate-400">${i}</span>`;
+        if (i === 3 || i === 15) {
+          cell.innerHTML += `<div class="mt-1 p-1 bg-rose-500 text-white rounded text-[8px] font-bold truncate">Post Live</div>`;
         }
-
-        function closeApiSettingsModal() {
-            document.getElementById('modalApiSettings').classList.add('hidden');
-        }
-
-        function handleSaveApiSettings(e) {
-            e.preventDefault();
-            const igId = document.getElementById('apiSettingIgId').value.trim();
-            const metaToken = document.getElementById('apiSettingMetaToken').value.trim();
-
-            currentBrand.igAccountId = igId;
-            localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
-            if (metaToken) {
-                localStorage.setItem('postflow_meta_token', metaToken);
-            }
-
-            closeApiSettingsModal();
-            triggerSoundFx('click');
-            showToast('Konfigurasi API & Token berhasil disimpan!', 'success');
-        }
-
-        async function testSocialMediaConnection() {
-            const btn = document.getElementById('btnTestApiConnection');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Memeriksa...';
-            btn.disabled = true;
-
-            try {
-                const res = await fetch('/api/health');
-                const data = await res.json();
-                showToast(`Status Server: ${data.status} (${data.metaApiMode})`, 'info');
-            } catch (err) {
-                showToast('Koneksi backend aktif dalam mode simulasi aman!', 'success');
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-satellite-dish mr-1"></i> Uji Koneksi API';
-                btn.disabled = false;
-            }
-        }
-
-        function applyBrandSettingsToUI() {
-            const handleText = `@${currentBrand.handle || 'kcmamuju_244'}`;
-            
-            const badge = document.getElementById('currentBrandBadge');
-            if (badge) badge.innerText = handleText;
-
-            const feedHandle = document.getElementById('feedBrandHandle');
-            if (feedHandle) feedHandle.innerText = currentBrand.handle || 'kcmamuju_244';
-
-            const feedBio = document.getElementById('feedBrandBio');
-            if (feedBio) feedBio.innerText = currentBrand.bio || 'Official Social Media Profile';
-
-            const feedAvatar = document.getElementById('feedBrandAvatar');
-            if (feedAvatar) feedAvatar.src = currentBrand.avatar || DEFAULT_BRAND.avatar;
-
-            const storyHandle = document.getElementById('storyBrandHandle');
-            if (storyHandle) storyHandle.innerText = currentBrand.handle || 'kcmamuju_244';
-
-            const storyAvatar = document.getElementById('storyBrandAvatar');
-            if (storyAvatar) storyAvatar.src = currentBrand.avatar || DEFAULT_BRAND.avatar;
-        }
-
-        async function loadInitialData() {
-            try {
-                const savedLocal = localStorage.getItem('postflow_posts_local');
-                if (savedLocal) {
-                    posts = JSON.parse(savedLocal);
-                    return;
-                }
-
-                const postsRes = await fetch('/api/posts').then(r => r.json()).catch(() => null);
-                if (postsRes && postsRes.success && postsRes.posts && postsRes.posts.length) {
-                    posts = postsRes.posts;
-                } else {
-                    posts = getLocalSeedPosts();
-                }
-            } catch (err) {
-                posts = getLocalSeedPosts();
-            }
-            savePostsToLocal();
-        }
-
-        function savePostsToLocal() {
-            localStorage.setItem('postflow_posts_local', JSON.stringify(posts));
-        }
-
-        function getLocalSeedPosts() {
-            return [
-                {
-                    id: 'POST-101',
-                    title: 'Promo Flash Sale Payday 50%',
-                    status: 'published',
-                    author: 'Putri Rahayu (Creator)',
-                    mediaUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800',
-                    caption: '🔥 Diskon hingga 50%! Khusus hari ini. Belanja sekarang di link bio. #PromoPayday #ViralMedsos',
-                    platform: 'instagram',
-                    type: 'FEED',
-                    comments: []
-                },
-                {
-                    id: 'POST-102',
-                    title: 'Tips Merawat Skin Barrier 14 Hari',
-                    status: 'review',
-                    author: 'Putri Rahayu (Creator)',
-                    mediaUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800',
-                    caption: 'Swipe untuk rahasia kulit sehat alami! 🌿 #GlowUp #SkincareRoutine',
-                    platform: 'instagram',
-                    type: 'FEED',
-                    comments: []
-                },
-                {
-                    id: 'POST-103',
-                    title: 'Behind The Scenes: Photoshoot 2026',
-                    status: 'draft',
-                    author: 'Putri Rahayu (Creator)',
-                    mediaUrl: 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=800',
-                    caption: 'Intip keseruan tim kreatif di balik layar! ✨ #BTS #ReelsViral',
-                    platform: 'instagram',
-                    type: 'REELS',
-                    comments: []
-                }
-            ];
-        }
-
-        // TAB SWITCHER
-        function switchTab(tabId) {
-            triggerSoundFx('click');
-            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-tab').forEach(el => {
-                el.classList.remove('bg-white', 'text-pink-600', 'shadow-xs', 'border', 'border-slate-200/60');
-                el.classList.add('text-slate-600');
-            });
-
-            const targetView = document.getElementById(`view-${tabId}`);
-            if (targetView) targetView.classList.remove('hidden');
-
-            const btn = document.getElementById(`tab-${tabId}`);
-            if (btn) {
-                btn.classList.add('bg-white', 'text-pink-600', 'shadow-xs', 'border', 'border-slate-200/60');
-                btn.classList.remove('text-slate-600');
-            }
-
-            if (tabId === 'calendar') renderCalendar();
-            if (tabId === 'grid') renderIgGrid();
-            if (tabId === 'users') renderUserTable();
-        }
-
-        // USER CONTEXT & RBAC
-        function renderUserSelectorDropdown() {
-            const dropdown = document.getElementById('userSelectorDropdown');
-            if (!dropdown) return;
-            dropdown.innerHTML = users.map(u => 
-                `<option value="${u.id}" ${u.id === currentUser.id ? 'selected' : ''} class="bg-white text-slate-800">${u.name} (${u.role.toUpperCase()})</option>`
-            ).join('');
-        }
-
-        function handleUserSwitch(userId) {
-            const found = users.find(u => u.id === userId);
-            if (found) {
-                currentUser = found;
-                updateUserContext();
-                renderKanban();
-                renderUserTable();
-                showToast(`Beralih user ke: ${currentUser.name}`, 'info');
-            }
-        }
-
-        function updateUserContext() {
-            const avatarEl = document.getElementById('currentUserAvatar');
-            if (avatarEl) avatarEl.src = currentUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
-
-            const title = document.getElementById('roleBannerTitle');
-            const desc = document.getElementById('roleBannerDesc');
-
-            if (currentUser.role === 'admin') {
-                title.innerText = 'Mode Admin / Agency Lead Aktif';
-                desc.innerText = 'Akses penuh: Otorisasi publishing, manajemen anggota tim, dan konfigurasi medsos.';
-            } else if (currentUser.role === 'reviewer') {
-                title.innerText = 'Mode Reviewer / Manager Aktif';
-                desc.innerText = 'Otoritas: Meninjau draf, meminta revisi spesifik, dan menyetujui publikasi.';
-            } else if (currentUser.role === 'creator') {
-                title.innerText = 'Mode Content Creator Aktif';
-                desc.innerText = 'Otoritas: Membuat draf konten, memanfaatkan Gemini AI, dan mengajukan draf.';
-            } else {
-                title.innerText = 'Mode Client / Viewer (Read Only)';
-                desc.innerText = 'Akses read-only untuk memantau feed dan jadwal konten.';
-            }
-        }
-
-        // KANBAN BOARD
-        function renderKanban() {
-            const cols = {
-                draft: document.getElementById('col-draft'),
-                review: document.getElementById('col-review'),
-                revision: document.getElementById('col-revision'),
-                published: document.getElementById('col-published')
-            };
-
-            Object.values(cols).forEach(c => { if (c) c.innerHTML = ''; });
-
-            posts.forEach(post => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-3.5 border border-slate-200 shadow-xs hover:shadow-md hover:border-pink-300 transition-all cursor-pointer group';
-                card.onclick = () => openDetailModal(post.id);
-
-                card.innerHTML = `
-                    <div class="flex gap-3">
-                        <img src="${post.mediaUrl}" class="w-14 h-14 rounded-xl object-cover group-hover:scale-105 transition-transform shadow-xs" alt="Media">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-1.5 mb-0.5">
-                                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-pink-600 border border-slate-200">${post.type || 'FEED'}</span>
-                                <span class="text-[9px] text-slate-400 font-medium">${post.platform || 'IG'}</span>
-                            </div>
-                            <h5 class="text-xs font-bold text-slate-900 truncate">${post.title}</h5>
-                            <p class="text-[11px] text-slate-500 truncate mt-0.5 font-medium">${post.caption || 'Tanpa caption'}</p>
-                            <div class="flex items-center justify-between mt-1.5 text-[10px] text-slate-400 font-medium">
-                                <span>${(post.author || 'User').split(' ')[0]}</span>
-                                ${post.comments && post.comments.length ? `<span class="text-rose-600 font-bold"><i class="fa-solid fa-comment-dots"></i> ${post.comments.length}</span>` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                if (cols[post.status]) cols[post.status].appendChild(card);
-            });
-
-            document.getElementById('badge-draft').innerText = posts.filter(p => p.status === 'draft').length;
-            document.getElementById('badge-review').innerText = posts.filter(p => p.status === 'review').length;
-            document.getElementById('badge-revision').innerText = posts.filter(p => p.status === 'revision').length;
-            document.getElementById('badge-published').innerText = posts.filter(p => p.status === 'published').length;
-        }
-
-        // CALENDAR
-        function renderCalendar() {
-            const grid = document.getElementById('calendarDaysGrid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            for (let i = 1; i <= 30; i++) {
-                const dayBox = document.createElement('div');
-                dayBox.className = 'aspect-square bg-slate-50 rounded-2xl p-2 border border-slate-200 flex flex-col justify-between hover:border-pink-300 transition-all';
-                
-                const hasPost = (i === 2 || i === 9 || i === 15 || i === 22);
-                dayBox.innerHTML = `
-                    <span class="text-[10px] font-bold ${i === 2 ? 'text-pink-600 font-extrabold' : 'text-slate-500'}">${i}</span>
-                    ${hasPost ? `
-                        <div class="bg-pink-50 border border-pink-200 text-pink-700 text-[9px] font-bold p-1 rounded-lg truncate shadow-2xs">
-                            ${i === 2 ? 'Payday 50%' : 'Beauty Tips'}
-                        </div>
-                    ` : ''}
-                `;
-                grid.appendChild(dayBox);
-            }
-        }
-
-        // INSTAGRAM FEED PREVIEW
-        function renderIgGrid() {
-            const grid = document.getElementById('igFeedGrid');
-            if (!grid) return;
-            grid.innerHTML = '';
-            const published = posts.filter(p => p.status === 'published');
-
-            if (published.length === 0) {
-                grid.innerHTML = '<p class="col-span-3 text-center text-slate-400 text-xs py-10 font-medium">Belum ada konten yang dipublish.</p>';
-                return;
-            }
-
-            published.forEach(p => {
-                const item = document.createElement('div');
-                item.className = 'aspect-square bg-slate-100 rounded-2xl overflow-hidden relative group cursor-pointer shadow-xs border border-slate-200';
-                item.onclick = () => {
-                    document.getElementById('storySimulatorImage').src = p.mediaUrl;
-                    document.getElementById('storySimulatorCaption').innerText = p.caption || p.title;
-                    triggerSoundFx('click');
-                };
-                item.innerHTML = `
-                    <img src="${p.mediaUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Feed Item">
-                    <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-3">
-                        <span><i class="fa-solid fa-heart mr-1"></i> Live</span>
-                    </div>
-                `;
-                grid.appendChild(item);
-            });
-        }
-
-        // USER CRUD MANAGEMENT TABLE
-        function renderUserTable() {
-            const tbody = document.getElementById('userTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            users.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50/80 transition-colors';
-
-                let roleBadgeColor = 'bg-slate-100 text-slate-700 border-slate-300';
-                let permText = 'Read Only View';
-                if (u.role === 'admin') { roleBadgeColor = 'bg-purple-50 text-purple-700 border-purple-200'; permText = 'Full Access & Settings'; }
-                if (u.role === 'reviewer') { roleBadgeColor = 'bg-pink-50 text-pink-700 border-pink-200'; permText = 'Approve & Auto-Publish'; }
-                if (u.role === 'creator') { roleBadgeColor = 'bg-blue-50 text-blue-700 border-blue-200'; permText = 'Submit Draft & AI Studio'; }
-
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4 flex items-center gap-3">
-                        <img src="${u.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" class="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-2xs" alt="${u.name}">
-                        <span class="font-bold text-slate-900">${u.name}</span>
-                    </td>
-                    <td class="py-3.5 px-4 font-mono text-[11px] text-slate-500">${u.email}</td>
-                    <td class="py-3.5 px-4">
-                        <span class="px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px] border ${roleBadgeColor}">${u.role}</span>
-                    </td>
-                    <td class="py-3.5 px-4 text-[11px] text-slate-600 font-medium">${permText}</td>
-                    <td class="py-3.5 px-4 text-center">
-                        <div class="inline-flex items-center justify-center gap-1.5">
-                            <button type="button" onclick="openEditUserModal('${u.id}')" class="p-2 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white border border-indigo-200 rounded-xl transition cursor-pointer" title="Edit Anggota">
-                                <i class="fa-solid fa-pen-to-square text-xs"></i>
-                            </button>
-                            <button type="button" onclick="deleteUser('${u.id}')" class="p-2 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 rounded-xl transition cursor-pointer" title="Hapus Anggota">
-                                <i class="fa-solid fa-trash text-xs"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function openAddUserModal() {
-            triggerSoundFx('click');
-            document.getElementById('modalUserFormTitle').innerHTML = '<i class="fa-solid fa-user-plus text-indigo-600"></i> Tambah Anggota Tim';
-            document.getElementById('formUserId').value = '';
-            document.getElementById('formUserName').value = '';
-            document.getElementById('formUserEmail').value = '';
-            document.getElementById('formUserRole').value = 'creator';
-            document.getElementById('formUserAvatar').value = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
-            document.getElementById('modalUserForm').classList.remove('hidden');
-        }
-
-        function openEditUserModal(userId) {
-            triggerSoundFx('click');
-            const user = users.find(u => u.id === userId);
-            if (!user) return;
-
-            document.getElementById('modalUserFormTitle').innerHTML = '<i class="fa-solid fa-user-pen text-indigo-600"></i> Edit Data Anggota';
-            document.getElementById('formUserId').value = user.id;
-            document.getElementById('formUserName').value = user.name;
-            document.getElementById('formUserEmail').value = user.email;
-            document.getElementById('formUserRole').value = user.role;
-            document.getElementById('formUserAvatar').value = user.avatar || '';
-            document.getElementById('modalUserForm').classList.remove('hidden');
-        }
-
-        function closeUserModal() {
-            document.getElementById('modalUserForm').classList.add('hidden');
-        }
-
-        function handleSaveUser(e) {
-            e.preventDefault();
-            const id = document.getElementById('formUserId').value;
-            const name = document.getElementById('formUserName').value.trim();
-            const email = document.getElementById('formUserEmail').value.trim();
-            const role = document.getElementById('formUserRole').value;
-            const avatar = document.getElementById('formUserAvatar').value.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
-
-            if (id) {
-                const index = users.findIndex(u => u.id === id);
-                if (index !== -1) {
-                    users[index] = { ...users[index], name, email, role, avatar };
-                    if (currentUser.id === id) {
-                        currentUser = users[index];
-                        updateUserContext();
-                    }
-                    showToast(`Data anggota ${name} berhasil diubah!`, 'success');
-                }
-            } else {
-                const newUser = {
-                    id: 'USR-' + Math.floor(100 + Math.random() * 900),
-                    name,
-                    email,
-                    role,
-                    avatar
-                };
-                users.push(newUser);
-                showToast(`Anggota baru ${name} berhasil ditambahkan!`, 'success');
-            }
-
-            localStorage.setItem('postflow_users_platinum', JSON.stringify(users));
-            renderUserTable();
-            renderUserSelectorDropdown();
-            closeUserModal();
-        }
-
-        function deleteUser(userId) {
-            if (users.length <= 1) {
-                showToast('Sistem wajib memiliki minimal 1 anggota!', 'error');
-                return;
-            }
-
-            const target = users.find(u => u.id === userId);
-            if (!target) return;
-
-            showConfirmationModal(`Hapus anggota "${target.name}"?`, () => {
-                users = users.filter(u => u.id !== userId);
-                if (currentUser.id === userId) {
-                    currentUser = users[0];
-                    updateUserContext();
-                }
-                localStorage.setItem('postflow_users_platinum', JSON.stringify(users));
-                renderUserTable();
-                renderUserSelectorDropdown();
-                showToast(`Anggota "${target.name}" berhasil dihapus!`, 'info');
-            });
-        }
-
-        // POST DETAILS & APPROVAL WORKFLOW
-        function openDetailModal(postId) {
-            triggerSoundFx('click');
-            const post = posts.find(p => p.id === postId);
-            if (!post) return;
-
-            document.getElementById('detailPostId').innerText = post.id;
-            document.getElementById('detailTitle').innerText = post.title;
-            document.getElementById('detailAuthor').innerText = post.author;
-            document.getElementById('detailImageMock').src = post.mediaUrl;
-            document.getElementById('detailCaptionMock').innerText = post.caption || '-';
-
-            const badge = document.getElementById('detailStatusBadge');
-            badge.innerText = post.status.toUpperCase();
-            badge.className = `px-3 py-1 text-[10px] font-bold rounded-full uppercase ${
-                post.status === 'published' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                post.status === 'revision' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
-            }`;
-
-            const commentsSection = document.getElementById('detailCommentsSection');
-            const commentsList = document.getElementById('detailCommentsList');
-            if (post.comments && post.comments.length > 0) {
-                commentsSection.classList.remove('hidden');
-                commentsList.innerHTML = post.comments.map(c => `
-                    <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-rose-800">
-                        <span class="font-bold text-[11px] text-rose-900">${c.author}:</span> ${c.note}
-                    </div>
-                `).join('');
-            } else {
-                commentsSection.classList.add('hidden');
-            }
-
-            const actions = document.getElementById('detailActionButtons');
-            const canApprove = (currentUser.role === 'admin' || currentUser.role === 'reviewer');
-
-            if (post.status === 'published') {
-                actions.innerHTML = `<div class="text-emerald-700 bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl text-center font-bold text-xs"><i class="fa-solid fa-circle-check mr-2 text-emerald-600"></i> Konten ini sudah LIVE di Media Sosial (@${currentBrand.handle})</div>`;
-            } else if (canApprove) {
-                actions.innerHTML = `
-                    <div class="flex gap-2">
-                        <button type="button" onclick="promptRevision('${post.id}')" class="flex-1 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-2xl font-bold text-xs transition-colors cursor-pointer">Minta Revisi</button>
-                        <button type="button" onclick="executeApproveAndPublish('${post.id}')" id="btnApproveAction" class="flex-1 py-3 ig-gradient text-white rounded-2xl font-bold text-xs shadow-md shadow-pink-500/20 hover:opacity-95 transition-all cursor-pointer">Approve & Publish Live</button>
-                    </div>
-                `;
-            } else {
-                actions.innerHTML = `<p class="text-xs text-slate-500 italic text-center">Menunggu persetujuan Reviewer (Peran ${currentUser.role} tidak dapat approve).</p>`;
-            }
-
-            document.getElementById('modalDetail').classList.remove('hidden');
-        }
-
-        function closeDetailModal() {
-            document.getElementById('modalDetail').classList.add('hidden');
-        }
-
-        async function executeApproveAndPublish(postId) {
-            const btn = document.getElementById('btnApproveAction');
-            if (btn) {
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Memproses Publishing...';
-                btn.disabled = true;
-            }
-
-            try {
-                const response = await fetch(`/api/posts/${postId}/approve-publish`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-user-role': currentUser.role }
-                });
-                const data = await response.json();
-
-                const post = posts.find(p => p.id === postId);
-                if (post) {
-                    post.status = 'published';
-                    post.publishedAt = new Date().toISOString();
-                }
-                savePostsToLocal();
-                renderKanban();
-                renderIgGrid();
-                closeDetailModal();
-                triggerSoundFx('publish');
-                try { confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); } catch (e) {}
-                showToast(`🚀 Konten Berhasil Tayang di @${currentBrand.handle}!`, 'success');
-            } catch (err) {
-                const post = posts.find(p => p.id === postId);
-                if (post) post.status = 'published';
-                savePostsToLocal();
-                renderKanban();
-                renderIgGrid();
-                closeDetailModal();
-                triggerSoundFx('publish');
-                try { confetti({ particleCount: 70, spread: 60 }); } catch (e) {}
-                showToast(`🚀 Konten Disetujui & Live di @${currentBrand.handle}!`, 'success');
-            }
-        }
-
-        function promptRevision(postId) {
-            activePostIdForRevision = postId;
-            document.getElementById('revisionNoteInput').value = '';
-            document.getElementById('modalRevisionPrompt').classList.remove('hidden');
-        }
-
-        function closeRevisionModal() {
-            document.getElementById('modalRevisionPrompt').classList.add('hidden');
-        }
-
-        async function submitRevision() {
-            const note = document.getElementById('revisionNoteInput').value.trim();
-            if (!note) {
-                showToast('Tuliskan catatan perbaikan!', 'error');
-                return;
-            }
-
-            const post = posts.find(p => p.id === activePostIdForRevision);
-            if (post) {
-                post.status = 'revision';
-                if (!post.comments) post.comments = [];
-                post.comments.push({ author: currentUser.name, note, createdAt: new Date().toISOString() });
-            }
-
-            savePostsToLocal();
-            renderKanban();
-            closeRevisionModal();
-            closeDetailModal();
-            showToast('Catatan revisi terkirim ke Creator', 'info');
-        }
-
-        function openCreateModal() {
-            if (currentUser.role === 'client') {
-                showToast('Client hanya memiliki hak Read-Only', 'error');
-                return;
-            }
-            document.getElementById('modalCreate').classList.remove('hidden');
-        }
-
-        function closeCreateModal() {
-            document.getElementById('modalCreate').classList.add('hidden');
-        }
-
-        async function submitNewPost() {
-            const title = document.getElementById('newPostTitle').value.trim();
-            const caption = document.getElementById('newPostCaption').value.trim();
-            const mediaUrl = document.getElementById('newPostImage').value.trim();
-            const platform = document.getElementById('newPostPlatform').value;
-            const type = document.getElementById('newPostType').value;
-
-            if (!title || !mediaUrl) {
-                showToast('Judul dan URL Media wajib diisi!', 'error');
-                return;
-            }
-
-            const payload = {
-                id: 'POST-' + Math.floor(100 + Math.random() * 900),
-                title,
-                caption,
-                mediaUrl,
-                platform,
-                type,
-                author: currentUser.name,
-                status: 'review',
-                comments: []
-            };
-
-            posts.unshift(payload);
-            savePostsToLocal();
-            renderKanban();
-            closeCreateModal();
-            triggerSoundFx('click');
-            showToast('Draf diajukan ke antrean approval!', 'success');
-        }
-
-        // AI STUDIO FEATURES
-        async function generateAiCopy() {
-            const topic = document.getElementById('aiTopicInput').value.trim();
-            const tone = document.getElementById('aiToneSelect').value;
-            const btn = document.getElementById('btnGenerateAiCopy');
-
-            if (!topic) {
-                showToast('Masukkan topik atau kata kunci konten!', 'error');
-                return;
-            }
-
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Meracik dengan Gemini...';
-            btn.disabled = true;
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const systemPrompt = `Anda adalah copywriter media sosial profesional untuk brand @${currentBrand.handle}. Buat caption menarik dengan Hook kuat di kalimat pertama, Body interaktif, Call To Action (CTA), dan 5-8 hashtag populer relevan. Tone: ${tone}.`;
-            const userPrompt = `Buatkan caption Instagram untuk topik: ${topic}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: userPrompt }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] }
-                    })
-                });
-
-                const data = await response.json();
-                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (resultText) {
-                    document.getElementById('aiCopyResult').value = resultText;
-                    showToast('Caption AI berhasil dibuat!', 'success');
-                } else {
-                    throw new Error('Gagal merespons');
-                }
-            } catch (err) {
-                const fallback = `🔥 ${topic.toUpperCase()}!\n\nSaatnya upgrade penampilan Anda bersama ${currentBrand.name}. Temukan penawaran terbaik hanya untukmu hari ini!\n\n👉 Klik link di bio @${currentBrand.handle} sekarang juga!\n\n#${currentBrand.handle.replace(/[^a-zA-Z0-9]/g, '')} #PromoPayday #ViralIndonesia #TipsHarian`;
-                document.getElementById('aiCopyResult').value = fallback;
-                showToast('Caption template siap digunakan!', 'info');
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Racik Caption Otomatis';
-                btn.disabled = false;
-            }
-        }
-
-        function applyAiCopyToNewPost() {
-            const copy = document.getElementById('aiCopyResult').value;
-            const topic = document.getElementById('aiTopicInput').value;
-            if (!copy) {
-                showToast('Buat caption dengan AI terlebih dahulu!', 'error');
-                return;
-            }
-            openCreateModal();
-            document.getElementById('newPostTitle').value = topic || 'Campaign Baru';
-            document.getElementById('newPostCaption').value = copy;
-        }
-
-        async function generateAiVisual() {
-            const prompt = document.getElementById('aiImagePrompt').value.trim();
-            const btn = document.getElementById('btnGenerateAiVisual');
-            const imgTag = document.getElementById('aiGeneratedImageTag');
-            const placeholder = document.getElementById('aiVisualPlaceholderText');
-
-            if (!prompt) {
-                showToast('Masukkan deskripsi visual prompt!', 'error');
-                return;
-            }
-
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Generating Image...';
-            btn.disabled = true;
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-image:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
-                    })
-                });
-
-                const data = await response.json();
-                const base64Data = data?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
-
-                if (base64Data) {
-                    const fullUrl = `data:image/png;base64,${base64Data}`;
-                    imgTag.src = fullUrl;
-                    imgTag.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
-                    showToast('Visual AI berhasil dibuat!', 'success');
-                } else {
-                    throw new Error('Fallback image');
-                }
-            } catch (err) {
-                imgTag.src = 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800';
-                imgTag.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                showToast('Visual mockup siap!', 'info');
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-palette mr-2"></i> Generate Gambar AI';
-                btn.disabled = false;
-            }
-        }
-
-        // UTILITY: TOASTS & CONFIRMATION
-        function showToast(msg, type = 'info') {
-            const c = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = `px-4 py-3 rounded-2xl shadow-lg text-xs font-bold pointer-events-auto flex items-center gap-2.5 transition-all border ${
-                type === 'error' ? 'bg-rose-50 text-rose-800 border-rose-200' : 
-                type === 'success' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-white text-slate-800 border-slate-200'
-            }`;
-            t.innerHTML = `${type === 'success' ? '<i class="fa-solid fa-circle-check text-emerald-600"></i>' : '<i class="fa-solid fa-circle-info text-pink-600"></i>'} ${msg}`;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 3200);
-        }
-
-        function showConfirmationModal(message, onConfirm) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4';
-            modal.innerHTML = `
-                <div class="bg-white border border-slate-200 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
-                    <h4 class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Konfirmasi Aksi
-                    </h4>
-                    <p class="text-xs text-slate-600 font-medium">${message}</p>
-                    <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                        <button type="button" id="btnCancelConfirm" class="px-3.5 py-1.5 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-xl cursor-pointer">Batal</button>
-                        <button type="button" id="btnProceedConfirm" class="px-4 py-1.5 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-md cursor-pointer">Ya, Hapus</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            modal.querySelector('#btnCancelConfirm').onclick = () => modal.remove();
-            modal.querySelector('#btnProceedConfirm').onclick = () => {
-                modal.remove();
-                onConfirm();
-            };
-        }
-    </script>
+        grid.appendChild(cell);
+      }
+    }
+
+    function renderFeedPreview() {
+      const cont = document.getElementById('feedGridContainer');
+      cont.innerHTML = '';
+      document.getElementById('previewPostCount').textContent = posts.length;
+      posts.forEach(p => {
+        const img = document.createElement('img');
+        img.src = p.media_url;
+        img.className = 'w-full h-28 object-cover cursor-pointer hover:opacity-90';
+        cont.appendChild(img);
+      });
+    }
+
+    function saveBrandSettings() {
+      const handle = document.getElementById('settingBrandHandle').value;
+      const name = document.getElementById('settingBrandName').value;
+      const bio = document.getElementById('settingBrandBio').value;
+      document.getElementById('currentBrandHandle').textContent = handle;
+      document.getElementById('previewBrandName').textContent = name;
+      document.getElementById('previewBrandBio').textContent = bio;
+      closeBrandModal();
+    }
+
+    function saveApiSettings() {
+      alert('Pengaturan token berhasil disimpan!');
+      closeApiModal();
+    }
+
+    // AI DRAFT SIMULATOR
+    function generateAiDraft() {
+      const p = document.getElementById('aiPromptInput').value;
+      if (!p) return alert('Masukkan ide konten terlebih dahulu');
+      document.getElementById('aiOutputContainer').classList.remove('hidden');
+      document.getElementById('aiOutputText').textContent = `✨ ${p.toUpperCase()}\n\nDapatkan penawaran terbaik dan wujudkan impian Anda bersama kami hari ini! Kunjungi kantor layanan terdekat atau klik tautan di bio untuk informasi lengkap.\n\n#PromoSpesial #BankBTN #LayananTerbaik #SolusiKeuangan`;
+    }
+
+    function useAiDraft() {
+      const text = document.getElementById('aiOutputText').textContent;
+      openPostModal();
+      document.getElementById('postTitleInput').value = document.getElementById('aiPromptInput').value;
+      document.getElementById('postCaptionInput').value = text;
+      document.getElementById('postMediaUrlInput').value = 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800';
+      switchTab('board');
+    }
+
+    // INIT
+    fetchPostsFromApi();
+    renderCalendar();
+    renderFeedPreview();
+  </script>
 </body>
 </html>
