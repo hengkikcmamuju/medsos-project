@@ -121,10 +121,7 @@
                     <div class="flex items-center gap-2 bg-slate-800/90 p-1.5 rounded-2xl border border-slate-700">
                         <img id="currentUserAvatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100" class="w-7 h-7 rounded-xl object-cover border border-slate-600">
                         <select id="userSelectorDropdown" onchange="handleUserSwitch(this.value)" class="bg-transparent text-xs font-bold text-slate-200 cursor-pointer focus:outline-none pr-1">
-                            <option value="USR-02" class="bg-slate-800" selected>Budi (Reviewer)</option>
-                            <option value="USR-03" class="bg-slate-800">Putri (Creator)</option>
-                            <option value="USR-01" class="bg-slate-800">Dimas (Admin)</option>
-                            <option value="USR-04" class="bg-slate-800">Sarah (Client)</option>
+                            <!-- Populated dynamically via JS -->
                         </select>
                     </div>
 
@@ -147,12 +144,12 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h4 class="text-xs font-bold text-white" id="roleBannerTitle">Mode Reviewer / Manager Aktif</h4>
+                        <h4 class="text-xs font-bold text-white" id="roleBannerTitle">Mode Admin / Lead Aktif</h4>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Meta API Connected
                         </span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-0.5" id="roleBannerDesc">Anda memiliki otoritas penuh menyetujui konten dan melakukan auto-publish langsung ke Instagram Feed & Reels.</p>
+                    <p class="text-xs text-slate-400 mt-0.5" id="roleBannerDesc">Akses penuh: Otorisasi publishing, manajemen anggota tim, dan konfigurasi API.</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -162,10 +159,10 @@
             </div>
         </div>
 
+        <!-- VIEW: KANBAN BOARD -->
         <div id="view-kanban" class="tab-view block space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                
-                <!-- Col 1: Draft Konten -->
+                <!-- Col 1: Draft -->
                 <div class="bg-slate-800/50 rounded-3xl p-3.5 border border-slate-800">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <span class="font-bold text-xs uppercase tracking-wider text-slate-300 flex items-center gap-2">
@@ -187,7 +184,7 @@
                     <div id="col-review" class="space-y-3 min-h-[400px]"></div>
                 </div>
 
-                <!-- Col 3: Revision Needed -->
+                <!-- Col 3: Revision -->
                 <div class="bg-rose-950/20 rounded-3xl p-3.5 border border-rose-900/40">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <span class="font-bold text-xs uppercase tracking-wider text-rose-400 flex items-center gap-2">
@@ -198,7 +195,7 @@
                     <div id="col-revision" class="space-y-3 min-h-[400px]"></div>
                 </div>
 
-                <!-- Col 4: Published / Live -->
+                <!-- Col 4: Published -->
                 <div class="bg-emerald-950/20 rounded-3xl p-3.5 border border-emerald-900/40">
                     <div class="flex items-center justify-between mb-3 px-1">
                         <span class="font-bold text-xs uppercase tracking-wider text-emerald-400 flex items-center gap-2">
@@ -208,10 +205,10 @@
                     </div>
                     <div id="col-published" class="space-y-3 min-h-[400px]"></div>
                 </div>
-
             </div>
         </div>
 
+        <!-- VIEW: CALENDAR -->
         <div id="view-calendar" class="tab-view hidden space-y-4">
             <div class="bg-slate-800/80 rounded-3xl border border-slate-700 p-6 shadow-xl">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-6 border-b border-slate-700">
@@ -225,8 +222,6 @@
                         September 2026
                     </div>
                 </div>
-
-                <!-- Calendar Grid Mockup -->
                 <div class="grid grid-cols-7 gap-2 mt-4 text-center font-bold text-xs text-slate-400 pb-2 border-b border-slate-700/60">
                     <div>SEN</div><div>SEL</div><div>RAB</div><div>KAM</div><div>JUM</div><div>SAB</div><div>MIN</div>
                 </div>
@@ -234,9 +229,9 @@
             </div>
         </div>
 
+        <!-- VIEW: INSTAGRAM FEED PREVIEW -->
         <div id="view-grid" class="tab-view hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Feed Column -->
                 <div class="lg:col-span-8 bg-slate-800/80 rounded-3xl border border-slate-700 p-6 shadow-xl">
                     <div class="flex items-center gap-5 pb-6 border-b border-slate-700">
                         <div class="w-16 h-16 rounded-full p-[2.5px] ig-gradient">
@@ -253,13 +248,11 @@
                     <div id="igFeedGrid" class="grid grid-cols-3 gap-3 mt-6"></div>
                 </div>
 
-                <!-- Story / Reels Mockup Preview -->
                 <div class="lg:col-span-4 bg-slate-800/80 rounded-3xl border border-slate-700 p-6 shadow-xl flex flex-col items-center">
                     <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-mobile-screen-button text-pink-500"></i> Reels & Story Simulator
                     </h4>
                     <div class="w-64 aspect-[9/16] bg-black rounded-3xl overflow-hidden relative shadow-2xl border-4 border-slate-700 flex flex-col justify-between p-3.5">
-                        <!-- Top Story Header -->
                         <div class="flex items-center justify-between text-white z-10">
                             <div class="flex items-center gap-2">
                                 <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200" class="w-6 h-6 rounded-full border border-white">
@@ -267,9 +260,7 @@
                             </div>
                             <span class="text-[10px] text-slate-300">Sponsored</span>
                         </div>
-                        <!-- Story Visual Backdrop -->
                         <img id="storySimulatorImage" src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800" class="absolute inset-0 w-full h-full object-cover opacity-85">
-                        <!-- Bottom Action Overlays -->
                         <div class="z-10 space-y-2">
                             <p class="text-[11px] text-white font-medium drop-shadow-md line-clamp-2" id="storySimulatorCaption">Swipe up untuk promo flash sale 50%!</p>
                             <div class="bg-white/20 backdrop-blur-md text-white text-center py-2 rounded-xl text-xs font-bold border border-white/30">
@@ -281,9 +272,10 @@
             </div>
         </div>
 
+        <!-- VIEW: AI STUDIO -->
         <div id="view-ai" class="tab-view hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- AI Copywriting Generator -->
+                <!-- AI Copywriting -->
                 <div class="bg-slate-800/80 rounded-3xl border border-slate-700 p-6 shadow-xl space-y-4">
                     <div class="flex items-center gap-3 pb-3 border-b border-slate-700">
                         <div class="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center font-bold">
@@ -300,7 +292,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Tone of Voice</label>
-                        <select id="aiToneSelect" class="w-full text-xs font-semibold bg-slate-900 border border-slate-700 rounded-2xl px-3 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        <select id="aiToneSelect" class="w-full text-xs font-semibold bg-slate-900 border border-slate-700 rounded-2xl px-3 py-2.5 text-slate-200 focus:outline-none">
                             <option value="persuasive">Persuasif & Hard Selling (Cocok untuk Promo)</option>
                             <option value="storytelling">Storytelling & Relatable (Cocok untuk Reels)</option>
                             <option value="educational">Edukatif & Informatif (Tips & Carousels)</option>
@@ -319,7 +311,7 @@
                     </button>
                 </div>
 
-                <!-- AI Visual Generator (Text to Image) -->
+                <!-- AI Visual Generator -->
                 <div class="bg-slate-800/80 rounded-3xl border border-slate-700 p-6 shadow-xl space-y-4">
                     <div class="flex items-center gap-3 pb-3 border-b border-slate-700">
                         <div class="w-10 h-10 rounded-2xl bg-pink-500/20 text-pink-400 border border-pink-500/30 flex items-center justify-center font-bold">
@@ -332,7 +324,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Prompt Visual Gambar</label>
-                        <input type="text" id="aiImagePrompt" placeholder="Misal: Minimalist aesthetic cosmetic bottle on marble table with soft studio lighting 8k" class="w-full text-xs bg-slate-900 border border-slate-700 rounded-2xl px-3.5 py-3 text-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
+                        <input type="text" id="aiImagePrompt" placeholder="Misal: Minimalist aesthetic cosmetic bottle on marble table 8k" class="w-full text-xs bg-slate-900 border border-slate-700 rounded-2xl px-3.5 py-3 text-white focus:ring-2 focus:ring-pink-500 focus:outline-none">
                     </div>
                     <button onclick="generateAiVisual()" id="btnGenerateAiVisual" class="w-full py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-2xl text-xs font-bold shadow-lg flex items-center justify-center gap-2 transition-all">
                         <i class="fa-solid fa-palette"></i> Generate Gambar AI
@@ -345,6 +337,7 @@
             </div>
         </div>
 
+        <!-- VIEW: MANAJEMEN TIM & RBAC (CRUD LENGKAP) -->
         <div id="view-users" class="tab-view hidden space-y-6">
             <div class="bg-slate-800/80 rounded-3xl border border-slate-700 p-6 shadow-xl">
                 <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-5 border-b border-slate-700">
@@ -352,7 +345,7 @@
                         <h3 class="text-base font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-users text-indigo-400"></i> Manajemen Tim & Role-Based Access Control
                         </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Pengaturan hak akses creator, reviewer, dan client viewer.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Kelola data anggota, hak otorisasi posting, dan kewenangan approval sistem.</p>
                     </div>
                     <button onclick="openAddUserModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20">
                         <i class="fa-solid fa-user-plus"></i> Tambah Anggota
@@ -367,10 +360,12 @@
                                 <th class="py-3 px-4">Email</th>
                                 <th class="py-3 px-4">Peran / Role</th>
                                 <th class="py-3 px-4">Kewenangan Sistem</th>
-                                <th class="py-3 px-4 text-right">Aksi</th>
+                                <th class="py-3 px-4 text-center">Aksi (CRUD)</th>
                             </tr>
                         </thead>
-                        <tbody id="userTableBody" class="divide-y divide-slate-700/60"></tbody>
+                        <tbody id="userTableBody" class="divide-y divide-slate-700/60">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -378,6 +373,55 @@
 
     </main>
 
+    <!-- MODAL FORM: TAMBAH & EDIT USER (CRUD) -->
+    <div id="modalUserForm" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <h3 id="modalUserFormTitle" class="font-bold text-sm text-white flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-indigo-400"></i> Tambah Anggota Tim
+                </h3>
+                <button onclick="closeUserModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form onsubmit="handleSaveUser(event)" class="space-y-3.5">
+                <input type="hidden" id="formUserId" value="">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Nama Lengkap</label>
+                    <input type="text" id="formUserName" required placeholder="Misal: Ahmad Fauzi" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Alamat Email</label>
+                    <input type="email" id="formUserEmail" required placeholder="ahmad@brandkita.id" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Peran / Role Akses</label>
+                    <select id="formUserRole" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                        <option value="admin">ADMIN (Akses Penuh, User & Token)</option>
+                        <option value="reviewer">REVIEWER (Review & Approve Live)</option>
+                        <option value="creator">CREATOR (Submit Draft & AI Studio)</option>
+                        <option value="client">CLIENT (Read Only Monitor)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">URL Avatar / Foto Profil</label>
+                    <input type="url" id="formUserAvatar" placeholder="https://images.unsplash.com/..." class="w-full text-xs font-mono bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-[11px]">
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeUserModal()" class="px-4 py-2 text-xs font-bold text-slate-400 hover:bg-slate-800 rounded-xl">Batal</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-600/25 flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL POST -->
     <div id="modalDetail" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
@@ -399,7 +443,6 @@
                         </div>
                         <div class="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 text-xs leading-relaxed text-slate-200 whitespace-pre-line custom-scrollbar max-h-48 overflow-y-auto" id="detailCaptionMock"></div>
                         
-                        <!-- Catatan Revisi Container -->
                         <div id="detailCommentsSection" class="space-y-2 hidden">
                             <span class="text-[11px] font-bold text-rose-400 uppercase tracking-wider block">Catatan Feedback / Revisi:</span>
                             <div id="detailCommentsList" class="space-y-2 text-xs"></div>
@@ -411,13 +454,14 @@
         </div>
     </div>
 
+    <!-- MODAL REVISI -->
     <div id="modalRevisionPrompt" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <h3 class="font-bold text-sm text-white flex items-center gap-2">
                 <i class="fa-solid fa-pen-ruler text-rose-500"></i> Minta Revisi Konten
             </h3>
             <p class="text-xs text-slate-400">Berikan catatan perbaikan yang spesifik agar creator dapat menyempurnakan konten.</p>
-            <textarea id="revisionNoteInput" rows="4" placeholder="Misal: Perbaiki typo pada CTA dan ganti visual produk dengan edisi botol 100ml..." class="w-full text-xs bg-slate-800 border border-slate-700 rounded-2xl p-3.5 text-white focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+            <textarea id="revisionNoteInput" rows="4" placeholder="Misal: Perbaiki typo pada CTA..." class="w-full text-xs bg-slate-800 border border-slate-700 rounded-2xl p-3.5 text-white focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
             <div class="flex justify-end gap-2 pt-2">
                 <button onclick="closeRevisionModal()" class="px-4 py-2 text-xs font-bold text-slate-400 hover:bg-slate-800 rounded-xl">Batal</button>
                 <button onclick="submitRevision()" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white rounded-xl shadow-lg shadow-rose-600/20">Kirim Feedback</button>
@@ -425,6 +469,7 @@
         </div>
     </div>
 
+    <!-- MODAL CREATE POST -->
     <div id="modalCreate" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/80">
@@ -439,7 +484,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Platform Target</label>
-                        <select id="newPostPlatform" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-2xl px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        <select id="newPostPlatform" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-2xl px-3 py-2.5 text-white focus:outline-none">
                             <option value="instagram">Instagram</option>
                             <option value="tiktok">TikTok</option>
                             <option value="youtube">YouTube Shorts</option>
@@ -447,7 +492,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-1">Tipe Media</label>
-                        <select id="newPostType" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-2xl px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-pink-500">
+                        <select id="newPostType" class="w-full text-xs font-semibold bg-slate-800 border border-slate-700 rounded-2xl px-3 py-2.5 text-white focus:outline-none">
                             <option value="FEED">Feed Post (1:1 / 4:5)</option>
                             <option value="REELS">Reels Video (9:16)</option>
                             <option value="STORY">Story Post (9:16)</option>
@@ -470,17 +515,38 @@
         </div>
     </div>
 
-    <!-- Toast Notification Container -->
+    <!-- Toast Notifications -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
     <script>
-        let currentUser = { id: 'USR-02', name: 'Budi Santoso', role: 'reviewer', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' };
-        let activeBrand = 'BRD-01';
+        // Data Default Awal
+        const DEFAULT_SEED_USERS = [
+            { id: 'USR-01', name: 'Dimas Admin (Lead)', email: 'admin@postflow.id', role: 'admin', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' },
+            { id: 'USR-02', name: 'Budi Santoso (Reviewer)', email: 'budi.manager@brandkita.id', role: 'reviewer', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' },
+            { id: 'USR-03', name: 'Putri Rahayu (Creator)', email: 'putri.creator@brandkita.id', role: 'creator', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
+            { id: 'USR-04', name: 'Sarah Client (Viewer)', email: 'sarah.client@partner.com', role: 'client', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100' }
+        ];
+
         let users = [];
+        try {
+            const saved = localStorage.getItem('postflow_users_platinum');
+            users = saved ? JSON.parse(saved) : DEFAULT_SEED_USERS;
+        } catch (e) {
+            users = DEFAULT_SEED_USERS;
+        }
+
+        let currentUser = users[0] || DEFAULT_SEED_USERS[0];
+        let activeBrand = 'BRD-01';
         let posts = [];
         let activePostIdForRevision = null;
 
-        // Audio synthesizer using Web Audio API
+        function saveUsersToLocalStorage() {
+            localStorage.setItem('postflow_users_platinum', JSON.stringify(users));
+            renderUserTable();
+            renderUserSelectorDropdown();
+        }
+
+        // Web Audio Synthesizer
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function triggerSoundFx(type = 'click') {
             try {
@@ -511,6 +577,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             await loadInitialData();
+            renderUserSelectorDropdown();
             updateUserContext();
             renderKanban();
             renderCalendar();
@@ -520,25 +587,14 @@
 
         async function loadInitialData() {
             try {
-                const [postsRes, usersRes] = await Promise.all([
-                    fetch('/api/posts').then(r => r.json()).catch(() => null),
-                    fetch('/api/users').then(r => r.json()).catch(() => null)
-                ]);
-
+                const postsRes = await fetch('/api/posts').then(r => r.json()).catch(() => null);
                 if (postsRes && postsRes.success) {
                     posts = postsRes.posts;
                 } else {
                     posts = getLocalSeedPosts();
                 }
-
-                if (usersRes && usersRes.success) {
-                    users = usersRes.users;
-                } else {
-                    users = getLocalSeedUsers();
-                }
             } catch (err) {
                 posts = getLocalSeedPosts();
-                users = getLocalSeedUsers();
             }
         }
 
@@ -583,15 +639,6 @@
             ];
         }
 
-        function getLocalSeedUsers() {
-            return [
-                { id: 'USR-01', name: 'Dimas Admin (Lead)', email: 'admin@postflow.id', role: 'admin', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' },
-                { id: 'USR-02', name: 'Budi Santoso (Reviewer)', email: 'budi.manager@brandkita.id', role: 'reviewer', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' },
-                { id: 'USR-03', name: 'Putri Rahayu (Creator)', email: 'putri.creator@brandkita.id', role: 'creator', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
-                { id: 'USR-04', name: 'Sarah Client (Viewer)', email: 'sarah.client@partner.com', role: 'client', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100' }
-            ];
-        }
-
         function switchTab(tabId) {
             triggerSoundFx('click');
             document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
@@ -612,6 +659,14 @@
             if (tabId === 'users') renderUserTable();
         }
 
+        function renderUserSelectorDropdown() {
+            const dropdown = document.getElementById('userSelectorDropdown');
+            if (!dropdown) return;
+            dropdown.innerHTML = users.map(u => 
+                `<option value="${u.id}" ${u.id === currentUser.id ? 'selected' : ''} class="bg-slate-800">${u.name} (${u.role.toUpperCase()})</option>`
+            ).join('');
+        }
+
         function handleUserSwitch(userId) {
             const found = users.find(u => u.id === userId);
             if (found) {
@@ -625,14 +680,16 @@
 
         function handleBrandChange(brandId) {
             activeBrand = brandId;
-            showToast(`Workspace beralih ke: ${brandId === 'BRD-01' ? '@brandkita_official' : '@luxeglow.id'}`, 'info');
+            showToast(`Workspace: ${brandId === 'BRD-01' ? '@brandkita_official' : '@luxeglow.id'}`, 'info');
             renderKanban();
             renderCalendar();
             renderIgGrid();
         }
 
         function updateUserContext() {
-            document.getElementById('currentUserAvatar').src = currentUser.avatar;
+            const avatarEl = document.getElementById('currentUserAvatar');
+            if (avatarEl) avatarEl.src = currentUser.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100';
+
             const title = document.getElementById('roleBannerTitle');
             const desc = document.getElementById('roleBannerDesc');
 
@@ -677,7 +734,7 @@
                             <h5 class="text-xs font-bold text-white truncate">${post.title}</h5>
                             <p class="text-[11px] text-slate-400 truncate mt-0.5">${post.caption || 'Tanpa caption'}</p>
                             <div class="flex items-center justify-between mt-1.5 text-[10px] text-slate-400">
-                                <span>${post.author.split(' ')[0]}</span>
+                                <span>${(post.author || 'User').split(' ')[0]}</span>
                                 ${post.comments && post.comments.length ? `<span class="text-rose-400 font-bold"><i class="fa-solid fa-comment-dots"></i> ${post.comments.length}</span>` : ''}
                             </div>
                         </div>
@@ -743,6 +800,9 @@
             });
         }
 
+        // ==========================================
+        // FITUR CRUD MANAJEMEN TIM
+        // ==========================================
         function renderUserTable() {
             const tbody = document.getElementById('userTableBody');
             if (!tbody) return;
@@ -752,32 +812,127 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800/40 transition-colors';
 
-                let roleBadgeColor = 'bg-slate-700 text-slate-300';
+                let roleBadgeColor = 'bg-slate-700 text-slate-300 border-slate-600';
                 let permText = 'Read Only View';
-                if (u.role === 'admin') { roleBadgeColor = 'bg-purple-900/60 text-purple-300 border border-purple-700'; permText = 'Full Access & Tokens'; }
-                if (u.role === 'reviewer') { roleBadgeColor = 'bg-pink-900/60 text-pink-300 border border-pink-700'; permText = 'Approve & Auto-Publish'; }
-                if (u.role === 'creator') { roleBadgeColor = 'bg-blue-900/60 text-blue-300 border border-blue-700'; permText = 'Submit Draft & AI Studio'; }
+                if (u.role === 'admin') { roleBadgeColor = 'bg-purple-900/60 text-purple-300 border-purple-700'; permText = 'Full Access & Tokens'; }
+                if (u.role === 'reviewer') { roleBadgeColor = 'bg-pink-900/60 text-pink-300 border-pink-700'; permText = 'Approve & Auto-Publish'; }
+                if (u.role === 'creator') { roleBadgeColor = 'bg-blue-900/60 text-blue-300 border-blue-700'; permText = 'Submit Draft & AI Studio'; }
 
                 tr.innerHTML = `
                     <td class="py-3.5 px-4 flex items-center gap-3">
-                        <img src="${u.avatar}" class="w-8 h-8 rounded-full object-cover border border-slate-700">
+                        <img src="${u.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}" class="w-8 h-8 rounded-full object-cover border border-slate-700">
                         <span class="font-bold text-white">${u.name}</span>
                     </td>
                     <td class="py-3.5 px-4 font-mono text-[11px] text-slate-400">${u.email}</td>
                     <td class="py-3.5 px-4">
-                        <span class="px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px] ${roleBadgeColor}">${u.role}</span>
+                        <span class="px-2.5 py-0.5 rounded-full font-bold uppercase text-[10px] border ${roleBadgeColor}">${u.role}</span>
                     </td>
                     <td class="py-3.5 px-4 text-[11px] text-slate-300 font-medium">${permText}</td>
-                    <td class="py-3.5 px-4 text-right">
-                        ${currentUser.role === 'admin' ? `
-                            <button onclick="deleteUser('${u.id}')" class="text-rose-400 hover:text-rose-300 font-bold text-xs"><i class="fa-solid fa-trash"></i></button>
-                        ` : `<span class="text-slate-600 text-[10px]">Protected</span>`}
+                    <td class="py-3.5 px-4 text-center">
+                        <div class="inline-flex items-center justify-center gap-2">
+                            <button onclick="openEditUserModal('${u.id}')" class="p-1.5 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-lg transition" title="Edit Anggota">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                            </button>
+                            <button onclick="deleteUser('${u.id}')" class="p-1.5 bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white rounded-lg transition" title="Hapus Anggota">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
+        // Buka Modal Tambah User
+        function openAddUserModal() {
+            document.getElementById('modalUserFormTitle').innerHTML = '<i class="fa-solid fa-user-plus text-indigo-400"></i> Tambah Anggota Tim';
+            document.getElementById('formUserId').value = '';
+            document.getElementById('formUserName').value = '';
+            document.getElementById('formUserEmail').value = '';
+            document.getElementById('formUserRole').value = 'creator';
+            document.getElementById('formUserAvatar').value = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
+            document.getElementById('modalUserForm').classList.remove('hidden');
+        }
+
+        // Buka Modal Edit User
+        function openEditUserModal(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('modalUserFormTitle').innerHTML = '<i class="fa-solid fa-user-pen text-indigo-400"></i> Edit Data Anggota';
+            document.getElementById('formUserId').value = user.id;
+            document.getElementById('formUserName').value = user.name;
+            document.getElementById('formUserEmail').value = user.email;
+            document.getElementById('formUserRole').value = user.role;
+            document.getElementById('formUserAvatar').value = user.avatar || '';
+            document.getElementById('modalUserForm').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('modalUserForm').classList.add('hidden');
+        }
+
+        // Simpan Data User (Create & Update)
+        function handleSaveUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('formUserId').value;
+            const name = document.getElementById('formUserName').value.trim();
+            const email = document.getElementById('formUserEmail').value.trim();
+            const role = document.getElementById('formUserRole').value;
+            const avatar = document.getElementById('formUserAvatar').value.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
+
+            if (id) {
+                // Update
+                const index = users.findIndex(u => u.id === id);
+                if (index !== -1) {
+                    users[index] = { ...users[index], name, email, role, avatar };
+                    if (currentUser.id === id) {
+                        currentUser = users[index];
+                        updateUserContext();
+                    }
+                    showToast(`Data anggota ${name} berhasil diubah!`, 'success');
+                }
+            } else {
+                // Create
+                const newUser = {
+                    id: 'USR-' + Math.floor(100 + Math.random() * 900),
+                    name,
+                    email,
+                    role,
+                    avatar
+                };
+                users.push(newUser);
+                showToast(`Anggota baru ${name} berhasil ditambahkan!`, 'success');
+            }
+
+            saveUsersToLocalStorage();
+            closeUserModal();
+        }
+
+        // Hapus User (Delete)
+        function deleteUser(userId) {
+            if (users.length <= 1) {
+                showToast('Sistem wajib memiliki minimal 1 anggota!', 'error');
+                return;
+            }
+
+            const target = users.find(u => u.id === userId);
+            if (!target) return;
+
+            if (confirm(`Yakin ingin menghapus anggota "${target.name}"?`)) {
+                users = users.filter(u => u.id !== userId);
+                if (currentUser.id === userId) {
+                    currentUser = users[0];
+                    updateUserContext();
+                }
+                saveUsersToLocalStorage();
+                showToast(`Anggota "${target.name}" berhasil dihapus!`, 'info');
+            }
+        }
+
+        // ==========================================
+        // FITUR DETAIL & APPROVAL PUBLISH
+        // ==========================================
         function openDetailModal(postId) {
             triggerSoundFx('click');
             const post = posts.find(p => p.id === postId);
