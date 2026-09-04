@@ -1437,6 +1437,62 @@
       }
     }
 
+    // HANDLER KHUSUS APPROVE & PUBLISH LANGSUNG KE INSTAGRAM LIVE
+    async function handleApproveAndPublishLive(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      openConfirmModal({
+        title: 'Publikasikan ke Instagram Live',
+        desc: `Apakah Anda yakin ingin menyetujui dan menerbitkan konten "${post.title}" langsung ke akun Instagram resmi?`,
+        btnText: 'Ya, Terbitkan Sekarang',
+        btnColor: 'bg-emerald-600 hover:bg-emerald-700',
+        onConfirm: async () => {
+          showToast('📡 Menghubungi Meta Graph API & Instagram Server...', 'info');
+
+          try {
+            const res = await fetch('/api/publish', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': currentRole
+              },
+              body: JSON.stringify({
+                postId: postId,
+                role: currentRole
+              })
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+              throw new Error(result.error || 'Gagal menerbitkan postingan ke Instagram.');
+            }
+
+            post.status = 'published';
+            post.published_at = new Date().toISOString();
+            if (result.publishData) {
+              post.api_publish_data = result.publishData;
+            }
+
+            renderKanban();
+            renderCalendar();
+            renderFeedPreview();
+            closeDetailModal();
+
+            if (result.publishData && result.publishData.permalink) {
+              showToast(`🎉 Berhasil! Konten LIVE di Instagram: ${result.publishData.permalink}`, 'success');
+            } else {
+              showToast(result.message || 'Postingan berhasil diterbitkan!', 'success');
+            }
+          } catch (err) {
+            console.error('Gagal publish live:', err);
+            showToast(err.message, 'error');
+          }
+        }
+      });
+    }
+
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
       if (!notes) {
@@ -1642,7 +1698,7 @@
         if (currentRole === 'ADMIN' || currentRole === 'REVIEWER' || currentRole === 'CLIENT') {
           inputContainer.classList.remove('hidden');
           actionButtonsRightHtml += `<button onclick="handleRequestRevision('${post.id}')" class="px-3.5 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl font-bold border border-rose-200">Minta Catatan Revisi</button>`;
-          actionButtonsRightHtml += `<button onclick="updatePostStatus('${post.id}', 'published')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-sm shadow-emerald-500/20"><i class="ph-bold ph-check"></i> Setujui & Publikasikan</button>`;
+          actionButtonsRightHtml += `<button onclick="handleApproveAndPublishLive('${post.id}')" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-md shadow-emerald-500/20 active:scale-95 transition"><i class="ph-bold ph-instagram-logo text-base"></i> Setujui & Publish ke IG Live</button>`;
         } else {
           actionButtonsRightHtml += `<span class="text-xs text-slate-400 italic">Menunggu evaluasi Reviewer / Client / Admin.</span>`;
         }
@@ -1661,10 +1717,16 @@
           actionButtonsRightHtml += `<span class="text-xs text-slate-400 italic">Menunggu perbaikan materi dari Creator.</span>`;
         }
       } else if (post.status === 'published') {
+        const permalink = (post.api_publish_data && post.api_publish_data.permalink) ? post.api_publish_data.permalink : `https://instagram.com/${currentBrand.handle.replace('@','')}`;
         actionButtonsRightHtml += `
-          <div class="w-full p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-center font-bold flex items-center justify-center gap-2">
-            <i class="ph-bold ph-check-circle text-base text-emerald-600"></i>
-            <span>Konten ini telah LIVE dan terbit di Media Sosial (@${currentBrand.handle.replace('@','')})</span>
+          <div class="w-full flex flex-col sm:flex-row items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl gap-2">
+            <div class="flex items-center gap-2 text-emerald-800 font-bold">
+              <i class="ph-bold ph-check-circle text-lg text-emerald-600"></i>
+              <span>Konten ini telah LIVE dan terbit di Instagram!</span>
+            </div>
+            <a href="${permalink}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition">
+              <i class="ph-bold ph-arrow-square-out"></i> Buka Post di Instagram
+            </a>
           </div>
         `;
       }
