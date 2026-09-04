@@ -1706,6 +1706,48 @@
     function closeBrandModal() { document.getElementById('brandModal').classList.add('hidden'); }
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
+
+    // 12. SISTEM NAVIGASI & TAB SWITCHER LENGKAP (DESKTOP & MOBILE)
+    function switchTab(tabId) {
+      const tabs = ['board', 'calendar', 'preview', 'ai', 'users'];
+
+      // Validasi hak akses khusus untuk tab Tim & RBAC
+      if (tabId === 'users' && currentRole !== 'ADMIN') {
+        showToast('Menu Tim & RBAC hanya dapat diakses oleh Administrator.', 'warning');
+        return;
+      }
+
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const dTab = document.getElementById(`tab-${t}`);
+        const mTab = document.getElementById(`m-tab-${t}`);
+
+        if (t === tabId) {
+          if (view) view.classList.remove('hidden');
+          if (dTab) {
+            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
+          }
+          if (mTab) {
+            mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
+          }
+        } else {
+          if (view) view.classList.add('hidden');
+          if (dTab) {
+            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
+          }
+          if (mTab) {
+            mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
+          }
+        }
+      });
+
+      // Sinkronkan dan render ulang komponen tampilan aktif
+      if (tabId === 'board') renderKanban();
+      if (tabId === 'calendar') renderCalendar();
+      if (tabId === 'preview') renderFeedPreview();
+      if (tabId === 'users') renderTeamTable();
+    }
+
     // 13. KALENDER DINAMIS DENGAN NAVIGASI BULAN & PARSING ZONA WAKTU AMAN
     function changeCalendarMonth(delta) {
       calMonth += delta;
