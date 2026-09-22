@@ -538,17 +538,21 @@
               <p class="font-bold text-slate-700">Tarik & lepas foto di sini, atau <span class="text-rose-600 underline">pilih dari perangkat</span></p>
               <p class="text-[10px] text-slate-400">Otomatis dioptimasi ke standar native Instagram 1080px (JPG / PNG / WebP)</p>
             </div>
-            <div id="postPreviewContainer" class="hidden flex-col items-center gap-2">
-              <div class="relative group/preview">
-                <img id="postPreviewImg" src="" class="max-h-40 rounded-xl object-contain border border-slate-200 shadow-sm bg-white" />
-                <button type="button" onclick="event.stopPropagation(); clearUploadedFile('post')" class="absolute -top-2 -right-2 w-6 h-6 bg-rose-600 hover:bg-rose-700 text-white rounded-full flex items-center justify-center shadow-md text-xs">
-                  <i class="ph-bold ph-x"></i>
-                </button>
+            
+            <!-- Tampilan File Attachment yang Baru (Tanpa Preview Gambar) -->
+            <div id="postPreviewContainer" class="hidden items-center justify-between bg-white border border-emerald-200 p-3 rounded-xl shadow-sm w-full">
+              <div class="flex items-center gap-3 overflow-hidden">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <i class="ph-bold ph-image text-xl"></i>
+                </div>
+                <div class="flex flex-col text-left overflow-hidden">
+                  <span id="postFileName" class="font-bold text-xs text-slate-700 truncate">file.jpg</span>
+                  <span id="postRatioBadge" class="text-[9px] font-extrabold text-emerald-600 mt-0.5">1080px HD</span>
+                </div>
               </div>
-              <div class="flex items-center gap-2 mt-1">
-                <span id="postFileName" class="font-semibold text-slate-700 truncate max-w-[200px]">file.jpg</span>
-                <span id="postRatioBadge" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">1080px HD</span>
-              </div>
+              <button type="button" onclick="event.stopPropagation(); clearUploadedFile('post')" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition flex-shrink-0 shadow-sm" title="Hapus Lampiran">
+                <i class="ph-bold ph-x"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -621,20 +625,21 @@
                 <i class="ph-bold ph-arrows-clockwise text-amber-600 text-lg mx-auto"></i>
                 <p class="font-semibold text-slate-700">Klik untuk mengganti foto materi dengan resolusi optimal 1080px</p>
               </div>
-              <div id="editPreviewContainer" class="hidden flex-col items-center gap-2">
-                <div class="relative group/editpreview cursor-pointer" onclick="openImageLightbox(document.getElementById('editPreviewImg').src)" title="Klik untuk memperbesar foto revisi">
-                  <img id="editPreviewImg" src="" class="max-h-32 rounded-lg object-contain border border-slate-200 bg-white" />
-                  <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover/editpreview:opacity-100 transition rounded-lg flex items-center justify-center text-white text-[10px] font-bold gap-1">
-                    <i class="ph-bold ph-arrows-out"></i> Zoom
+              
+              <!-- Tampilan File Attachment Revisi yang Baru (Tanpa Preview Gambar) -->
+              <div id="editPreviewContainer" class="hidden items-center justify-between bg-white border border-amber-200 p-2.5 rounded-xl shadow-sm w-full mt-2">
+                <div class="flex items-center gap-2.5 overflow-hidden">
+                  <div class="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
+                    <i class="ph-bold ph-image text-base"></i>
                   </div>
-                  <button type="button" onclick="event.stopPropagation(); clearUploadedFile('edit')" class="absolute -top-2 -right-2 w-5 h-5 bg-rose-600 text-white rounded-full flex items-center justify-center text-[10px] z-10 shadow-sm">
-                    <i class="ph-bold ph-x"></i>
-                  </button>
+                  <div class="flex flex-col text-left overflow-hidden">
+                    <span id="editFileName" class="font-bold text-[11px] text-slate-700 truncate">file_revisi.jpg</span>
+                    <span id="editRatioBadge" class="text-[9px] font-extrabold text-amber-600 mt-0.5">1080px HD</span>
+                  </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <span id="editFileName" class="font-semibold text-slate-700 truncate max-w-[200px]">file_revisi.jpg</span>
-                  <span id="editRatioBadge" class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">1080px HD</span>
-                </div>
+                <button type="button" onclick="event.stopPropagation(); clearUploadedFile('edit')" class="w-7 h-7 flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-md transition flex-shrink-0" title="Hapus Lampiran">
+                  <i class="ph-bold ph-x"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -882,47 +887,52 @@
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-          // PRIORITAS 1: Gunakan Blob URL yang Ramah RAM sebagai ganti Base64 Data URL
+          // PRIORITAS 1: Gunakan Blob (Memory Efficient) alih-alih Base64 String
           canvas.toBlob((blob) => {
             if (!blob) {
-              showToast('Gagal memproses memori gambar.', 'error');
+              showToast('Gagal memproses gambar.', 'error');
               return;
             }
             const optimizedDataUrl = URL.createObjectURL(blob);
 
+            // Analisis Rasio
             const ratio = originalHeight / originalWidth;
             let ratioLabel = '1080px HD';
-            if (Math.abs(ratio - 1.25) < 0.08) ratioLabel = '🌟 4:5 Portrait Emas (1080x1350)';
-            else if (Math.abs(ratio - 1.0) < 0.05) ratioLabel = '1:1 Square (1080x1080)';
-            else if (ratio > 1.6) ratioLabel = '9:16 Vertikal (Story/Reels)';
-            else ratioLabel = `${targetWidth}x${targetHeight}px`;
+            if (Math.abs(ratio - 1.25) < 0.08) {
+              ratioLabel = '🌟 4:5 Portrait Emas (1080x1350)';
+            } else if (Math.abs(ratio - 1.0) < 0.05) {
+              ratioLabel = '1:1 Square (1080x1080)';
+            } else if (ratio > 1.6) {
+              ratioLabel = '9:16 Vertikal (Story/Reels)';
+            } else {
+              ratioLabel = `${targetWidth}x${targetHeight}px`;
+            }
 
             if (target === 'post') {
-              // Bersihkan blob lama di memory jika re-upload
+              // Bersihkan memori blob lama jika user mengunggah ulang foto
               const oldUrl = document.getElementById('postMediaUrlInput').value;
               if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
 
               document.getElementById('postMediaUrlInput').value = optimizedDataUrl;
-              document.getElementById('postPreviewImg').src = optimizedDataUrl;
               document.getElementById('postFileName').textContent = file.name;
               document.getElementById('postRatioBadge').textContent = ratioLabel;
               document.getElementById('postUploadPlaceholder').classList.add('hidden');
               document.getElementById('postPreviewContainer').classList.remove('hidden');
               document.getElementById('postPreviewContainer').classList.add('flex');
             } else if (target === 'edit') {
-              // Bersihkan blob lama di memory jika re-upload
+              // Bersihkan memori blob lama jika ada
               const oldUrl = document.getElementById('editMediaUrlInput').value;
               if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
 
               document.getElementById('editMediaUrlInput').value = optimizedDataUrl;
-              document.getElementById('editPreviewImg').src = optimizedDataUrl;
               document.getElementById('editFileName').textContent = file.name;
               document.getElementById('editRatioBadge').textContent = ratioLabel;
               document.getElementById('editUploadPlaceholder').classList.add('hidden');
               document.getElementById('editPreviewContainer').classList.remove('hidden');
               document.getElementById('editPreviewContainer').classList.add('flex');
             }
-            showToast('Gambar berhasil dioptimasi ke 1080px tanpa distorsi.', 'success');
+
+            showToast('Gambar berhasil dioptimasi ke 1080px.', 'success');
           }, 'image/jpeg', 0.90);
         };
         img.src = evt.target.result;
@@ -933,13 +943,19 @@
     function clearUploadedFile(target) {
       if (target === 'post') {
         document.getElementById('postFileInput').value = '';
+        const oldUrl = document.getElementById('postMediaUrlInput').value;
+        if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
         document.getElementById('postMediaUrlInput').value = '';
+        
         document.getElementById('postUploadPlaceholder').classList.remove('hidden');
         document.getElementById('postPreviewContainer').classList.add('hidden');
         document.getElementById('postPreviewContainer').classList.remove('flex');
       } else if (target === 'edit') {
         document.getElementById('editFileInput').value = '';
+        const oldUrl = document.getElementById('editMediaUrlInput').value;
+        if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
         document.getElementById('editMediaUrlInput').value = '';
+        
         document.getElementById('editUploadPlaceholder').classList.remove('hidden');
         document.getElementById('editPreviewContainer').classList.add('hidden');
         document.getElementById('editPreviewContainer').classList.remove('flex');
@@ -1654,7 +1670,7 @@
           actionButtonsRightHtml += `<span class="text-xs text-slate-400 italic">Menunggu perbaikan materi dari Creator.</span>`;
         }
       } else if (post.status === 'published') {
-        // PRIORITAS 2: Handling tombol Instagram Permalink secara presisi
+        // PRIORITAS 2: Validasi Permalink Tepat Sasaran
         const hasPermalink = post.api_publish_data && post.api_publish_data.permalink;
         
         actionButtonsRightHtml += `
@@ -1726,12 +1742,20 @@
 
         if (t === tabId) {
           if (view) view.classList.remove('hidden');
-          if (dTab) dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
-          if (mTab) mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
+          if (dTab) {
+            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
+          }
+          if (mTab) {
+            mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
+          }
         } else {
           if (view) view.classList.add('hidden');
-          if (dTab) dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
-          if (mTab) mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
+          if (dTab) {
+            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
+          }
+          if (mTab) {
+            mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
+          }
         }
       });
 
@@ -1744,16 +1768,23 @@
     // 13. KALENDER DINAMIS
     function changeCalendarMonth(delta) {
       calMonth += delta;
-      if (calMonth < 0) { calMonth = 11; calYear--; } 
-      else if (calMonth > 11) { calMonth = 0; calYear++; }
+      if (calMonth < 0) {
+        calMonth = 11;
+        calYear--;
+      } else if (calMonth > 11) {
+        calMonth = 0;
+        calYear++;
+      }
       renderCalendar();
     }
+
     function resetCalendarToToday() {
       const now = new Date();
       calYear = now.getFullYear();
       calMonth = now.getMonth();
       renderCalendar();
     }
+
     function parseDatePartsSafe(dateStr) {
       if (!dateStr) return null;
       if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
@@ -1769,8 +1800,12 @@
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
       grid.innerHTML = '';
+
       const now = new Date();
-      const todayYear = now.getFullYear(), todayMonth = now.getMonth(), todayDate = now.getDate();
+      const todayYear = now.getFullYear();
+      const todayMonth = now.getMonth();
+      const todayDate = now.getDate();
+
       const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       const monthBadge = document.getElementById('calendarMonthBadge');
       if (monthBadge) monthBadge.textContent = `${monthNames[calMonth]} ${calYear}`;
@@ -1789,10 +1824,16 @@
         const cell = document.createElement('div');
         cell.className = `min-h-20 border ${isToday ? 'border-rose-400 ring-2 ring-rose-100 bg-rose-50/20' : 'border-slate-100 bg-slate-50/60'} rounded-xl p-1.5 text-left relative flex flex-col justify-between hover:border-rose-300 transition`;
         
-        cell.innerHTML = `<div class="flex items-center justify-between"><span class="text-[10px] font-bold ${isToday ? 'text-rose-600 font-extrabold' : 'text-slate-400'}">${day}</span>${isToday ? '<span class="text-[8px] font-extrabold px-1 py-0.2 rounded bg-rose-600 text-white leading-none">HARI INI</span>' : ''}</div>`;
+        cell.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold ${isToday ? 'text-rose-600 font-extrabold' : 'text-slate-400'}">${day}</span>
+            ${isToday ? '<span class="text-[8px] font-extrabold px-1 py-0.2 rounded bg-rose-600 text-white leading-none">HARI INI</span>' : ''}
+          </div>
+        `;
 
         const matchingPosts = posts.filter(p => {
-          const parsed = parseDatePartsSafe(p.scheduled_at || p.created_at);
+          const dateStr = p.scheduled_at || p.created_at;
+          const parsed = parseDatePartsSafe(dateStr);
           if (!parsed) return false;
           return parsed.day === day && parsed.month === calMonth && parsed.year === calYear;
         });
@@ -1802,11 +1843,22 @@
           postDiv.className = 'space-y-1 mt-1';
           matchingPosts.slice(0, 2).forEach(mp => {
             const isLive = mp.status === 'published';
-            postDiv.innerHTML += `<div onclick="openDetailModal('${mp.id}')" class="p-1 rounded-md text-[8px] font-bold truncate cursor-pointer shadow-2xs transition hover:opacity-90 ${isLive ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}">${mp.title}</div>`;
+            postDiv.innerHTML += `
+              <div onclick="openDetailModal('${mp.id}')" class="p-1 rounded-md text-[8px] font-bold truncate cursor-pointer shadow-2xs transition hover:opacity-90 ${isLive ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}">
+                ${mp.title}
+              </div>
+            `;
           });
-          if (matchingPosts.length > 2) postDiv.innerHTML += `<div class="text-[7px] text-slate-400 font-bold text-center">+${matchingPosts.length - 2} lainnya</div>`;
+          if (matchingPosts.length > 2) {
+            postDiv.innerHTML += `
+              <div class="text-[7px] text-slate-400 font-bold text-center">
+                +${matchingPosts.length - 2} lainnya
+              </div>
+            `;
+          }
           cell.appendChild(postDiv);
         }
+
         grid.appendChild(cell);
       }
     }
@@ -1819,7 +1871,12 @@
       document.getElementById('previewPostCount').textContent = posts.length;
 
       if (posts.length === 0) {
-        cont.innerHTML = `<div class="col-span-3 py-12 text-center text-slate-400 space-y-1"><i class="ph-bold ph-images text-2xl mx-auto block text-slate-300"></i><p class="text-[11px]">Belum ada konten feed yang diunggah.</p></div>`;
+        cont.innerHTML = `
+          <div class="col-span-3 py-12 text-center text-slate-400 space-y-1">
+            <i class="ph-bold ph-images text-2xl mx-auto block text-slate-300"></i>
+            <p class="text-[11px]">Belum ada konten feed yang diunggah.</p>
+          </div>
+        `;
         return;
       }
 
@@ -1834,7 +1891,9 @@
         img.className = 'w-full h-full object-cover group-hover:scale-105 transition duration-200';
 
         let badgeOverlay = '';
-        if (p.type === 'REELS') badgeOverlay = '<div class="absolute top-1.5 right-1.5 text-white text-xs drop-shadow-md"><i class="ph-fill ph-video-camera"></i></div>';
+        if (p.type === 'REELS') {
+          badgeOverlay = '<div class="absolute top-1.5 right-1.5 text-white text-xs drop-shadow-md"><i class="ph-fill ph-video-camera"></i></div>';
+        }
 
         wrapper.appendChild(img);
         if (badgeOverlay) wrapper.innerHTML += badgeOverlay;
@@ -1845,33 +1904,48 @@
     // 15. PERSISTENSI SETTING BRAND
     function loadBrandSettings() {
       const saved = localStorage.getItem('postflow_brand_settings');
-      if (saved) { try { currentBrand = JSON.parse(saved); } catch (e) {} }
+      if (saved) {
+        try {
+          currentBrand = JSON.parse(saved);
+        } catch (e) {}
+      }
       applyBrandToUI();
     }
+
     function saveBrandSettings() {
       currentBrand.handle = document.getElementById('settingBrandHandle').value.trim();
       currentBrand.name = document.getElementById('settingBrandName').value.trim();
       currentBrand.bio = document.getElementById('settingBrandBio').value.trim();
+
       localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
       applyBrandToUI();
       closeBrandModal();
       showToast('Profil akun brand berhasil disimpan.', 'success');
     }
+
     function applyBrandToUI() {
       document.getElementById('currentBrandHandle').textContent = currentBrand.handle;
       document.getElementById('previewBrandName').textContent = currentBrand.name;
       document.getElementById('previewBrandBio').textContent = currentBrand.bio;
     }
-    function saveApiSettings() { closeApiModal(); showToast('Pengaturan token integrasi API tersimpan di sesi.', 'success'); }
+
+    function saveApiSettings() {
+      closeApiModal();
+      showToast('Pengaturan token integrasi API tersimpan di sesi.', 'success');
+    }
 
     // 16. AI STUDIO COPYWRITING
     function generateAiDraft() {
       const p = document.getElementById('aiPromptInput').value.trim();
-      if (!p) return showToast('Masukkan topik atau ide konten terlebih dahulu.', 'warning');
+      if (!p) {
+        showToast('Masukkan topik atau ide konten terlebih dahulu.', 'warning');
+        return;
+      }
       document.getElementById('aiOutputContainer').classList.remove('hidden');
       document.getElementById('aiOutputText').textContent = `✨ ${p.toUpperCase()}\n\nDapatkan penawaran terbaik dan wujudkan impian Anda bersama kami hari ini! Kunjungi kantor layanan terdekat atau klik tautan di bio untuk informasi lengkap.\n\n#PromoSpesial #BankBTN #LayananTerbaik #SolusiKeuangan #BTNMobile`;
       showToast('Draf AI copywriting berhasil digenerate.', 'success');
     }
+
     function useAiDraft() {
       const text = document.getElementById('aiOutputText').textContent;
       openPostModal();
