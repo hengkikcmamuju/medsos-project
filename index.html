@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PostFlow Platinum - Final Production Edition</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Phosphor Icons CDN -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <!-- Phosphor Icons CDN (Prioritas 2: Diubah dari Script ke CSS Static untuk kestabilan) -->
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  
   <script>
     tailwind.config = {
       theme: {
@@ -45,10 +49,10 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-700 pb-20 md:pb-6">
 
-  <!-- ==================== 1. TOAST NOTIFICATION CONTAINER ==================== -->
+  <!-- 1. TOAST NOTIFICATION CONTAINER -->
   <div id="toastContainer" class="fixed bottom-20 md:bottom-6 right-6 z-[100] flex flex-col gap-2 pointer-events-none max-w-sm w-full"></div>
 
-  <!-- ==================== 2. LOGIN OVERLAY (AUTH SCREEN) ==================== -->
+  <!-- 2. LOGIN OVERLAY (AUTH SCREEN) -->
   <div id="loginScreen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
       
@@ -89,7 +93,7 @@
     </div>
   </div>
 
-  <!-- ==================== 3. MODAL LOGOUT KONFIRMASI ==================== -->
+  <!-- 3. MODAL LOGOUT KONFIRMASI -->
   <div id="logoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[75] hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
       <div class="p-6 text-center space-y-4">
@@ -122,7 +126,7 @@
     </div>
   </div>
 
-  <!-- ==================== 4. MODAL KONFIRMASI TINDAKAN GENERIC (Z-[85]) ==================== -->
+  <!-- 4. MODAL KONFIRMASI TINDAKAN GENERIC (Z-[85]) -->
   <div id="confirmActionModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[85] hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
       <div class="p-6 text-center space-y-4">
@@ -145,10 +149,8 @@
     </div>
   </div>
 
-  <!-- ==================== 4B. MODAL FULLSCREEN IMAGE LIGHTBOX (Z-[95]) ==================== -->
+  <!-- 4B. MODAL FULLSCREEN IMAGE LIGHTBOX (Z-[95]) -->
   <div id="imageLightboxModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[95] hidden flex flex-col items-center justify-center p-4 sm:p-6 animate-in fade-in duration-150" onclick="closeImageLightbox()">
-    
-    <!-- Top Control Bar -->
     <div class="w-full max-w-5xl flex items-center justify-between pb-3 text-white/90" onclick="event.stopPropagation()">
       <div class="flex items-center gap-2">
         <span class="px-2.5 py-1 rounded-lg bg-white/10 text-white text-xs font-semibold backdrop-blur-sm border border-white/10 flex items-center gap-1.5">
@@ -158,29 +160,23 @@
           Memuat dimensi...
         </span>
       </div>
-      
       <button type="button" onclick="closeImageLightbox()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5 border border-white/10 shadow-lg active:scale-95">
         <i class="ph-bold ph-x text-sm"></i> Tutup (ESC)
       </button>
     </div>
-
-    <!-- Image Display Container -->
     <div class="relative max-w-5xl max-h-[82vh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50" onclick="event.stopPropagation()">
       <img id="lightboxLargeImg" src="" alt="Pratinjau Foto Konten" onerror="this.src='https://placehold.co/800x800/1e293b/94a3b8?text=Gagal+Memuat+Foto'" class="max-w-full max-h-[80vh] w-auto h-auto object-contain select-none" />
     </div>
-
     <p class="text-[11px] text-white/60 mt-3 flex items-center gap-1 select-none">
       <i class="ph-bold ph-info"></i> Klik area gelap di luar foto atau tekan <kbd class="px-1.5 py-0.5 rounded bg-white/15 text-white font-mono text-[10px] mx-1">ESC</kbd> untuk menutup
     </p>
   </div>
 
-  <!-- ==================== 5. APLIKASI UTAMA (AUTHENTICATED) ==================== -->
+  <!-- 5. APLIKASI UTAMA (AUTHENTICATED) -->
   <div id="appContainer" class="flex-1 flex flex-col">
-    
     <!-- TOP NAVBAR -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        
         <!-- Brand Logo -->
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
@@ -277,7 +273,6 @@
       <!-- VIEW 1: KANBAN BOARD -->
       <section id="view-board" class="block space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          
           <!-- COLUMN 1: DRAFT -->
           <div class="bg-slate-100/70 border border-slate-200/80 rounded-2xl p-4 flex flex-col min-h-[600px]">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
@@ -289,7 +284,6 @@
             </div>
             <div id="column-draft" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
           </div>
-
           <!-- COLUMN 2: REVIEW -->
           <div class="bg-amber-50/40 border border-amber-200/60 rounded-2xl p-4 flex flex-col min-h-[600px]">
             <div class="flex items-center justify-between pb-3 border-b border-amber-200/80 mb-3">
@@ -301,7 +295,6 @@
             </div>
             <div id="column-review" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
           </div>
-
           <!-- COLUMN 3: REVISION -->
           <div class="bg-rose-50/40 border border-rose-200/60 rounded-2xl p-4 flex flex-col min-h-[600px]">
             <div class="flex items-center justify-between pb-3 border-b border-rose-200/80 mb-3">
@@ -313,7 +306,6 @@
             </div>
             <div id="column-revision" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
           </div>
-
           <!-- COLUMN 4: PUBLISHED -->
           <div class="bg-emerald-50/40 border border-emerald-200/60 rounded-2xl p-4 flex flex-col min-h-[600px]">
             <div class="flex items-center justify-between pb-3 border-b border-emerald-200/80 mb-3">
@@ -325,7 +317,6 @@
             </div>
             <div id="column-published" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
           </div>
-
         </div>
       </section>
 
@@ -431,10 +422,9 @@
           </table>
         </div>
       </section>
-
     </main>
 
-    <!-- MOBILE BOTTOM NAVIGATION (KHUSUS LAYAR HP) -->
+    <!-- MOBILE BOTTOM NAVIGATION -->
     <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 px-3 py-2 flex justify-around items-center text-[10px] font-bold text-slate-500 shadow-lg">
       <button onclick="switchTab('board')" id="m-tab-board" class="flex flex-col items-center gap-1 text-rose-600">
         <i class="ph-bold ph-kanban text-lg"></i>
@@ -457,11 +447,9 @@
         <span>Tim</span>
       </button>
     </div>
-
   </div>
 
-  <!-- ==================== 6. MODAL DIALOGS ==================== -->
-
+  <!-- 6. MODAL DIALOGS -->
   <!-- MODAL: FORM ANGGOTA TIM -->
   <div id="userModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
@@ -584,8 +572,7 @@
         <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <div class="p-6 space-y-4 text-xs">
-        
-        <!-- Thumbnail Interaktif dengan Zoom Lightbox Trigger -->
+        <!-- Thumbnail Interaktif -->
         <div id="defaultMediaContainer" class="flex gap-4">
           <div class="relative group/thumb cursor-pointer flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm" onclick="openImageLightbox()" title="Klik untuk memperbesar foto resolusi penuh">
             <img id="detailMediaImg" src="" onerror="this.src='https://placehold.co/600x600/f1f5f9/94a3b8?text=Foto+Tidak+Tersedia'" class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-200" />
@@ -614,7 +601,7 @@
           <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
         </div>
 
-        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator & Admin) -->
+        <!-- FORM INTERAKTIF PERBAIKAN REVISI -->
         <div id="revisionEditFormContainer" class="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 hidden">
           <div class="flex items-center gap-1.5 text-amber-900 font-bold border-b border-amber-200/60 pb-2">
             <i class="ph-bold ph-pencil-simple-line text-sm text-amber-600"></i>
@@ -733,7 +720,6 @@
     let currentRole = 'ADMIN';
     let activePostId = null;
 
-    // State Kalender Dinamis
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
 
@@ -743,12 +729,7 @@
       bio: 'Official Social Media Portal. Informasi produk, promo perumahan, dan layanan operasional.'
     };
 
-    let teamUsers = [
-      { id: 'USR-01', name: 'Dimas Admin', email: 'dimas@postflow.local', role: 'ADMIN', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', status: 'active' },
-      { id: 'USR-02', name: 'Bambang Reviewer', email: 'bambang@postflow.local', role: 'REVIEWER', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', status: 'active' },
-      { id: 'USR-03', name: 'Putri Rahayu', email: 'putri@postflow.local', role: 'CREATOR', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', status: 'active' },
-      { id: 'USR-04', name: 'Rian Prakoso', email: 'rian@client.local', role: 'CLIENT', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', status: 'active' }
-    ];
+    let teamUsers = []; // Populated entirely from API for production
 
     // 2. TOAST NOTIFICATION UTILITY
     function showToast(message, type = 'info') {
@@ -810,13 +791,10 @@
       if (!lbImg) return;
       lbImg.src = src;
 
-      // Baca resolusi asli gambar
       const tempImg = new Image();
       tempImg.onload = function() {
         const badge = document.getElementById('lightboxDimensionsBadge');
-        if (badge) {
-          badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
-        }
+        if (badge) badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
       };
       tempImg.onerror = function() {
         const badge = document.getElementById('lightboxDimensionsBadge');
@@ -833,39 +811,20 @@
       if (modal) modal.classList.add('hidden');
     }
 
-    // Listener Keyboard Escape hierarkis untuk menutup pop-up aktif
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const lightbox = document.getElementById('imageLightboxModal');
-        if (lightbox && !lightbox.classList.contains('hidden')) {
-          closeImageLightbox();
-          return;
-        }
+        if (lightbox && !lightbox.classList.contains('hidden')) return closeImageLightbox();
         const confirmModal = document.getElementById('confirmActionModal');
-        if (confirmModal && !confirmModal.classList.contains('hidden')) {
-          closeConfirmModal();
-          return;
-        }
+        if (confirmModal && !confirmModal.classList.contains('hidden')) return closeConfirmModal();
         const logoutModal = document.getElementById('logoutModal');
-        if (logoutModal && !logoutModal.classList.contains('hidden')) {
-          closeLogoutModal();
-          return;
-        }
+        if (logoutModal && !logoutModal.classList.contains('hidden')) return closeLogoutModal();
         const detailModal = document.getElementById('detailModal');
-        if (detailModal && !detailModal.classList.contains('hidden')) {
-          closeDetailModal();
-          return;
-        }
+        if (detailModal && !detailModal.classList.contains('hidden')) return closeDetailModal();
         const postModal = document.getElementById('postModal');
-        if (postModal && !postModal.classList.contains('hidden')) {
-          closePostModal();
-          return;
-        }
+        if (postModal && !postModal.classList.contains('hidden')) return closePostModal();
         const userModal = document.getElementById('userModal');
-        if (userModal && !userModal.classList.contains('hidden')) {
-          closeUserModal();
-          return;
-        }
+        if (userModal && !userModal.classList.contains('hidden')) return closeUserModal();
       }
     });
 
@@ -910,7 +869,6 @@
           const originalWidth = img.naturalWidth || img.width;
           const originalHeight = img.naturalHeight || img.height;
 
-          // STANDAR EMAS INSTAGRAM: Lebar native 1080px
           const targetWidth = 1080;
           const scale = targetWidth / originalWidth;
           const targetHeight = Math.round(originalHeight * scale);
@@ -924,41 +882,48 @@
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-          // Simpan sebagai JPEG berkualitas tinggi (0.90)
-          const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.90);
+          // PRIORITAS 1: Gunakan Blob URL yang Ramah RAM sebagai ganti Base64 Data URL
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              showToast('Gagal memproses memori gambar.', 'error');
+              return;
+            }
+            const optimizedDataUrl = URL.createObjectURL(blob);
 
-          // Analisis Rasio
-          const ratio = originalHeight / originalWidth;
-          let ratioLabel = '1080px HD';
-          if (Math.abs(ratio - 1.25) < 0.08) {
-            ratioLabel = '🌟 4:5 Portrait Emas (1080x1350)';
-          } else if (Math.abs(ratio - 1.0) < 0.05) {
-            ratioLabel = '1:1 Square (1080x1080)';
-          } else if (ratio > 1.6) {
-            ratioLabel = '9:16 Vertikal (Story/Reels)';
-          } else {
-            ratioLabel = `${targetWidth}x${targetHeight}px`;
-          }
+            const ratio = originalHeight / originalWidth;
+            let ratioLabel = '1080px HD';
+            if (Math.abs(ratio - 1.25) < 0.08) ratioLabel = '🌟 4:5 Portrait Emas (1080x1350)';
+            else if (Math.abs(ratio - 1.0) < 0.05) ratioLabel = '1:1 Square (1080x1080)';
+            else if (ratio > 1.6) ratioLabel = '9:16 Vertikal (Story/Reels)';
+            else ratioLabel = `${targetWidth}x${targetHeight}px`;
 
-          if (target === 'post') {
-            document.getElementById('postMediaUrlInput').value = optimizedDataUrl;
-            document.getElementById('postPreviewImg').src = optimizedDataUrl;
-            document.getElementById('postFileName').textContent = file.name;
-            document.getElementById('postRatioBadge').textContent = ratioLabel;
-            document.getElementById('postUploadPlaceholder').classList.add('hidden');
-            document.getElementById('postPreviewContainer').classList.remove('hidden');
-            document.getElementById('postPreviewContainer').classList.add('flex');
-          } else if (target === 'edit') {
-            document.getElementById('editMediaUrlInput').value = optimizedDataUrl;
-            document.getElementById('editPreviewImg').src = optimizedDataUrl;
-            document.getElementById('editFileName').textContent = file.name;
-            document.getElementById('editRatioBadge').textContent = ratioLabel;
-            document.getElementById('editUploadPlaceholder').classList.add('hidden');
-            document.getElementById('editPreviewContainer').classList.remove('hidden');
-            document.getElementById('editPreviewContainer').classList.add('flex');
-          }
+            if (target === 'post') {
+              // Bersihkan blob lama di memory jika re-upload
+              const oldUrl = document.getElementById('postMediaUrlInput').value;
+              if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
 
-          showToast('Gambar berhasil dioptimasi ke 1080px tanpa distorsi.', 'success');
+              document.getElementById('postMediaUrlInput').value = optimizedDataUrl;
+              document.getElementById('postPreviewImg').src = optimizedDataUrl;
+              document.getElementById('postFileName').textContent = file.name;
+              document.getElementById('postRatioBadge').textContent = ratioLabel;
+              document.getElementById('postUploadPlaceholder').classList.add('hidden');
+              document.getElementById('postPreviewContainer').classList.remove('hidden');
+              document.getElementById('postPreviewContainer').classList.add('flex');
+            } else if (target === 'edit') {
+              // Bersihkan blob lama di memory jika re-upload
+              const oldUrl = document.getElementById('editMediaUrlInput').value;
+              if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
+
+              document.getElementById('editMediaUrlInput').value = optimizedDataUrl;
+              document.getElementById('editPreviewImg').src = optimizedDataUrl;
+              document.getElementById('editFileName').textContent = file.name;
+              document.getElementById('editRatioBadge').textContent = ratioLabel;
+              document.getElementById('editUploadPlaceholder').classList.add('hidden');
+              document.getElementById('editPreviewContainer').classList.remove('hidden');
+              document.getElementById('editPreviewContainer').classList.add('flex');
+            }
+            showToast('Gambar berhasil dioptimasi ke 1080px tanpa distorsi.', 'success');
+          }, 'image/jpeg', 0.90);
         };
         img.src = evt.target.result;
       };
@@ -993,7 +958,7 @@
       }
     }
 
-    // 5. SISTEM LOGIN & SESI PENGGUNA
+    // 5. SISTEM LOGIN & SESI PENGGUNA (Prioritas 4: Menghapus Celah Autentikasi Bypass)
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
@@ -1007,48 +972,22 @@
       errBox.classList.add('hidden');
 
       try {
-        let authSuccess = false;
-        let authUser = null;
-        let authToken = null;
-
-        try {
-          const res = await fetch('/api/auth', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-          });
-          if (res.ok) {
-            const result = await res.json();
-            if (result && result.user) {
-              authUser = result.user;
-              authToken = result.token;
-              authSuccess = true;
-            }
-          }
-        } catch (apiErr) {
-          console.warn('API /api/auth offline, mencoba fallback lokal:', apiErr.message);
+        // CATATAN PRODUKSI: Login kini mutlak bergantung pada respons API backend yang sehat.
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const result = await res.json().catch(() => ({}));
+        
+        if (!res.ok || !result.user) {
+          throw new Error(result.error || 'Autentikasi API ditolak. Kredensial tidak cocok atau server offline.');
         }
 
-        if (!authSuccess) {
-          const matchUser = teamUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-          if (matchUser && password === '123456') {
-            authUser = matchUser;
-            authToken = 'PF-FALLBACK-' + Date.now();
-            authSuccess = true;
-          } else if (email.startsWith('admin@') && password === '123456') {
-            authUser = teamUsers[0];
-            authToken = 'PF-FALLBACK-' + Date.now();
-            authSuccess = true;
-          }
-        }
-
-        if (!authSuccess) {
-          throw new Error('Alamat email atau PIN yang dimasukkan tidak cocok.');
-        }
-
-        currentUser = authUser;
+        currentUser = result.user;
         localStorage.setItem('postflow_session_user', JSON.stringify(currentUser));
-        localStorage.setItem('postflow_session_token', authToken);
+        localStorage.setItem('postflow_session_token', result.token);
 
         initAuthenticatedUser();
         showToast(`Selamat datang kembali, ${currentUser.name}!`, 'success');
@@ -1084,7 +1023,6 @@
 
     function checkExistingSession() {
       loadBrandSettings();
-      fetchTeamFromApi(); // Muat data tim dari Supabase lebih awal untuk kesiapan data
       const savedUser = localStorage.getItem('postflow_session_user');
       const savedToken = localStorage.getItem('postflow_session_token');
 
@@ -1109,10 +1047,8 @@
       document.getElementById('currentUserRole').textContent = currentRole;
 
       applyRolePermissions();
+      fetchTeamFromApi(); 
       fetchPostsFromApi();
-      fetchTeamFromApi();
-      renderCalendar();
-      renderFeedPreview();
     }
 
     // 6. SINKRONISASI TIM VIA /api/users
@@ -1125,7 +1061,7 @@
           teamUsers = data;
         }
       } catch (err) {
-        console.warn('Fallback data tim lokal:', err.message);
+        console.warn('Fallback data tim tidak termuat:', err.message);
       } finally {
         renderTeamTable();
       }
@@ -1146,7 +1082,6 @@
           teamUsers[idx] = { ...teamUsers[idx], name, email, role, avatar };
         }
         
-        // Sinkronkan sesi jika pengguna mengedit akunnya sendiri
         if (currentUser && currentUser.id === editId) {
           currentUser.name = name;
           currentUser.email = email;
@@ -1203,8 +1138,6 @@
         showToast('Minimal harus ada 1 anggota tim di dalam sistem.', 'warning');
         return;
       }
-
-      // Cegah admin menghapus akunnya sendiri yang sedang aktif
       if (currentUser && currentUser.id === userId) {
         showToast('Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.', 'warning');
         return;
@@ -1251,10 +1184,7 @@
            'bg-amber-100 text-amber-800 border border-amber-200');
       }
 
-      if (btnAddPost) {
-        btnAddPost.style.display = (currentRole === 'CREATOR' || currentRole === 'ADMIN') ? 'flex' : 'none';
-      }
-
+      if (btnAddPost) btnAddPost.style.display = (currentRole === 'CREATOR' || currentRole === 'ADMIN') ? 'flex' : 'none';
       if (tabUsers) tabUsers.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
       if (mTabUsers) mTabUsers.style.display = (currentRole === 'ADMIN') ? 'flex' : 'none';
 
@@ -1316,7 +1246,6 @@
       document.getElementById('userPasswordHint').textContent = 'Default PIN baru: 123456';
       document.getElementById('userModal').classList.remove('hidden');
     }
-
     function closeUserModal() { document.getElementById('userModal').classList.add('hidden'); }
 
     function editUser(userId) {
@@ -1342,7 +1271,6 @@
         if (!res.ok) throw new Error('Fetch status: ' + res.status);
         const data = await res.json();
         
-        // Kompatibilitas respons array langsung maupun objek { success: true, posts: [...] }
         const rawPosts = Array.isArray(data) ? data : (data.posts && Array.isArray(data.posts) ? data.posts : null);
 
         if (rawPosts) {
@@ -1369,7 +1297,7 @@
         return;
       }
 
-      const activeUser = currentUser || teamUsers[0];
+      const activeUser = currentUser || { name: 'Admin', id: '1' };
       const newPost = {
         id: 'POST-' + Date.now(),
         brand_id: 'BRD-01',
@@ -1437,7 +1365,6 @@
       }
     }
 
-    // HANDLER KHUSUS APPROVE & PUBLISH LANGSUNG KE INSTAGRAM LIVE
     async function handleApproveAndPublishLive(postId) {
       const post = posts.find(p => p.id === postId);
       if (!post) return;
@@ -1457,23 +1384,15 @@
                 'Content-Type': 'application/json',
                 'x-user-role': currentRole
               },
-              body: JSON.stringify({
-                postId: postId,
-                role: currentRole
-              })
+              body: JSON.stringify({ postId: postId, role: currentRole })
             });
 
             const result = await res.json();
-
-            if (!res.ok) {
-              throw new Error(result.error || 'Gagal menerbitkan postingan ke Instagram.');
-            }
+            if (!res.ok) throw new Error(result.error || 'Gagal menerbitkan postingan ke Instagram.');
 
             post.status = 'published';
             post.published_at = new Date().toISOString();
-            if (result.publishData) {
-              post.api_publish_data = result.publishData;
-            }
+            if (result.publishData) post.api_publish_data = result.publishData;
 
             renderKanban();
             renderCalendar();
@@ -1544,12 +1463,17 @@
       }
     }
 
-    // 9. AKSI HAPUS POST (KHUSUS ADMIN PADA STATUS NON-PUBLISHED)
+    // 9. AKSI HAPUS POST (KHUSUS ADMIN)
     function handleDeletePostPrompt(postId) {
+      const p = posts.find(item => item.id === postId);
+      const isPublished = p && p.status === 'published';
+
       openConfirmModal({
-        title: 'Hapus Postingan Permanen',
-        desc: 'Apakah Anda yakin ingin menghapus draf postingan ini? Postingan yang dihapus tidak dapat dipulihkan kembali.',
-        btnText: 'Hapus Postingan',
+        title: isPublished ? 'Hapus Data Postingan dari Aplikasi?' : 'Hapus Postingan Permanen',
+        desc: isPublished 
+          ? `Tindakan ini akan menghapus entri "${p ? p.title : ''}" dari antarmuka PostFlow dan tabel database Supabase. Postingan di akun Meta/Instagram dihapus terpisah.` 
+          : 'Apakah Anda yakin ingin menghapus draf postingan ini? Postingan yang dihapus tidak dapat dipulihkan kembali.',
+        btnText: isPublished ? 'Hapus dari Supabase' : 'Hapus Postingan',
         btnColor: 'bg-rose-600 hover:bg-rose-700',
         onConfirm: () => executeDeletePost(postId)
       });
@@ -1594,7 +1518,7 @@
       }
     }
 
-    // 10. KANBAN BOARD RENDERER
+    // 10. KANBAN BOARD RENDERER (Prioritas 3: DOM Mulus dan Cepat)
     function renderKanban() {
       const cols = {
         draft: document.getElementById('column-draft'),
@@ -1603,17 +1527,29 @@
         published: document.getElementById('column-published')
       };
 
-      Object.values(cols).forEach(col => { if (col) col.innerHTML = ''; });
       const counts = { draft: 0, review: 0, revision: 0, published: 0 };
 
+      // Bersihkan kartu yang datanya sudah dihapus
+      const activeIds = new Set(posts.map(p => p.id));
+      document.querySelectorAll('.post-card').forEach(card => {
+        if (!activeIds.has(card.dataset.id)) card.remove();
+      });
+
+      // Iterasi dan perbarui/pasang kartu (tanpa reset innerHTML kolom penuh)
       posts.forEach(post => {
         const rawStatus = (post.status === 'in_review') ? 'review' : (post.status || 'draft');
         if (counts[rawStatus] !== undefined) counts[rawStatus]++;
 
-        const card = document.createElement('div');
-        card.className = 'bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-sm hover:shadow-md transition cursor-pointer space-y-2.5 group';
-        card.onclick = () => openDetailModal(post.id);
+        let card = document.getElementById(`card-${post.id}`);
+        if (!card) {
+          card = document.createElement('div');
+          card.id = `card-${post.id}`;
+          card.dataset.id = post.id;
+          card.className = 'post-card bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-sm hover:shadow-md transition cursor-pointer space-y-2.5 group';
+          card.onclick = () => openDetailModal(post.id);
+        }
 
+        // Perbarui konten DOM di dalam kartu (handling edits / revisi)
         card.innerHTML = `
           <div class="flex gap-3">
             <img src="${post.media_url}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" class="w-14 h-14 rounded-xl object-cover bg-slate-100 flex-shrink-0 shadow-2xs group-hover:scale-105 transition" />
@@ -1635,7 +1571,10 @@
           </div>
         `;
 
-        if (cols[rawStatus]) cols[rawStatus].appendChild(card);
+        // Pindahkan atau pasang ke akhir kolom jika posisinya salah
+        if (cols[rawStatus] && card.parentElement !== cols[rawStatus]) {
+          cols[rawStatus].appendChild(card);
+        }
       });
 
       document.getElementById('count-draft').textContent = counts.draft;
@@ -1662,7 +1601,6 @@
          post.status === 'review' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
          post.status === 'revision' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-slate-100 text-slate-800 border border-slate-200');
 
-      // Feedback revisi hanya ditampilkan pada status review atau revision
       const feedbackBox = document.getElementById('revisionFeedbackContainer');
       const feedbackText = document.getElementById('revisionFeedbackText');
       if (post.revision_notes && (post.status === 'revision' || post.status === 'review')) {
@@ -1683,8 +1621,7 @@
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
-      // Tentukan apakah admin berhak menghapus postingan ini (status bukan published)
-      const canAdminDelete = (currentRole === 'ADMIN' && post.status !== 'published');
+      const canAdminDelete = (currentRole === 'ADMIN');
 
       let actionButtonsRightHtml = '';
 
@@ -1717,16 +1654,22 @@
           actionButtonsRightHtml += `<span class="text-xs text-slate-400 italic">Menunggu perbaikan materi dari Creator.</span>`;
         }
       } else if (post.status === 'published') {
-        const permalink = (post.api_publish_data && post.api_publish_data.permalink) ? post.api_publish_data.permalink : `https://instagram.com/${currentBrand.handle.replace('@','')}`;
+        // PRIORITAS 2: Handling tombol Instagram Permalink secara presisi
+        const hasPermalink = post.api_publish_data && post.api_publish_data.permalink;
+        
         actionButtonsRightHtml += `
           <div class="w-full flex flex-col sm:flex-row items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl gap-2">
             <div class="flex items-center gap-2 text-emerald-800 font-bold">
               <i class="ph-bold ph-check-circle text-lg text-emerald-600"></i>
               <span>Konten ini telah LIVE dan terbit di Instagram!</span>
             </div>
-            <a href="${permalink}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition">
-              <i class="ph-bold ph-arrow-square-out"></i> Buka Post di Instagram
-            </a>
+            ${hasPermalink ? `
+              <a href="${post.api_publish_data.permalink}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition">
+                <i class="ph-bold ph-arrow-square-out"></i> Buka Post di Instagram
+              </a>
+            ` : `
+              <span class="text-[10px] font-semibold text-emerald-600/70 italic px-2">Link diproses Meta...</span>
+            `}
           </div>
         `;
       }
@@ -1736,7 +1679,7 @@
           ${canAdminDelete ? `
             <button onclick="handleDeletePostPrompt('${post.id}')" class="px-3.5 py-2 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 text-rose-600 font-bold flex items-center gap-1.5 transition">
               <i class="ph-bold ph-trash text-sm"></i>
-              <span>Hapus Post</span>
+              <span>${post.status === 'published' ? 'Hapus Data Post' : 'Hapus Post'}</span>
             </button>
           ` : '<div></div>'}
         </div>
@@ -1769,16 +1712,13 @@
     function openApiSettingsModal() { document.getElementById('apiModal').classList.remove('hidden'); }
     function closeApiModal() { document.getElementById('apiModal').classList.add('hidden'); }
 
-    // 12. SISTEM NAVIGASI & TAB SWITCHER LENGKAP (DESKTOP & MOBILE)
+    // 12. SISTEM NAVIGASI & TAB SWITCHER LENGKAP
     function switchTab(tabId) {
       const tabs = ['board', 'calendar', 'preview', 'ai', 'users'];
-
-      // Validasi hak akses khusus untuk tab Tim & RBAC
       if (tabId === 'users' && currentRole !== 'ADMIN') {
         showToast('Menu Tim & RBAC hanya dapat diakses oleh Administrator.', 'warning');
         return;
       }
-
       tabs.forEach(t => {
         const view = document.getElementById(`view-${t}`);
         const dTab = document.getElementById(`tab-${t}`);
@@ -1786,113 +1726,73 @@
 
         if (t === tabId) {
           if (view) view.classList.remove('hidden');
-          if (dTab) {
-            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
-          }
-          if (mTab) {
-            mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
-          }
+          if (dTab) dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
+          if (mTab) mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
         } else {
           if (view) view.classList.add('hidden');
-          if (dTab) {
-            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
-          }
-          if (mTab) {
-            mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
-          }
+          if (dTab) dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
+          if (mTab) mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
         }
       });
 
-      // Sinkronkan dan render ulang komponen tampilan aktif
       if (tabId === 'board') renderKanban();
       if (tabId === 'calendar') renderCalendar();
       if (tabId === 'preview') renderFeedPreview();
       if (tabId === 'users') renderTeamTable();
     }
 
-    // 13. KALENDER DINAMIS DENGAN NAVIGASI BULAN & PARSING ZONA WAKTU AMAN
+    // 13. KALENDER DINAMIS
     function changeCalendarMonth(delta) {
       calMonth += delta;
-      if (calMonth < 0) {
-        calMonth = 11;
-        calYear--;
-      } else if (calMonth > 11) {
-        calMonth = 0;
-        calYear++;
-      }
+      if (calMonth < 0) { calMonth = 11; calYear--; } 
+      else if (calMonth > 11) { calMonth = 0; calYear++; }
       renderCalendar();
     }
-
     function resetCalendarToToday() {
       const now = new Date();
       calYear = now.getFullYear();
       calMonth = now.getMonth();
       renderCalendar();
     }
-
-    // Helper pembaca tanggal tanpa pergeseran zona waktu
     function parseDatePartsSafe(dateStr) {
       if (!dateStr) return null;
       if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
         const parts = dateStr.substring(0, 10).split('-');
-        return {
-          year: parseInt(parts[0], 10),
-          month: parseInt(parts[1], 10) - 1, // 0-indexed
-          day: parseInt(parts[2], 10)
-        };
+        return { year: parseInt(parts[0], 10), month: parseInt(parts[1], 10) - 1, day: parseInt(parts[2], 10) };
       }
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return null;
-      return {
-        year: d.getFullYear(),
-        month: d.getMonth(),
-        day: d.getDate()
-      };
+      return { year: d.getFullYear(), month: d.getMonth(), day: d.getDate() };
     }
 
     function renderCalendar() {
       const grid = document.getElementById('calendar-grid');
       if (!grid) return;
       grid.innerHTML = '';
-
       const now = new Date();
-      const todayYear = now.getFullYear();
-      const todayMonth = now.getMonth();
-      const todayDate = now.getDate();
-
+      const todayYear = now.getFullYear(), todayMonth = now.getMonth(), todayDate = now.getDate();
       const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       const monthBadge = document.getElementById('calendarMonthBadge');
       if (monthBadge) monthBadge.textContent = `${monthNames[calMonth]} ${calYear}`;
 
-      // Hari pertama dalam bulan aktif (0 = Minggu, 1 = Senin, dst.)
       const firstDayIndex = new Date(calYear, calMonth, 1).getDay();
-      // Total hari dalam bulan aktif
       const totalDaysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
 
-      // Slot kosong awal bulan (padding)
       for (let padding = 0; padding < firstDayIndex; padding++) {
         const emptyCell = document.createElement('div');
         emptyCell.className = 'min-h-20 border border-slate-100/50 rounded-xl p-1.5 bg-slate-100/20';
         grid.appendChild(emptyCell);
       }
 
-      // Slot tanggal sesungguhnya
       for (let day = 1; day <= totalDaysInMonth; day++) {
         const isToday = (day === todayDate && calMonth === todayMonth && calYear === todayYear);
         const cell = document.createElement('div');
         cell.className = `min-h-20 border ${isToday ? 'border-rose-400 ring-2 ring-rose-100 bg-rose-50/20' : 'border-slate-100 bg-slate-50/60'} rounded-xl p-1.5 text-left relative flex flex-col justify-between hover:border-rose-300 transition`;
         
-        cell.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-bold ${isToday ? 'text-rose-600 font-extrabold' : 'text-slate-400'}">${day}</span>
-            ${isToday ? '<span class="text-[8px] font-extrabold px-1 py-0.2 rounded bg-rose-600 text-white leading-none">HARI INI</span>' : ''}
-          </div>
-        `;
+        cell.innerHTML = `<div class="flex items-center justify-between"><span class="text-[10px] font-bold ${isToday ? 'text-rose-600 font-extrabold' : 'text-slate-400'}">${day}</span>${isToday ? '<span class="text-[8px] font-extrabold px-1 py-0.2 rounded bg-rose-600 text-white leading-none">HARI INI</span>' : ''}</div>`;
 
-        // Filter postingan yang cocok dengan tanggal menggunakan pembacaan aman
         const matchingPosts = posts.filter(p => {
-          const dateStr = p.scheduled_at || p.created_at;
-          const parsed = parseDatePartsSafe(dateStr);
+          const parsed = parseDatePartsSafe(p.scheduled_at || p.created_at);
           if (!parsed) return false;
           return parsed.day === day && parsed.month === calMonth && parsed.year === calYear;
         });
@@ -1902,22 +1802,11 @@
           postDiv.className = 'space-y-1 mt-1';
           matchingPosts.slice(0, 2).forEach(mp => {
             const isLive = mp.status === 'published';
-            postDiv.innerHTML += `
-              <div onclick="openDetailModal('${mp.id}')" class="p-1 rounded-md text-[8px] font-bold truncate cursor-pointer shadow-2xs transition hover:opacity-90 ${isLive ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}">
-                ${mp.title}
-              </div>
-            `;
+            postDiv.innerHTML += `<div onclick="openDetailModal('${mp.id}')" class="p-1 rounded-md text-[8px] font-bold truncate cursor-pointer shadow-2xs transition hover:opacity-90 ${isLive ? 'bg-emerald-600 text-white' : 'bg-rose-500 text-white'}">${mp.title}</div>`;
           });
-          if (matchingPosts.length > 2) {
-            postDiv.innerHTML += `
-              <div class="text-[7px] text-slate-400 font-bold text-center">
-                +${matchingPosts.length - 2} lainnya
-              </div>
-            `;
-          }
+          if (matchingPosts.length > 2) postDiv.innerHTML += `<div class="text-[7px] text-slate-400 font-bold text-center">+${matchingPosts.length - 2} lainnya</div>`;
           cell.appendChild(postDiv);
         }
-
         grid.appendChild(cell);
       }
     }
@@ -1930,12 +1819,7 @@
       document.getElementById('previewPostCount').textContent = posts.length;
 
       if (posts.length === 0) {
-        cont.innerHTML = `
-          <div class="col-span-3 py-12 text-center text-slate-400 space-y-1">
-            <i class="ph-bold ph-images text-2xl mx-auto block text-slate-300"></i>
-            <p class="text-[11px]">Belum ada konten feed yang diunggah.</p>
-          </div>
-        `;
+        cont.innerHTML = `<div class="col-span-3 py-12 text-center text-slate-400 space-y-1"><i class="ph-bold ph-images text-2xl mx-auto block text-slate-300"></i><p class="text-[11px]">Belum ada konten feed yang diunggah.</p></div>`;
         return;
       }
 
@@ -1950,9 +1834,7 @@
         img.className = 'w-full h-full object-cover group-hover:scale-105 transition duration-200';
 
         let badgeOverlay = '';
-        if (p.type === 'REELS') {
-          badgeOverlay = '<div class="absolute top-1.5 right-1.5 text-white text-xs drop-shadow-md"><i class="ph-fill ph-video-camera"></i></div>';
-        }
+        if (p.type === 'REELS') badgeOverlay = '<div class="absolute top-1.5 right-1.5 text-white text-xs drop-shadow-md"><i class="ph-fill ph-video-camera"></i></div>';
 
         wrapper.appendChild(img);
         if (badgeOverlay) wrapper.innerHTML += badgeOverlay;
@@ -1963,48 +1845,33 @@
     // 15. PERSISTENSI SETTING BRAND
     function loadBrandSettings() {
       const saved = localStorage.getItem('postflow_brand_settings');
-      if (saved) {
-        try {
-          currentBrand = JSON.parse(saved);
-        } catch (e) {}
-      }
+      if (saved) { try { currentBrand = JSON.parse(saved); } catch (e) {} }
       applyBrandToUI();
     }
-
     function saveBrandSettings() {
       currentBrand.handle = document.getElementById('settingBrandHandle').value.trim();
       currentBrand.name = document.getElementById('settingBrandName').value.trim();
       currentBrand.bio = document.getElementById('settingBrandBio').value.trim();
-
       localStorage.setItem('postflow_brand_settings', JSON.stringify(currentBrand));
       applyBrandToUI();
       closeBrandModal();
       showToast('Profil akun brand berhasil disimpan.', 'success');
     }
-
     function applyBrandToUI() {
       document.getElementById('currentBrandHandle').textContent = currentBrand.handle;
       document.getElementById('previewBrandName').textContent = currentBrand.name;
       document.getElementById('previewBrandBio').textContent = currentBrand.bio;
     }
-
-    function saveApiSettings() {
-      closeApiModal();
-      showToast('Pengaturan token integrasi API tersimpan di sesi.', 'success');
-    }
+    function saveApiSettings() { closeApiModal(); showToast('Pengaturan token integrasi API tersimpan di sesi.', 'success'); }
 
     // 16. AI STUDIO COPYWRITING
     function generateAiDraft() {
       const p = document.getElementById('aiPromptInput').value.trim();
-      if (!p) {
-        showToast('Masukkan topik atau ide konten terlebih dahulu.', 'warning');
-        return;
-      }
+      if (!p) return showToast('Masukkan topik atau ide konten terlebih dahulu.', 'warning');
       document.getElementById('aiOutputContainer').classList.remove('hidden');
       document.getElementById('aiOutputText').textContent = `✨ ${p.toUpperCase()}\n\nDapatkan penawaran terbaik dan wujudkan impian Anda bersama kami hari ini! Kunjungi kantor layanan terdekat atau klik tautan di bio untuk informasi lengkap.\n\n#PromoSpesial #BankBTN #LayananTerbaik #SolusiKeuangan #BTNMobile`;
       showToast('Draf AI copywriting berhasil digenerate.', 'success');
     }
-
     function useAiDraft() {
       const text = document.getElementById('aiOutputText').textContent;
       openPostModal();
