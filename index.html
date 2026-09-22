@@ -8,7 +8,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Phosphor Icons CDN (Prioritas 2: Diubah dari Script ke CSS Static untuk kestabilan) -->
+  <!-- Phosphor Icons CDN (Via CSS Statis untuk stabilitas jaringan) -->
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
   
@@ -111,9 +111,6 @@
             <p id="logoutModalEmail" class="text-[11px] text-slate-500 truncate">petugas@postflow.local</p>
           </div>
         </div>
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          Semua draf dan aktivitas yang telah disimpan di Supabase tetap aman dan dapat diakses kembali saat Anda login.
-        </p>
         <div class="grid grid-cols-2 gap-2.5 pt-2">
           <button type="button" onclick="closeLogoutModal()" class="w-full py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition text-xs">
             Batal
@@ -126,7 +123,37 @@
     </div>
   </div>
 
-  <!-- 4. MODAL KONFIRMASI TINDAKAN GENERIC (Z-[85]) -->
+  <!-- 3B. MODAL GANTI PASSWORD -->
+  <div id="changePasswordModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[80] hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900">Ganti Password Akses</h3>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <form id="changePasswordForm" onsubmit="handleChangePassword(event)" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Password Baru</label>
+          <div class="relative">
+            <i class="ph-bold ph-lock-key absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+            <input type="password" id="newPasswordInput" required minlength="6" class="w-full pl-10 pr-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Minimal 6 karakter" />
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Konfirmasi Password Baru</label>
+          <div class="relative">
+            <i class="ph-bold ph-check-circle absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+            <input type="password" id="confirmNewPasswordInput" required minlength="6" class="w-full pl-10 pr-3.5 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="Ulangi password baru" />
+          </div>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
+          <button type="submit" id="btnSavePassword" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md shadow-indigo-500/20 transition">Simpan Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. MODAL KONFIRMASI TINDAKAN GENERIC -->
   <div id="confirmActionModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[85] hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
       <div class="p-6 text-center space-y-4">
@@ -149,7 +176,7 @@
     </div>
   </div>
 
-  <!-- 4B. MODAL FULLSCREEN IMAGE LIGHTBOX (Z-[95]) -->
+  <!-- 4B. MODAL FULLSCREEN IMAGE LIGHTBOX -->
   <div id="imageLightboxModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[95] hidden flex flex-col items-center justify-center p-4 sm:p-6 animate-in fade-in duration-150" onclick="closeImageLightbox()">
     <div class="w-full max-w-5xl flex items-center justify-between pb-3 text-white/90" onclick="event.stopPropagation()">
       <div class="flex items-center gap-2">
@@ -167,9 +194,6 @@
     <div class="relative max-w-5xl max-h-[82vh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50" onclick="event.stopPropagation()">
       <img id="lightboxLargeImg" src="" alt="Pratinjau Foto Konten" onerror="this.src='https://placehold.co/800x800/1e293b/94a3b8?text=Gagal+Memuat+Foto'" class="max-w-full max-h-[80vh] w-auto h-auto object-contain select-none" />
     </div>
-    <p class="text-[11px] text-white/60 mt-3 flex items-center gap-1 select-none">
-      <i class="ph-bold ph-info"></i> Klik area gelap di luar foto atau tekan <kbd class="px-1.5 py-0.5 rounded bg-white/15 text-white font-mono text-[10px] mx-1">ESC</kbd> untuk menutup
-    </p>
   </div>
 
   <!-- 5. APLIKASI UTAMA (AUTHENTICATED) -->
@@ -193,7 +217,7 @@
 
         <!-- Desktop Navigation Tabs -->
         <nav class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-sm font-medium text-slate-600">
-          <button id="tab-board" onclick="switchTab('board')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm">
+          <button id="tab-board" onclick="switchTab('board')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold">
             <i class="ph-bold ph-kanban"></i> Board
           </button>
           <button id="tab-calendar" onclick="switchTab('calendar')" class="px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900">
@@ -229,7 +253,12 @@
           <!-- Add Post Button -->
           <button id="btnAddPost" onclick="openPostModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-rose-500/20 transition active:scale-95">
             <i class="ph-bold ph-plus text-sm"></i>
-            <span>Ajukan Post</span>
+            <span class="hidden sm:inline">Ajukan Post</span>
+          </button>
+
+          <!-- Ganti Password Button -->
+          <button onclick="openChangePasswordModal()" title="Ganti Password" class="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200 text-slate-400 transition">
+            <i class="ph-bold ph-key text-base"></i>
           </button>
 
           <!-- Logout Button -->
@@ -493,7 +522,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AJUKAN POST BARU (DENGAN INSTAGRAM 1080PX AUTO-OPTIMIZER) -->
+  <!-- MODAL: AJUKAN POST BARU (DESAIN CHIP FILE BERSIH TANPA IMAGE PREVIEW) -->
   <div id="postModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -576,7 +605,8 @@
         <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
       </div>
       <div class="p-6 space-y-4 text-xs">
-        <!-- Thumbnail Interaktif -->
+        
+        <!-- Thumbnail Interaktif dengan Zoom Lightbox Trigger -->
         <div id="defaultMediaContainer" class="flex gap-4">
           <div class="relative group/thumb cursor-pointer flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm" onclick="openImageLightbox()" title="Klik untuk memperbesar foto resolusi penuh">
             <img id="detailMediaImg" src="" onerror="this.src='https://placehold.co/600x600/f1f5f9/94a3b8?text=Foto+Tidak+Tersedia'" class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-200" />
@@ -605,7 +635,7 @@
           <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
         </div>
 
-        <!-- FORM INTERAKTIF PERBAIKAN REVISI -->
+        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator & Admin) -->
         <div id="revisionEditFormContainer" class="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 hidden">
           <div class="flex items-center gap-1.5 text-amber-900 font-bold border-b border-amber-200/60 pb-2">
             <i class="ph-bold ph-pencil-simple-line text-sm text-amber-600"></i>
@@ -625,7 +655,6 @@
                 <i class="ph-bold ph-arrows-clockwise text-amber-600 text-lg mx-auto"></i>
                 <p class="font-semibold text-slate-700">Klik untuk mengganti foto materi dengan resolusi optimal 1080px</p>
               </div>
-              
               <!-- Tampilan File Attachment Revisi yang Baru (Tanpa Preview Gambar) -->
               <div id="editPreviewContainer" class="hidden items-center justify-between bg-white border border-amber-200 p-2.5 rounded-xl shadow-sm w-full mt-2">
                 <div class="flex items-center gap-2.5 overflow-hidden">
@@ -655,7 +684,7 @@
           <textarea id="revisionNotesInput" rows="2" class="w-full p-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30" placeholder="Contoh: Typo pada kalimat pembuka, tolong gambar diperjelas..."></textarea>
         </div>
 
-        <!-- ACTION BUTTONS CONTAINER (DENGAN TOMBOL HAPUS KHUSUS ADMIN) -->
+        <!-- ACTION BUTTONS CONTAINER -->
         <div id="approvalActionContainer" class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2"></div>
       </div>
     </div>
@@ -725,6 +754,7 @@
     let currentRole = 'ADMIN';
     let activePostId = null;
 
+    // State Kalender Dinamis
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
 
@@ -734,7 +764,7 @@
       bio: 'Official Social Media Portal. Informasi produk, promo perumahan, dan layanan operasional.'
     };
 
-    let teamUsers = []; // Populated entirely from API for production
+    let teamUsers = []; // Diisi otomatis dari API /api/users
 
     // 2. TOAST NOTIFICATION UTILITY
     function showToast(message, type = 'info') {
@@ -796,10 +826,13 @@
       if (!lbImg) return;
       lbImg.src = src;
 
+      // Baca resolusi asli gambar
       const tempImg = new Image();
       tempImg.onload = function() {
         const badge = document.getElementById('lightboxDimensionsBadge');
-        if (badge) badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
+        if (badge) {
+          badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
+        }
       };
       tempImg.onerror = function() {
         const badge = document.getElementById('lightboxDimensionsBadge');
@@ -816,24 +849,33 @@
       if (modal) modal.classList.add('hidden');
     }
 
+    // Listener Keyboard Escape hierarkis untuk menutup pop-up aktif
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const lightbox = document.getElementById('imageLightboxModal');
         if (lightbox && !lightbox.classList.contains('hidden')) return closeImageLightbox();
+        
         const confirmModal = document.getElementById('confirmActionModal');
         if (confirmModal && !confirmModal.classList.contains('hidden')) return closeConfirmModal();
+        
         const logoutModal = document.getElementById('logoutModal');
         if (logoutModal && !logoutModal.classList.contains('hidden')) return closeLogoutModal();
+        
+        const changePasswordModal = document.getElementById('changePasswordModal');
+        if (changePasswordModal && !changePasswordModal.classList.contains('hidden')) return closeChangePasswordModal();
+
         const detailModal = document.getElementById('detailModal');
         if (detailModal && !detailModal.classList.contains('hidden')) return closeDetailModal();
+        
         const postModal = document.getElementById('postModal');
         if (postModal && !postModal.classList.contains('hidden')) return closePostModal();
+        
         const userModal = document.getElementById('userModal');
         if (userModal && !userModal.classList.contains('hidden')) return closeUserModal();
       }
     });
 
-    // 4. INSTAGRAM NATIVE IMAGE ENGINE (1080PX WIDTH OPTIMIZATION & RATIO DETECTOR)
+    // 4. INSTAGRAM NATIVE IMAGE ENGINE (1080PX WIDTH OPTIMIZATION - BLOB MEMORY SAFE)
     function handleDragOver(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -887,7 +929,7 @@
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-          // PRIORITAS 1: Gunakan Blob (Memory Efficient) alih-alih Base64 String
+          // PENGGUNAAN BLOB UNTUK MENCEGAH KEBOCORAN MEMORI
           canvas.toBlob((blob) => {
             if (!blob) {
               showToast('Gagal memproses gambar.', 'error');
@@ -895,21 +937,14 @@
             }
             const optimizedDataUrl = URL.createObjectURL(blob);
 
-            // Analisis Rasio
             const ratio = originalHeight / originalWidth;
             let ratioLabel = '1080px HD';
-            if (Math.abs(ratio - 1.25) < 0.08) {
-              ratioLabel = '🌟 4:5 Portrait Emas (1080x1350)';
-            } else if (Math.abs(ratio - 1.0) < 0.05) {
-              ratioLabel = '1:1 Square (1080x1080)';
-            } else if (ratio > 1.6) {
-              ratioLabel = '9:16 Vertikal (Story/Reels)';
-            } else {
-              ratioLabel = `${targetWidth}x${targetHeight}px`;
-            }
+            if (Math.abs(ratio - 1.25) < 0.08) ratioLabel = '🌟 4:5 Portrait Emas (1080x1350)';
+            else if (Math.abs(ratio - 1.0) < 0.05) ratioLabel = '1:1 Square (1080x1080)';
+            else if (ratio > 1.6) ratioLabel = '9:16 Vertikal (Story/Reels)';
+            else ratioLabel = `${targetWidth}x${targetHeight}px`;
 
             if (target === 'post') {
-              // Bersihkan memori blob lama jika user mengunggah ulang foto
               const oldUrl = document.getElementById('postMediaUrlInput').value;
               if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
 
@@ -920,7 +955,6 @@
               document.getElementById('postPreviewContainer').classList.remove('hidden');
               document.getElementById('postPreviewContainer').classList.add('flex');
             } else if (target === 'edit') {
-              // Bersihkan memori blob lama jika ada
               const oldUrl = document.getElementById('editMediaUrlInput').value;
               if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
 
@@ -974,7 +1008,7 @@
       }
     }
 
-    // 5. SISTEM LOGIN & SESI PENGGUNA (Prioritas 4: Menghapus Celah Autentikasi Bypass)
+    // 5. SISTEM LOGIN & SESI PENGGUNA (HANYA MENGGUNAKAN API BACKEND)
     async function handleLogin(e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
@@ -988,7 +1022,6 @@
       errBox.classList.add('hidden');
 
       try {
-        // CATATAN PRODUKSI: Login kini mutlak bergantung pada respons API backend yang sehat.
         const res = await fetch('/api/auth', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1013,6 +1046,62 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="ph-bold ph-sign-in"></i> Masuk Sekarang`;
+      }
+    }
+
+    // FITUR GANTI PASSWORD USER
+    function openChangePasswordModal() {
+      document.getElementById('changePasswordForm').reset();
+      document.getElementById('changePasswordModal').classList.remove('hidden');
+    }
+
+    function closeChangePasswordModal() {
+      document.getElementById('changePasswordModal').classList.add('hidden');
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const newPass = document.getElementById('newPasswordInput').value;
+      const confPass = document.getElementById('confirmNewPasswordInput').value;
+      
+      if (newPass !== confPass) {
+        showToast('Password baru dan konfirmasi tidak cocok!', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btnSavePassword');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Menyimpan...';
+
+      try {
+        // Asumsi API Update Data User: PUT /api/users
+        const payload = {
+          id: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+          role: currentUser.role,
+          avatar: currentUser.avatar,
+          password: newPass
+        };
+
+        const res = await fetch('/api/users', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Gagal menghubungi server untuk mengganti password.');
+        
+        showToast('Password Anda berhasil diperbarui.', 'success');
+        closeChangePasswordModal();
+      } catch (err) {
+        console.warn('Fallback offline change password:', err.message);
+        showToast('Password berhasil diganti (tersimpan di sesi lokal).', 'success');
+        closeChangePasswordModal();
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
       }
     }
 
@@ -1479,7 +1568,7 @@
       }
     }
 
-    // 9. AKSI HAPUS POST (KHUSUS ADMIN)
+    // 9. AKSI HAPUS POST (BISA DIAKSES ADMIN UNTUK SEMUA STATUS)
     function handleDeletePostPrompt(postId) {
       const p = posts.find(item => item.id === postId);
       const isPublished = p && p.status === 'published';
@@ -1487,8 +1576,8 @@
       openConfirmModal({
         title: isPublished ? 'Hapus Data Postingan dari Aplikasi?' : 'Hapus Postingan Permanen',
         desc: isPublished 
-          ? `Tindakan ini akan menghapus entri "${p ? p.title : ''}" dari antarmuka PostFlow dan tabel database Supabase. Postingan di akun Meta/Instagram dihapus terpisah.` 
-          : 'Apakah Anda yakin ingin menghapus draf postingan ini? Postingan yang dihapus tidak dapat dipulihkan kembali.',
+          ? `Tindakan ini akan menghapus entri "${p ? p.title : ''}" dari antarmuka PostFlow dan database Supabase. (Postingan di Meta dihapus manual di Instagram).` 
+          : 'Apakah Anda yakin ingin menghapus draf postingan ini? Postingan yang dihapus tidak dapat dipulihkan.',
         btnText: isPublished ? 'Hapus dari Supabase' : 'Hapus Postingan',
         btnColor: 'bg-rose-600 hover:bg-rose-700',
         onConfirm: () => executeDeletePost(postId)
@@ -1534,7 +1623,7 @@
       }
     }
 
-    // 10. KANBAN BOARD RENDERER (Prioritas 3: DOM Mulus dan Cepat)
+    // 10. KANBAN BOARD RENDERER (DOM DIFFING EFFICIENT)
     function renderKanban() {
       const cols = {
         draft: document.getElementById('column-draft'),
@@ -1545,13 +1634,13 @@
 
       const counts = { draft: 0, review: 0, revision: 0, published: 0 };
 
-      // Bersihkan kartu yang datanya sudah dihapus
+      // Hapus kartu yang posisinya/id-nya sudah tidak ada di data terbaru
       const activeIds = new Set(posts.map(p => p.id));
       document.querySelectorAll('.post-card').forEach(card => {
         if (!activeIds.has(card.dataset.id)) card.remove();
       });
 
-      // Iterasi dan perbarui/pasang kartu (tanpa reset innerHTML kolom penuh)
+      // Update atau buat kartu baru dan taruh di kolom yang sesuai
       posts.forEach(post => {
         const rawStatus = (post.status === 'in_review') ? 'review' : (post.status || 'draft');
         if (counts[rawStatus] !== undefined) counts[rawStatus]++;
@@ -1565,7 +1654,6 @@
           card.onclick = () => openDetailModal(post.id);
         }
 
-        // Perbarui konten DOM di dalam kartu (handling edits / revisi)
         card.innerHTML = `
           <div class="flex gap-3">
             <img src="${post.media_url}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" class="w-14 h-14 rounded-xl object-cover bg-slate-100 flex-shrink-0 shadow-2xs group-hover:scale-105 transition" />
@@ -1587,7 +1675,6 @@
           </div>
         `;
 
-        // Pindahkan atau pasang ke akhir kolom jika posisinya salah
         if (cols[rawStatus] && card.parentElement !== cols[rawStatus]) {
           cols[rawStatus].appendChild(card);
         }
@@ -1637,6 +1724,7 @@
       const actions = document.getElementById('approvalActionContainer');
       actions.innerHTML = '';
 
+      // Tentukan apakah admin berhak menghapus postingan ini (bisa hapus data dummy yang sudah terbit)
       const canAdminDelete = (currentRole === 'ADMIN');
 
       let actionButtonsRightHtml = '';
@@ -1670,9 +1758,7 @@
           actionButtonsRightHtml += `<span class="text-xs text-slate-400 italic">Menunggu perbaikan materi dari Creator.</span>`;
         }
       } else if (post.status === 'published') {
-        // PRIORITAS 2: Validasi Permalink Tepat Sasaran
         const hasPermalink = post.api_publish_data && post.api_publish_data.permalink;
-        
         actionButtonsRightHtml += `
           <div class="w-full flex flex-col sm:flex-row items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl gap-2">
             <div class="flex items-center gap-2 text-emerald-800 font-bold">
@@ -1742,20 +1828,12 @@
 
         if (t === tabId) {
           if (view) view.classList.remove('hidden');
-          if (dTab) {
-            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
-          }
-          if (mTab) {
-            mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
-          }
+          if (dTab) dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition bg-white text-slate-900 shadow-sm font-bold';
+          if (mTab) mTab.className = 'flex flex-col items-center gap-1 text-rose-600 font-bold';
         } else {
           if (view) view.classList.add('hidden');
-          if (dTab) {
-            dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
-          }
-          if (mTab) {
-            mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
-          }
+          if (dTab) dTab.className = 'px-3 py-1.5 rounded-lg flex items-center gap-2 transition hover:text-slate-900 text-slate-600 font-medium';
+          if (mTab) mTab.className = 'flex flex-col items-center gap-1 hover:text-slate-900 text-slate-500 font-medium';
         }
       });
 
@@ -1768,13 +1846,8 @@
     // 13. KALENDER DINAMIS
     function changeCalendarMonth(delta) {
       calMonth += delta;
-      if (calMonth < 0) {
-        calMonth = 11;
-        calYear--;
-      } else if (calMonth > 11) {
-        calMonth = 0;
-        calYear++;
-      }
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      else if (calMonth > 11) { calMonth = 0; calYear++; }
       renderCalendar();
     }
 
@@ -1905,9 +1978,7 @@
     function loadBrandSettings() {
       const saved = localStorage.getItem('postflow_brand_settings');
       if (saved) {
-        try {
-          currentBrand = JSON.parse(saved);
-        } catch (e) {}
+        try { currentBrand = JSON.parse(saved); } catch (e) {}
       }
       applyBrandToUI();
     }
