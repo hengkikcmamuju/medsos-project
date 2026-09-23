@@ -717,10 +717,10 @@
     let currentUser = null;
     let currentRole = 'ADMIN';
     let activePostId = null;
-    let supabaseClient = null; // Engine Supabase Bawaan Browser
-    
-    // STATE ANTREAN MULTI-UPLOAD & FILE FISIK
-    let uploadedFilesPost = [];
+    let supabaseClient = null; // Client Supabase di Browser
+
+    // STATE ANTREAN MULTI-UPLOAD & FILE FISIK
+    let uploadedFilesPost = [];
     let uploadedFilesEdit = [];
 
     // State Kalender Dinamis
@@ -1159,9 +1159,10 @@
       showToast('Sesi kerja Anda telah diakhiri.', 'info');
     }
 
-    function checkExistingSession() {
+        function checkExistingSession() {
       loadBrandSettings();
-      loadApiSettings(); // Panggil kunci Supabase & Meta saat boot
+      loadApiSettings(); // Muat API key dari localStorage
+
       const savedUser = localStorage.getItem('postflow_session_user');
       const savedToken = localStorage.getItem('postflow_session_token');
 
@@ -1443,7 +1444,7 @@
       }
 
       if (!supabaseClient) {
-        showToast('Supabase belum dikonfigurasi! Harap isi URL dan Anon Key di menu Integrasi API.', 'error');
+        showToast('Supabase belum dikonfigurasi! Harap isi URL dan Anon Key di menu Integrasi API terlebih dahulu.', 'error');
         openApiSettingsModal();
         return;
       }
@@ -1453,9 +1454,9 @@
       btn.disabled = true; btn.innerHTML = 'Mengunggah ke Storage...';
 
       const activeUser = currentUser || { name: 'Admin', id: '1' };
-
-      try {
-        // TAHAP 1: BROWSER DIRECT UPLOAD KE SUPABASE
+      
+      try {
+        // 1. Upload semua file langsung ke Supabase dari Browser
         const finalMediaUrls = [];
         for (const f of uploadedFilesPost) {
           const fileExt = f.name.split('.').pop();
@@ -1467,9 +1468,7 @@
 
           if (uploadError) throw new Error(`Gagal upload ${f.name}: ${uploadError.message}`);
 
-          const { data: publicUrlData } = supabaseClient.storage
-            .from('post-media')
-            .getPublicUrl(fileName);
+          const { data: publicUrlData } = supabaseClient.storage.from('post-media').getPublicUrl(fileName);
 
           finalMediaUrls.push({
             url: publicUrlData.publicUrl,
@@ -1479,7 +1478,7 @@
           });
         }
 
-        // TAHAP 2: KIRIM DATA TEKS (JSON) KE BACKEND VERCEL
+        // 2. Kirim data teks (JSON) ke Backend Vercel
         const newPost = {
           id: 'POST-' + Date.now(),
           brand_id: 'BRD-01',
@@ -1502,7 +1501,10 @@
           body: JSON.stringify(newPost) 
         });
 
-        if (!res.ok) throw new Error('Gagal menyimpan draf ke database server.');
+        if (!res.ok) {
+          const errData = await res.json().catch(()=>({}));
+          throw new Error(errData.error || 'Gagal menyimpan draf ke database server.');
+        }
         
         showToast('Draf postingan berhasil dibuat dan disimpan.', 'success');
         fetchPostsFromApi();
@@ -1510,7 +1512,7 @@
         document.getElementById('newPostForm').reset();
         clearUploadedFile('post');
       } catch (err) {
-        console.error('Koneksi POST gagal:', err);
+        console.error('Koneksi server POST gagal:', err);
         showToast(`Error: ${err.message}`, 'error');
       } finally {
         btn.disabled = false; btn.innerHTML = origBtnText;
@@ -1554,7 +1556,7 @@
 
       const apiSettings = JSON.parse(localStorage.getItem('postflow_api_settings') || '{}');
       if (!apiSettings.igId || !apiSettings.metaToken) {
-        showToast('Kunci Instagram ID dan Meta Token belum diisi. Silakan isi di menu Integrasi API.', 'error');
+        showToast('Kunci Meta API belum dikonfigurasi! Harap isi di menu Integrasi API.', 'error');
         openApiSettingsModal();
         return;
       }
@@ -1565,120 +1567,59 @@
         btnText: 'Ya, Terbitkan Sekarang',
         btnColor: 'bg-emerald-600 hover:bg-emerald-700',
         onConfirm: async () => {
-          showToast('📡 Menghubungi Meta Graph API langsung dari Browser...', 'info');
+          showToast('📡 Menghubungi Meta Graph API dari Browser...', 'info');
 
           try {
-            // 1. Tentukan URL Publik Media
-            let mediaList = post.media_urls || [];
-            if (mediaList.length === 0 && post.media_url) mediaList = [{ url: post.media_url, type: post.type === 'REELS' ? 'video' : 'image' }];
+            // TAHAP 1: Kirim ke Container Instagram
+            const mediaType = post.type === 'REELS' ? 'VIDEO' : 'IMAGE';
+            let containerUrl = `https://graph.facebook.com/v19.0/${apiSettings.igId}/media?access_token=${apiSettings.metaToken}&caption=${encodeURIComponent(post.caption)}`;
             
-            const mediaUrl = mediaList[0].url;
-            const isVideo = mediaList[0].type === 'video' || post.type === 'REELS';
-
-            const GRAPH_BASE_URL = 'https://graph.facebook.com/v19.0';
-            
-            // TAHAP 1: Buat Container di Instagram Server
-            const containerParams = new URLSearchParams({
-              caption: post.caption || post.title || '',
-              access_token: apiSettings.metaToken
-            });
-
-            if (isVideo) {
-              containerParams.append('media_type', 'VIDEO');
-              containerParams.append('video_url', mediaUrl);
+            if (mediaType === 'VIDEO') {
+              containerUrl += `&media_type=REELS&video_url=${encodeURIComponent(post.media_url)}`;
             } else {
-              containerParams.append('image_url', mediaUrl);
+              containerUrl += `&image_url=${encodeURIComponent(post.media_url)}`;
             }
 
-            const createContainerRes = await fetch(`${GRAPH_BASE_URL}/${apiSettings.igId}/media`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: containerParams
-            });
+            const containerRes = await fetch(containerUrl, { method: 'POST' });
+            const containerData = await containerRes.json();
 
-            const containerData = await createContainerRes.json();
-
-            if (containerData.error) {
-              throw new Error(`Meta API Container Error: ${containerData.error.message}`);
-            }
-
+            if (containerData.error) throw new Error(containerData.error.message);
             const creationId = containerData.id;
 
-            // TAHAP 2: Jeda untuk menunggu Meta memproses (Aman dilakukan di browser)
-            if (isVideo) {
-              showToast('⏳ Instagram sedang memproses video... Mohon tunggu 15 detik. Jangan tutup halaman ini.', 'warning');
-              await new Promise(resolve => setTimeout(resolve, 15000));
-            } else {
-              await new Promise(resolve => setTimeout(resolve, 3000));
+            // Jika Video, beri jeda waktu tunggu agar Meta selesai encoding
+            if (mediaType === 'VIDEO') {
+              showToast('Menunggu Meta memproses video (sekitar 10-15 detik)...', 'info');
+              await new Promise(resolve => setTimeout(resolve, 12000));
             }
 
-            // TAHAP 3: Publish Container ke Feed Instagram
-            showToast('🚀 Menerbitkan postingan ke publik...', 'info');
-            const publishParams = new URLSearchParams({
-              creation_id: creationId,
-              access_token: apiSettings.metaToken
-            });
+            // TAHAP 2: Publish Container
+            const publishUrl = `https://graph.facebook.com/v19.0/${apiSettings.igId}/media_publish?creation_id=${creationId}&access_token=${apiSettings.metaToken}`;
+            const publishRes = await fetch(publishUrl, { method: 'POST' });
+            const publishData = await publishRes.json();
 
-            const publishRes = await fetch(`${GRAPH_BASE_URL}/${apiSettings.igId}/media_publish`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: publishParams
-            });
+            if (publishData.error) throw new Error(publishData.error.message);
 
-            const publishResult = await publishRes.json();
-
-            if (publishResult.error) {
-              throw new Error(`Meta API Publishing Error: ${publishResult.error.message}`);
-            }
-
-            const liveMediaId = publishResult.id;
-
-            // TAHAP 4: Ambil Permalink
-            let postPermalink = `https://www.instagram.com/`;
-            try {
-              const mediaInfoRes = await fetch(`${GRAPH_BASE_URL}/${liveMediaId}?fields=permalink&access_token=${apiSettings.metaToken}`);
-              const mediaInfo = await mediaInfoRes.json();
-              if (mediaInfo && mediaInfo.permalink) {
-                postPermalink = mediaInfo.permalink;
-              }
-            } catch (e) {
-              console.warn('Gagal mengambil permalink:', e.message);
-            }
-
-            const finalPublishData = {
-              mode: 'REAL_LIVE_FROM_BROWSER',
-              publish_id: liveMediaId,
-              creation_id: creationId,
-              platform: 'instagram',
-              permalink: postPermalink,
-              published_at: new Date().toISOString()
-            };
-
-            // TAHAP 5: Update Vercel Database bahwa konten tayang
-            await fetch('/api/posts', { 
-              method: 'PUT', 
-              headers: { 'Content-Type': 'application/json', 'x-user-role': currentRole }, 
-              body: JSON.stringify({ id: postId, status: 'published', api_publish_data: finalPublishData }) 
-            });
-
+            // Update status di Vercel/Supabase
             post.status = 'published';
-            post.published_at = finalPublishData.published_at;
-            post.api_publish_data = finalPublishData;
+            post.published_at = new Date().toISOString();
+            post.api_publish_data = publishData;
+
+            await updatePostStatus(postId, 'published');
 
             renderKanban();
             renderCalendar();
             renderFeedPreview();
             closeDetailModal();
 
-            showToast(`🎉 Berhasil! Konten TAYANG LIVE di Instagram!`, 'success');
-
+            showToast(`🎉 Berhasil! ID Konten LIVE: ${publishData.id}`, 'success');
           } catch (err) {
             console.error('Gagal publish live:', err);
-            showToast(err.message, 'error');
+            showToast(`Error Meta API: ${err.message}`, 'error');
           }
         }
       });
     }
+    
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
       if (!notes) {
@@ -1689,17 +1630,17 @@
     }
 
     async function handleResubmitRevision(postId) {
-      const updatedTitle = document.getElementById('editTitleInput').value.trim();
-      const updatedCaption = document.getElementById('editCaptionInput').value.trim();
+      const updatedTitle = document.getElementById('editTitleInput').value.trim();
+      const updatedCaption = document.getElementById('editCaptionInput').value.trim();
 
-      if (!updatedCaption) {
-        showToast('Caption materi tidak boleh kosong.', 'warning');
+      if (!updatedCaption) {
+        showToast('Caption materi tidak boleh kosong.', 'warning');
         return;
       }
 
       showToast('Menyiapkan file revisi...', 'info');
 
-      try {
+      try {
         const payload = {
           id: postId,
           status: 'review',
@@ -1708,7 +1649,6 @@
         };
         if (updatedTitle) payload.title = updatedTitle;
 
-        // Jika Creator melampirkan gambar/video perbaikan, Browser langsung upload ke Supabase
         if (uploadedFilesEdit.length > 0) {
           if (!supabaseClient) throw new Error('Supabase belum dikonfigurasi di menu Integrasi API.');
           
@@ -1724,9 +1664,7 @@
 
             if (uploadError) throw new Error(`Gagal upload revisi: ${uploadError.message}`);
 
-            const { data: publicUrlData } = supabaseClient.storage
-              .from('post-media')
-              .getPublicUrl(fileName);
+            const { data: publicUrlData } = supabaseClient.storage.from('post-media').getPublicUrl(fileName);
 
             finalMediaUrls.push({
               url: publicUrlData.publicUrl,
@@ -1739,7 +1677,6 @@
           payload.media_urls = finalMediaUrls;
         }
 
-        // Kirim perubahan teks (JSON) ke Backend Vercel
         const res = await fetch('/api/posts', { 
           method: 'PUT', 
           headers: { 'Content-Type': 'application/json', 'x-user-role': currentRole },
@@ -1751,11 +1688,11 @@
         fetchPostsFromApi();
         closeDetailModal();
       } catch (err) {
-        console.error('Gagal memperbarui revisi:', err);
+        console.error('Gagal memperbarui revisi di server:', err);
         showToast(`Error: ${err.message}`, 'error');
       }
     }
-
+    
     // 9. AKSI HAPUS POST
     function handleDeletePostPrompt(postId) {
       const p = posts.find(item => item.id === postId);
@@ -2236,13 +2173,13 @@
       showToast('Profil akun brand berhasil disimpan.', 'success');
     }
 
-    function applyBrandToUI() {
+    function applyBrandToUI() {
       document.getElementById('currentBrandHandle').textContent = currentBrand.handle;
       document.getElementById('previewBrandName').textContent = currentBrand.name;
       document.getElementById('previewBrandBio').textContent = currentBrand.bio;
     }
 
-function loadApiSettings() {
+    function loadApiSettings() {
       const apiSettings = localStorage.getItem('postflow_api_settings');
       const alertBox = document.getElementById('apiStatusAlert');
       
@@ -2255,12 +2192,22 @@ function loadApiSettings() {
           if (parsedApi.supabaseKey) document.getElementById('settingSupabaseKey').value = parsedApi.supabaseKey;
           
           if (parsedApi.supabaseUrl && parsedApi.supabaseKey && window.supabase) {
-            // Aktifkan Direct Upload Engine ke Supabase
-            supabaseClient = window.supabase.createClient(parsedApi.supabaseUrl, parsedApi.supabaseKey);
-            alertBox.className = 'p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800 font-bold mb-2';
-            alertBox.innerHTML = '<i class="ph-bold ph-check-circle text-base"></i><span>Supabase Client Siap (Direct Upload).</span>';
+            try {
+              supabaseClient = window.supabase.createClient(parsedApi.supabaseUrl, parsedApi.supabaseKey);
+              if (alertBox) {
+                alertBox.className = 'p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800 font-bold mb-2';
+                alertBox.innerHTML = '<i class="ph-bold ph-check-circle text-base"></i><span>Supabase Client Siap (Direct Upload).</span>';
+              }
+            } catch(e) {
+              if (alertBox) {
+                alertBox.className = 'p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-800 font-bold mb-2';
+                alertBox.innerHTML = '<i class="ph-bold ph-x-circle text-base"></i><span>URL Supabase Tidak Valid.</span>';
+              }
+            }
           }
-        } catch(e) {}
+        } catch(e) {
+          console.error("Format konfigurasi API rusak", e);
+        }
       }
     }
 
@@ -2276,7 +2223,7 @@ function loadApiSettings() {
       showToast('Pengaturan API & Supabase tersimpan di sesi.', 'success');
     }
 
-      // 16. AI STUDIO COPYWRITING
+    // 16. AI STUDIO COPYWRITING
     function generateAiDraft() {
       const p = document.getElementById('aiPromptInput').value.trim();
       if (!p) {
