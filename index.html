@@ -8,7 +8,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Phosphor Icons CDN (Via CSS Statis untuk stabilitas jaringan) -->
+  <!-- Phosphor Icons CDN -->
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
   
@@ -16,35 +16,17 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            brand: {
-              50: '#fff1f2',
-              100: '#ffe4e6',
-              500: '#f43f5e',
-              600: '#e11d48',
-              700: '#be123c',
-            }
-          }
+          colors: { brand: { 50: '#fff1f2', 100: '#ffe4e6', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', } }
         }
       }
     }
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
-    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-rose-100 selection:text-rose-700 pb-20 md:pb-6">
@@ -176,15 +158,15 @@
     </div>
   </div>
 
-  <!-- 4B. MODAL FULLSCREEN IMAGE LIGHTBOX -->
+  <!-- 4B. MODAL FULLSCREEN IMAGE / VIDEO LIGHTBOX -->
   <div id="imageLightboxModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[95] hidden flex flex-col items-center justify-center p-4 sm:p-6 animate-in fade-in duration-150" onclick="closeImageLightbox()">
     <div class="w-full max-w-5xl flex items-center justify-between pb-3 text-white/90" onclick="event.stopPropagation()">
       <div class="flex items-center gap-2">
         <span class="px-2.5 py-1 rounded-lg bg-white/10 text-white text-xs font-semibold backdrop-blur-sm border border-white/10 flex items-center gap-1.5">
-          <i class="ph-bold ph-image"></i> Pratinjau Foto Asli HD
+          <i class="ph-bold ph-magnifying-glass-plus"></i> Pratinjau HD
         </span>
         <span id="lightboxDimensionsBadge" class="text-[11px] font-mono text-slate-300 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
-          Memuat dimensi...
+          Memuat...
         </span>
       </div>
       <button type="button" onclick="closeImageLightbox()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5 border border-white/10 shadow-lg active:scale-95">
@@ -192,7 +174,8 @@
       </button>
     </div>
     <div class="relative max-w-5xl max-h-[82vh] flex items-center justify-center overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/50" onclick="event.stopPropagation()">
-      <img id="lightboxLargeImg" src="" alt="Pratinjau Foto Konten" onerror="this.src='https://placehold.co/800x800/1e293b/94a3b8?text=Gagal+Memuat+Foto'" class="max-w-full max-h-[80vh] w-auto h-auto object-contain select-none" />
+      <video id="lightboxVideo" controls class="max-w-full max-h-[80vh] hidden w-auto h-auto outline-none"></video>
+      <img id="lightboxLargeImg" src="" alt="Pratinjau Foto Konten" onerror="this.src='https://placehold.co/800x800/1e293b/94a3b8?text=Gagal+Memuat+Foto'" class="max-w-full max-h-[80vh] w-auto h-auto object-contain select-none hidden" />
     </div>
   </div>
 
@@ -522,7 +505,7 @@
     </div>
   </div>
 
-  <!-- MODAL: AJUKAN POST BARU -->
+  <!-- MODAL: AJUKAN POST BARU DENGAN MULTI UPLOAD & MP4 -->
   <div id="postModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -550,39 +533,23 @@
         </div>
         <div>
           <div class="flex items-center justify-between mb-1">
-            <label class="block font-semibold text-slate-700">Unggah Media (Foto / Banner Konten)</label>
+            <label class="block font-semibold text-slate-700">Unggah Media (Foto / Video MP4)</label>
             <span id="igFormatHelperBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
               Rekomendasi IG: 4:5 (1080x1350px)
             </span>
           </div>
-          <input type="file" id="postFileInput" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleFileSelect(event, 'post')" />
-          <input type="hidden" id="postMediaUrlInput" />
+          <input type="file" id="postFileInput" accept="image/jpeg,image/png,image/webp,video/mp4" multiple class="hidden" onchange="handleFileSelect(event, 'post')" />
 
-          <!-- Dropzone Container -->
           <div id="postDropzone" onclick="document.getElementById('postFileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'post')" class="border-2 border-dashed border-slate-200 hover:border-rose-400 rounded-2xl p-4 text-center cursor-pointer transition bg-slate-50/60 hover:bg-rose-50/20 group">
             <div id="postUploadPlaceholder" class="space-y-2 py-2">
               <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-500 group-hover:text-rose-600 mx-auto transition">
                 <i class="ph-bold ph-cloud-arrow-up text-xl"></i>
               </div>
-              <p class="font-bold text-slate-700">Tarik & lepas foto di sini, atau <span class="text-rose-600 underline">pilih dari perangkat</span></p>
-              <p class="text-[10px] text-slate-400">Otomatis dioptimasi ke standar native Instagram 1080px (JPG / PNG / WebP)</p>
+              <p class="font-bold text-slate-700">Tarik & lepas file di sini, atau <span class="text-rose-600 underline">pilih dari perangkat</span></p>
+              <p class="text-[10px] text-slate-400">Mendukung banyak file: Foto (dioptimasi 1080px) & Video MP4 (Max 50MB)</p>
             </div>
             
-            <!-- Tampilan File Attachment -->
-            <div id="postPreviewContainer" class="hidden items-center justify-between bg-white border border-emerald-200 p-3 rounded-xl shadow-sm w-full">
-              <div class="flex items-center gap-3 overflow-hidden">
-                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
-                  <i class="ph-bold ph-image text-xl"></i>
-                </div>
-                <div class="flex flex-col text-left overflow-hidden">
-                  <span id="postFileName" class="font-bold text-xs text-slate-700 truncate">file.jpg</span>
-                  <span id="postRatioBadge" class="text-[9px] font-extrabold text-emerald-600 mt-0.5">1080px HD</span>
-                </div>
-              </div>
-              <button type="button" onclick="event.stopPropagation(); clearUploadedFile('post')" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition flex-shrink-0 shadow-sm" title="Hapus Lampiran">
-                <i class="ph-bold ph-x"></i>
-              </button>
-            </div>
+            <div id="postPreviewContainer" class="hidden flex-col gap-2 w-full mt-3 text-left" onclick="event.stopPropagation()"></div>
           </div>
         </div>
         <div>
@@ -591,13 +558,13 @@
         </div>
         <div class="pt-2 flex justify-end gap-2">
           <button type="button" onclick="closePostModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Batal</button>
-          <button type="submit" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20">Simpan ke Supabase</button>
+          <button type="submit" id="btnSubmitPost" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold shadow-md shadow-rose-500/20">Simpan ke Database</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW -->
+  <!-- MODAL: DETAIL, APPROVAL & REVISION WORKFLOW (DENGAN CAROUSEL) -->
   <div id="detailModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl">
       <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -606,27 +573,18 @@
       </div>
       <div class="p-6 space-y-4 text-xs">
         
-        <!-- Thumbnail Interaktif dengan Zoom Lightbox Trigger -->
-        <div id="defaultMediaContainer" class="flex gap-4">
-          <div class="relative group/thumb cursor-pointer flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm" onclick="openImageLightbox()" title="Klik untuk memperbesar foto resolusi penuh">
-            <img id="detailMediaImg" src="" onerror="this.src='https://placehold.co/600x600/f1f5f9/94a3b8?text=Foto+Tidak+Tersedia'" class="w-full h-full object-cover group-hover/thumb:scale-105 transition duration-200" />
-            <div class="absolute inset-0 bg-slate-950/45 opacity-0 group-hover/thumb:opacity-100 transition duration-150 flex flex-col items-center justify-center text-white gap-1">
-              <i class="ph-bold ph-magnifying-glass-plus text-2xl drop-shadow-md"></i>
-              <span class="text-[10px] font-extrabold tracking-wide drop-shadow-md">Perbesar Foto</span>
-            </div>
-            <div class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-bold flex items-center gap-0.5 backdrop-blur-xs">
-              <i class="ph-bold ph-arrows-out"></i>
-            </div>
+        <div id="defaultMediaContainer" class="flex flex-col gap-4">
+          <div id="detailMediaGallery" class="flex gap-3 overflow-x-auto custom-scrollbar pb-2">
+            <!-- Media diinjeksi via JS -->
           </div>
 
-          <div class="space-y-2 flex-1">
+          <div class="space-y-2">
             <span id="detailStatusBadge" class="px-2.5 py-1 rounded-md text-[10px] font-bold">STATUS</span>
-            <p id="detailCaption" class="text-slate-600 whitespace-pre-wrap max-h-28 overflow-y-auto custom-scrollbar"></p>
+            <p id="detailCaption" class="text-slate-600 whitespace-pre-wrap max-h-32 overflow-y-auto custom-scrollbar"></p>
             <p class="text-[11px] text-slate-400" id="detailAuthorText">Penulis: -</p>
           </div>
         </div>
 
-        <!-- REVISION FEEDBACK BOX -->
         <div id="revisionFeedbackContainer" class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-1.5 hidden">
           <div class="flex items-center gap-1.5 text-rose-800 font-bold">
             <i class="ph-bold ph-warning-circle text-sm"></i>
@@ -635,7 +593,6 @@
           <p id="revisionFeedbackText" class="text-rose-700 bg-white p-2.5 rounded-lg border border-rose-100 whitespace-pre-wrap"></p>
         </div>
 
-        <!-- FORM INTERAKTIF PERBAIKAN REVISI (Creator & Admin) -->
         <div id="revisionEditFormContainer" class="p-4 bg-amber-50/50 border border-amber-200 rounded-xl space-y-3 hidden">
           <div class="flex items-center gap-1.5 text-amber-900 font-bold border-b border-amber-200/60 pb-2">
             <i class="ph-bold ph-pencil-simple-line text-sm text-amber-600"></i>
@@ -646,29 +603,15 @@
             <input type="text" id="editTitleInput" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-amber-500" />
           </div>
           <div>
-            <label class="block font-semibold text-slate-700 mb-1">Unggah Materi Visual Baru (Jika Ada Perbaikan Gambar):</label>
-            <input type="file" id="editFileInput" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleFileSelect(event, 'edit')" />
-            <input type="hidden" id="editMediaUrlInput" />
-
+            <label class="block font-semibold text-slate-700 mb-1">Unggah Materi Visual Baru (Jika Ada Perbaikan Gambar/Video):</label>
+            <input type="file" id="editFileInput" accept="image/jpeg,image/png,image/webp,video/mp4" multiple class="hidden" onchange="handleFileSelect(event, 'edit')" />
+            
             <div id="editDropzone" onclick="document.getElementById('editFileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'edit')" class="border-2 border-dashed border-amber-300 hover:border-amber-500 rounded-xl p-3 text-center cursor-pointer transition bg-white group">
               <div id="editUploadPlaceholder" class="space-y-1 py-1">
                 <i class="ph-bold ph-arrows-clockwise text-amber-600 text-lg mx-auto"></i>
-                <p class="font-semibold text-slate-700">Klik untuk mengganti foto materi dengan resolusi optimal 1080px</p>
+                <p class="font-semibold text-slate-700">Klik untuk mengganti/menambah lampiran</p>
               </div>
-              <div id="editPreviewContainer" class="hidden items-center justify-between bg-white border border-amber-200 p-2.5 rounded-xl shadow-sm w-full mt-2">
-                <div class="flex items-center gap-2.5 overflow-hidden">
-                  <div class="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center flex-shrink-0">
-                    <i class="ph-bold ph-image text-base"></i>
-                  </div>
-                  <div class="flex flex-col text-left overflow-hidden">
-                    <span id="editFileName" class="font-bold text-[11px] text-slate-700 truncate">file_revisi.jpg</span>
-                    <span id="editRatioBadge" class="text-[9px] font-extrabold text-amber-600 mt-0.5">1080px HD</span>
-                  </div>
-                </div>
-                <button type="button" onclick="event.stopPropagation(); clearUploadedFile('edit')" class="w-7 h-7 flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-md transition flex-shrink-0" title="Hapus Lampiran">
-                  <i class="ph-bold ph-x"></i>
-                </button>
-              </div>
+              <div id="editPreviewContainer" class="hidden flex-col gap-2 w-full mt-2 text-left" onclick="event.stopPropagation()"></div>
             </div>
           </div>
           <div>
@@ -677,13 +620,11 @@
           </div>
         </div>
 
-        <!-- INPUT CATATAN REVISI KHUSUS PENINJAU -->
         <div id="revisionInputContainer" class="space-y-1.5 hidden">
           <label class="block font-bold text-slate-700">Tulis Poin Catatan Revisi (Sebelum Minta Revisi):</label>
           <textarea id="revisionNotesInput" rows="2" class="w-full p-2.5 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none bg-rose-50/30" placeholder="Contoh: Typo pada kalimat pembuka, tolong gambar diperjelas..."></textarea>
         </div>
 
-        <!-- ACTION BUTTONS CONTAINER -->
         <div id="approvalActionContainer" class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2"></div>
       </div>
     </div>
@@ -753,6 +694,11 @@
     let currentRole = 'ADMIN';
     let activePostId = null;
 
+    // STATE ANTREAN MULTI-UPLOAD & FILE FISIK
+    let uploadedFilesPost = [];
+    let uploadedFilesEdit = [];
+
+    // State Kalender Dinamis
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
 
@@ -816,33 +762,49 @@
     });
 
     // 3B. FULLSCREEN LIGHTBOX CONTROLLER
-    function openImageLightbox(specificSrc = null) {
-      const src = specificSrc || document.getElementById('detailMediaImg').src;
+    function openImageLightbox(specificSrc = null, type = 'image') {
+      const modal = document.getElementById('imageLightboxModal');
+      const lbImg = document.getElementById('lightboxLargeImg');
+      const lbVid = document.getElementById('lightboxVideo');
+      const badge = document.getElementById('lightboxDimensionsBadge');
+      
+      const src = specificSrc || (document.querySelector('.detail-media-item') ? document.querySelector('.detail-media-item').src : null);
       if (!src) return;
 
-      const lbImg = document.getElementById('lightboxLargeImg');
-      if (!lbImg) return;
-      lbImg.src = src;
+      if (type === 'video') {
+        lbImg.classList.add('hidden');
+        lbImg.src = '';
+        lbVid.src = src;
+        lbVid.classList.remove('hidden');
+        if (badge) badge.textContent = 'Format Video (MP4)';
+        lbVid.play().catch(() => {});
+      } else {
+        lbVid.classList.add('hidden');
+        lbVid.pause();
+        lbVid.src = '';
+        lbImg.src = src;
+        lbImg.classList.remove('hidden');
 
-      const tempImg = new Image();
-      tempImg.onload = function() {
-        const badge = document.getElementById('lightboxDimensionsBadge');
-        if (badge) {
-          badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
-        }
-      };
-      tempImg.onerror = function() {
-        const badge = document.getElementById('lightboxDimensionsBadge');
-        if (badge) badge.textContent = 'Resolusi tidak terbaca';
-      };
-      tempImg.src = src;
+        const tempImg = new Image();
+        tempImg.onload = function() {
+          if (badge) badge.textContent = `${this.naturalWidth} x ${this.naturalHeight} px (Resolusi Asli)`;
+        };
+        tempImg.onerror = function() {
+          if (badge) badge.textContent = 'Resolusi tidak terbaca';
+        };
+        tempImg.src = src;
+      }
 
-      const modal = document.getElementById('imageLightboxModal');
       if (modal) modal.classList.remove('hidden');
     }
 
     function closeImageLightbox() {
       const modal = document.getElementById('imageLightboxModal');
+      const lbVid = document.getElementById('lightboxVideo');
+      if (lbVid) {
+        lbVid.pause();
+        lbVid.src = '';
+      }
       if (modal) modal.classList.add('hidden');
     }
 
@@ -871,36 +833,52 @@
       }
     });
 
-    // 4. INSTAGRAM NATIVE IMAGE ENGINE
+    // 4. INSTAGRAM NATIVE IMAGE ENGINE & MULTI-UPLOAD FORMDATA
     function handleDragOver(e) {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       e.currentTarget.classList.add('border-rose-400', 'bg-rose-50/30');
     }
 
     function handleDragLeave(e) {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       e.currentTarget.classList.remove('border-rose-400', 'bg-rose-50/30');
     }
 
     function handleDrop(e, target) {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       e.currentTarget.classList.remove('border-rose-400', 'bg-rose-50/30');
       const files = e.dataTransfer.files;
-      if (files && files[0]) processSelectedImage(files[0], target);
+      if (files) Array.from(files).forEach(f => processSelectedFile(f, target));
     }
 
     function handleFileSelect(e, target) {
-      const file = e.target.files[0];
-      if (file) processSelectedImage(file, target);
+      if (e.target.files) Array.from(e.target.files).forEach(f => processSelectedFile(f, target));
+      e.target.value = ''; 
     }
 
-    function processSelectedImage(file, target = 'post') {
-      if (!file.type.startsWith('image/')) {
-        showToast('Harap pilih file gambar (JPG, PNG, atau WebP).', 'warning');
+    function processSelectedFile(file, target = 'post') {
+      const targetQueue = target === 'post' ? uploadedFilesPost : uploadedFilesEdit;
+
+      if (file.type.startsWith('video/')) {
+        const mbSize = file.size / (1024 * 1024);
+        if (mbSize > 50) {
+          showToast(`Ukuran video ${file.name} melebihi 50MB.`, 'error'); return;
+        }
+        targetQueue.push({
+          url: URL.createObjectURL(file),
+          name: file.name,
+          type: 'video',
+          label: `🎥 Video MP4 (${mbSize.toFixed(1)}MB)`,
+          isBlob: true,
+          rawData: file // File Fisik
+        });
+        renderUploadList(target);
+        showToast('Video berhasil ditambahkan.', 'success');
         return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        showToast(`Format file ${file.name} tidak didukung.`, 'warning'); return;
       }
 
       showToast('Mengoptimasi gambar ke standar tajam Instagram 1080px...', 'info');
@@ -927,41 +905,28 @@
 
           canvas.toBlob((blob) => {
             if (!blob) {
-              showToast('Gagal memproses gambar.', 'error');
-              return;
+              showToast(`Gagal memproses gambar ${file.name}.`, 'error'); return;
             }
             const optimizedDataUrl = URL.createObjectURL(blob);
 
             const ratio = originalHeight / originalWidth;
             let ratioLabel = '1080px HD';
-            if (Math.abs(ratio - 1.25) < 0.08) ratioLabel = '🌟 4:5 Portrait (1080x1350)';
-            else if (Math.abs(ratio - 1.0) < 0.05) ratioLabel = '1:1 Square (1080x1080)';
-            else if (ratio > 1.6) ratioLabel = '9:16 Vertikal (Story/Reels)';
+            if (Math.abs(ratio - 1.25) < 0.08) ratioLabel = '🌟 4:5 Portrait';
+            else if (Math.abs(ratio - 1.0) < 0.05) ratioLabel = '1:1 Square';
+            else if (ratio > 1.6) ratioLabel = '📱 9:16 Vertikal';
             else ratioLabel = `${targetWidth}x${targetHeight}px`;
 
-            if (target === 'post') {
-              const oldUrl = document.getElementById('postMediaUrlInput').value;
-              if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
-
-              document.getElementById('postMediaUrlInput').value = optimizedDataUrl;
-              document.getElementById('postFileName').textContent = file.name;
-              document.getElementById('postRatioBadge').textContent = ratioLabel;
-              document.getElementById('postUploadPlaceholder').classList.add('hidden');
-              document.getElementById('postPreviewContainer').classList.remove('hidden');
-              document.getElementById('postPreviewContainer').classList.add('flex');
-            } else if (target === 'edit') {
-              const oldUrl = document.getElementById('editMediaUrlInput').value;
-              if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
-
-              document.getElementById('editMediaUrlInput').value = optimizedDataUrl;
-              document.getElementById('editFileName').textContent = file.name;
-              document.getElementById('editRatioBadge').textContent = ratioLabel;
-              document.getElementById('editUploadPlaceholder').classList.add('hidden');
-              document.getElementById('editPreviewContainer').classList.remove('hidden');
-              document.getElementById('editPreviewContainer').classList.add('flex');
-            }
-
-            showToast('Gambar berhasil dioptimasi ke 1080px.', 'success');
+            targetQueue.push({
+              url: optimizedDataUrl,
+              name: file.name,
+              type: 'image',
+              label: ratioLabel,
+              isBlob: true,
+              rawData: blob // Blob Fisik untuk Form Data
+            });
+            
+            renderUploadList(target);
+            showToast('Gambar berhasil dioptimasi.', 'success');
           }, 'image/jpeg', 0.90);
         };
         img.src = evt.target.result;
@@ -969,26 +934,68 @@
       reader.readAsDataURL(file);
     }
 
-    function clearUploadedFile(target) {
-      if (target === 'post') {
-        document.getElementById('postFileInput').value = '';
-        const oldUrl = document.getElementById('postMediaUrlInput').value;
-        if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
-        document.getElementById('postMediaUrlInput').value = '';
-        
-        document.getElementById('postUploadPlaceholder').classList.remove('hidden');
-        document.getElementById('postPreviewContainer').classList.add('hidden');
-        document.getElementById('postPreviewContainer').classList.remove('flex');
-      } else if (target === 'edit') {
-        document.getElementById('editFileInput').value = '';
-        const oldUrl = document.getElementById('editMediaUrlInput').value;
-        if (oldUrl.startsWith('blob:')) URL.revokeObjectURL(oldUrl);
-        document.getElementById('editMediaUrlInput').value = '';
-        
-        document.getElementById('editUploadPlaceholder').classList.remove('hidden');
-        document.getElementById('editPreviewContainer').classList.add('hidden');
-        document.getElementById('editPreviewContainer').classList.remove('flex');
+    function renderUploadList(target) {
+      const queue = target === 'post' ? uploadedFilesPost : uploadedFilesEdit;
+      const container = document.getElementById(`${target}PreviewContainer`);
+      const placeholder = document.getElementById(`${target}UploadPlaceholder`);
+      
+      container.innerHTML = '';
+
+      if (queue.length === 0) {
+        container.classList.add('hidden');
+        container.classList.remove('flex');
+        placeholder.classList.remove('hidden');
+        return;
       }
+
+      placeholder.classList.add('hidden');
+      container.classList.remove('hidden');
+      container.classList.add('flex');
+
+      queue.forEach((fileObj, index) => {
+        const isVid = fileObj.type === 'video';
+        const iconColor = isVid ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100';
+        const iconName = isVid ? 'ph-video-camera' : 'ph-image';
+        
+        container.innerHTML += `
+          <div class="flex items-center justify-between bg-white border border-slate-200 p-2.5 rounded-xl shadow-sm w-full hover:border-slate-300 transition">
+            <div class="flex items-center gap-3 overflow-hidden">
+              <div class="w-10 h-10 rounded-lg border ${iconColor} flex items-center justify-center flex-shrink-0">
+                <i class="ph-bold ${iconName} text-xl"></i>
+              </div>
+              <div class="flex flex-col text-left overflow-hidden">
+                <span class="font-bold text-xs text-slate-700 truncate max-w-[200px]" title="${fileObj.name}">${fileObj.name}</span>
+                <span class="text-[9px] font-extrabold ${isVid ? 'text-rose-600' : 'text-emerald-600'} mt-0.5">${fileObj.label}</span>
+              </div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); removeUploadedFile('${target}', ${index})" class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition flex-shrink-0 shadow-sm" title="Hapus Lampiran">
+              <i class="ph-bold ph-x"></i>
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    function removeUploadedFile(target, index) {
+      const queue = target === 'post' ? uploadedFilesPost : uploadedFilesEdit;
+      const item = queue[index];
+      if (item && item.isBlob) URL.revokeObjectURL(item.url);
+      queue.splice(index, 1);
+      renderUploadList(target);
+    }
+
+    function clearUploadedFile(target) {
+      const queue = target === 'post' ? uploadedFilesPost : uploadedFilesEdit;
+      queue.forEach(item => {
+        if (item.isBlob) URL.revokeObjectURL(item.url);
+      });
+      if (target === 'post') uploadedFilesPost = [];
+      else uploadedFilesEdit = [];
+      
+      const inputMedia = document.getElementById(`${target}FileInput`);
+      if (inputMedia) inputMedia.value = '';
+      
+      renderUploadList(target);
     }
 
     function updateIgFormatHelperBadge(format, target) {
@@ -1023,17 +1030,17 @@
           body: JSON.stringify({ email, password })
         });
         
-        // PENGAMAN JSON SERVER CRASH DARI VERCEL
+        // Anti-crash jika API timeout
         const responseText = await res.text();
         let result;
         try {
           result = JSON.parse(responseText);
         } catch (jsonErr) {
-          throw new Error(`Server API merespons dengan format tidak valid: ${responseText.substring(0, 50)}...`);
+          throw new Error(`Server API merespons error (Timeout): ${responseText.substring(0, 50)}...`);
         }
         
         if (!res.ok || !result.user) {
-          throw new Error(result.error || 'Autentikasi API ditolak. Kredensial tidak cocok atau server offline.');
+          throw new Error(result.error || 'Autentikasi ditolak.');
         }
 
         currentUser = result.user;
@@ -1091,7 +1098,7 @@
           body: JSON.stringify(payload)
         });
 
-        if (!res.ok) throw new Error('Gagal menghubungi server untuk mengganti password.');
+        if (!res.ok) throw new Error('Gagal menghubungi server.');
         
         showToast('Password Anda berhasil diperbarui.', 'success');
         closeChangePasswordModal();
@@ -1123,7 +1130,7 @@
       localStorage.removeItem('postflow_session_token');
       currentUser = null;
       document.getElementById('loginScreen').classList.remove('hidden');
-      showToast('Sesi kerja Anda telah berhasil diakhiri.', 'info');
+      showToast('Sesi kerja Anda telah diakhiri.', 'info');
     }
 
     function checkExistingSession() {
@@ -1367,7 +1374,7 @@
       document.getElementById('userModal').classList.remove('hidden');
     }
 
-    // 8. POSTINGAN WORKFLOW KE SUPABASE
+    // 8. POSTINGAN WORKFLOW KE SUPABASE DENGAN FORMDATA FISIK
     async function fetchPostsFromApi() {
       const statusBadge = document.getElementById('dbStatusBadge');
       try {
@@ -1396,46 +1403,49 @@
 
     async function handleCreatePost(e) {
       e.preventDefault();
-      const mediaUrl = document.getElementById('postMediaUrlInput').value.trim();
-      if (!mediaUrl) {
-        showToast('Silakan pilih dan unggah foto materi terlebih dahulu.', 'warning');
+      
+      if (uploadedFilesPost.length === 0) {
+        showToast('Silakan pilih dan unggah minimal 1 foto/video materi.', 'warning');
         return;
       }
 
-      const activeUser = currentUser || { name: 'Admin', id: '1' };
-      const newPost = {
-        id: 'POST-' + Date.now(),
-        brand_id: 'BRD-01',
-        title: document.getElementById('postTitleInput').value.trim(),
-        type: document.getElementById('postTypeInput').value,
-        scheduled_at: document.getElementById('postDateInput').value || null,
-        media_url: mediaUrl,
-        caption: document.getElementById('postCaptionInput').value.trim(),
-        status: 'draft',
-        author: activeUser.name,
-        author_id: activeUser.id,
-        role: currentRole,
-        revision_notes: '',
-        platform: 'instagram'
-      };
+      const btn = document.querySelector('#newPostForm button[type="submit"]');
+      const origBtnText = btn.innerHTML;
+      btn.disabled = true; btn.innerHTML = 'Mengunggah...';
 
-      posts.unshift(newPost);
-      renderKanban();
-      renderCalendar();
-      renderFeedPreview();
-      closePostModal();
-      document.getElementById('newPostForm').reset();
-      clearUploadedFile('post');
-      showToast('Draf postingan berhasil dibuat dan disimpan.', 'success');
+      const activeUser = currentUser || { name: 'Admin', id: '1' };
+      
+      const formData = new FormData();
+      formData.append('id', 'POST-' + Date.now());
+      formData.append('brand_id', 'BRD-01');
+      formData.append('title', document.getElementById('postTitleInput').value.trim());
+      formData.append('type', document.getElementById('postTypeInput').value);
+      if (document.getElementById('postDateInput').value) formData.append('scheduled_at', document.getElementById('postDateInput').value);
+      formData.append('caption', document.getElementById('postCaptionInput').value.trim());
+      formData.append('status', 'draft');
+      formData.append('author', activeUser.name);
+      formData.append('author_id', activeUser.id);
+      formData.append('role', currentRole);
+      formData.append('platform', 'instagram');
+
+      uploadedFilesPost.forEach((f) => {
+        formData.append('media_files', f.rawData, f.name);
+      });
 
       try {
-        await fetch('/api/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newPost)
-        });
+        const res = await fetch('/api/posts', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Gagal menghubungi server.');
+        
+        showToast('Draf postingan berhasil dibuat dan disimpan.', 'success');
+        fetchPostsFromApi();
+        closePostModal();
+        document.getElementById('newPostForm').reset();
+        clearUploadedFile('post');
       } catch (err) {
         console.error('Koneksi server POST gagal:', err);
+        showToast('Terjadi kesalahan saat mengunggah (Pastikan API posts.js sudah pakai Multer).', 'error');
+      } finally {
+        btn.disabled = false; btn.innerHTML = origBtnText;
       }
     }
 
@@ -1492,13 +1502,11 @@
               body: JSON.stringify({ postId: postId, role: currentRole })
             });
 
-            // PENGAMAN JSON SERVER CRASH DARI VERCEL
             const responseText = await res.text();
             let result;
             try {
               result = JSON.parse(responseText);
             } catch (jsonErr) {
-              // Jika Vercel Crash atau Timeout, ia membalas dengan teks HTML biasa (seperti "A server error occurred")
               throw new Error(`Server Vercel Crash / Timeout: ${responseText.substring(0, 80)}... Cek Logs Vercel Anda.`);
             }
 
@@ -1520,8 +1528,23 @@
             }
           } catch (err) {
             console.error('Gagal publish live:', err);
-            // Menampilkan toast dengan error asli dari Vercel
-            showToast(err.message, 'error');
+            // FAILSAFE LOKAL JIKA VERCEL CRASH
+            if (err.message.includes('Vercel') || err.message.includes('Timeout') || err.message.includes('FUNCTION_INVOCATION_FAILED')) {
+              openConfirmModal({
+                title: 'Server Vercel Timeout ⚠️',
+                desc: 'Backend gagal merespons tepat waktu (Batas 10 detik Vercel Gratis). Ingin memaksa status menjadi "Published" (Simulasi Lokal)?',
+                btnText: 'Ya, Paksa Publish Lokal',
+                btnColor: 'bg-amber-600 hover:bg-amber-700',
+                onConfirm: () => {
+                  post.status = 'published';
+                  post.published_at = new Date().toISOString();
+                  renderKanban(); renderCalendar(); renderFeedPreview(); closeDetailModal();
+                  showToast('Mode Simulasi: Konten ditandai sebagai Published.', 'success');
+                }
+              });
+            } else {
+              showToast(err.message, 'error');
+            }
           }
         }
       });
@@ -1538,7 +1561,6 @@
 
     async function handleResubmitRevision(postId) {
       const updatedTitle = document.getElementById('editTitleInput').value.trim();
-      const updatedMedia = document.getElementById('editMediaUrlInput').value.trim();
       const updatedCaption = document.getElementById('editCaptionInput').value.trim();
 
       if (!updatedCaption) {
@@ -1546,35 +1568,30 @@
         return;
       }
 
-      const p = posts.find(item => item.id === postId);
-      if (p) {
-        p.title = updatedTitle || p.title;
-        if (updatedMedia) p.media_url = updatedMedia;
-        p.caption = updatedCaption;
-        p.status = 'review';
+      const formData = new FormData();
+      formData.append('id', postId);
+      formData.append('status', 'review');
+      formData.append('role', currentRole);
+      if (updatedTitle) formData.append('title', updatedTitle);
+      formData.append('caption', updatedCaption);
 
-        renderKanban();
-        renderCalendar();
-        renderFeedPreview();
-        closeDetailModal();
+      if (uploadedFilesEdit.length > 0) {
+        uploadedFilesEdit.forEach(f => {
+           formData.append('media_files', f.rawData, f.name);
+        });
+      }
+
+      showToast('Mengirim hasil revisi ke server...', 'info');
+
+      try {
+        const res = await fetch('/api/posts', { method: 'PUT', body: formData });
+        if(!res.ok) throw new Error("Gagal");
         showToast('Hasil revisi berhasil dikirim ulang ke reviewer.', 'success');
-
-        try {
-          await fetch('/api/posts', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: postId,
-              status: 'review',
-              role: currentRole,
-              title: p.title,
-              media_url: p.media_url,
-              caption: updatedCaption
-            })
-          });
-        } catch (err) {
-          console.error('Gagal memperbarui revisi di server:', err);
-        }
+        fetchPostsFromApi();
+        closeDetailModal();
+      } catch (err) {
+        console.error('Gagal memperbarui revisi di server:', err);
+        showToast('Gagal terhubung ke server', 'error');
       }
     }
 
@@ -1658,13 +1675,24 @@
           card = document.createElement('div');
           card.id = `card-${post.id}`;
           card.dataset.id = post.id;
-          card.className = 'post-card bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-sm hover:shadow-md transition cursor-pointer space-y-2.5 group';
+          card.className = 'post-card bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-sm hover:shadow-md transition cursor-pointer space-y-2.5 group relative';
           card.onclick = () => openDetailModal(post.id);
         }
 
+        let mediaList = post.media_urls || [];
+        if (mediaList.length === 0 && post.media_url) mediaList = [{ url: post.media_url, type: post.type === 'REELS' ? 'video' : 'image' }];
+        
+        const isVideo = mediaList[0] && mediaList[0].type === 'video';
+        const hasMultiple = mediaList.length > 1;
+        const srcToUse = isVideo ? 'https://placehold.co/150x150/1e293b/white?text=VIDEO' : (mediaList[0] ? mediaList[0].url : 'https://placehold.co/150');
+
         card.innerHTML = `
+          ${hasMultiple ? '<div class="absolute -top-1.5 -left-1.5 z-10 bg-slate-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1"><i class="ph-fill ph-copy"></i> ' + mediaList.length + '</div>' : ''}
           <div class="flex gap-3">
-            <img src="${post.media_url}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" class="w-14 h-14 rounded-xl object-cover bg-slate-100 flex-shrink-0 shadow-2xs group-hover:scale-105 transition" />
+            <div class="relative w-14 h-14 rounded-xl flex-shrink-0">
+              ${isVideo ? '<div class="absolute inset-0 m-auto w-6 h-6 bg-rose-600 rounded-full flex items-center justify-center text-white shadow-sm z-10"><i class="ph-fill ph-play text-xs"></i></div>' : ''}
+              <img src="${srcToUse}" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'" class="w-full h-full object-cover rounded-xl bg-slate-100 shadow-2xs group-hover:scale-105 transition" />
+            </div>
             <div class="overflow-hidden flex-1">
               <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 uppercase tracking-wider">${post.type || 'FEED'}</span>
               <h4 class="font-bold text-xs text-slate-900 truncate mt-1">${post.title}</h4>
@@ -1701,9 +1729,38 @@
       if (!post) return;
 
       document.getElementById('detailModalTitle').textContent = post.title;
-      document.getElementById('detailMediaImg').src = post.media_url;
       document.getElementById('detailCaption').textContent = post.caption || '(Tidak ada caption)';
       document.getElementById('detailAuthorText').textContent = `Dibuat oleh: ${post.author || 'Creator'}`;
+
+      const gallery = document.getElementById('detailMediaGallery');
+      gallery.innerHTML = '';
+      
+      let mediaList = post.media_urls || [];
+      if (mediaList.length === 0 && post.media_url) mediaList = [{ url: post.media_url, type: post.type === 'REELS' ? 'video' : 'image' }];
+      
+      mediaList.forEach(m => {
+        const wrap = document.createElement('div');
+        wrap.className = 'relative group/thumb cursor-pointer flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm';
+        wrap.onclick = () => openImageLightbox(m.url, m.type);
+        
+        if (m.type === 'video') {
+          wrap.innerHTML = `
+            <video src="${m.url}" class="w-full h-full object-cover detail-media-item"></video>
+            <div class="absolute inset-0 bg-slate-950/40 flex flex-col items-center justify-center text-white gap-1 group-hover/thumb:bg-slate-950/60 transition">
+              <i class="ph-fill ph-play-circle text-3xl drop-shadow-md"></i>
+            </div>
+            <div class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md bg-black/60 text-white text-[9px] font-bold flex items-center gap-0.5"><i class="ph-bold ph-video-camera"></i></div>
+          `;
+        } else {
+          wrap.innerHTML = `
+            <img src="${m.url}" onerror="this.src='https://placehold.co/600x600/f1f5f9/94a3b8?text=Foto'" class="w-full h-full object-cover detail-media-item group-hover/thumb:scale-105 transition" />
+            <div class="absolute inset-0 bg-slate-950/45 opacity-0 group-hover/thumb:opacity-100 transition duration-150 flex flex-col items-center justify-center text-white gap-1">
+              <i class="ph-bold ph-magnifying-glass-plus text-2xl drop-shadow-md"></i>
+            </div>
+          `;
+        }
+        gallery.appendChild(wrap);
+      });
 
       const badge = document.getElementById('detailStatusBadge');
       badge.textContent = post.status.toUpperCase();
@@ -1733,7 +1790,6 @@
       actions.innerHTML = '';
 
       const canAdminDelete = (currentRole === 'ADMIN');
-
       let actionButtonsRightHtml = '';
 
       if (post.status === 'draft') {
@@ -1965,14 +2021,23 @@
         wrapper.className = 'relative group cursor-pointer aspect-square bg-slate-200 overflow-hidden';
         wrapper.onclick = () => openDetailModal(p.id);
 
+        let mediaList = p.media_urls || [];
+        if (mediaList.length === 0 && p.media_url) mediaList = [{ url: p.media_url, type: p.type === 'REELS' ? 'video' : 'image' }];
+        
+        const isVideo = mediaList[0] && mediaList[0].type === 'video';
+        const hasMultiple = mediaList.length > 1;
+        const srcToUse = isVideo ? 'https://placehold.co/300x300/1e293b/white?text=VIDEO' : (mediaList[0] ? mediaList[0].url : 'https://placehold.co/150');
+
         const img = document.createElement('img');
-        img.src = p.media_url;
+        img.src = srcToUse;
         img.onerror = () => { img.src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150'; };
         img.className = 'w-full h-full object-cover group-hover:scale-105 transition duration-200';
 
         let badgeOverlay = '';
-        if (p.type === 'REELS') {
+        if (isVideo || p.type === 'REELS') {
           badgeOverlay = '<div class="absolute top-1.5 right-1.5 text-white text-xs drop-shadow-md"><i class="ph-fill ph-video-camera"></i></div>';
+        } else if (hasMultiple) {
+          badgeOverlay = '<div class="absolute top-1.5 right-1.5 text-white text-xs drop-shadow-md"><i class="ph-fill ph-copy"></i></div>';
         }
 
         wrapper.appendChild(img);
