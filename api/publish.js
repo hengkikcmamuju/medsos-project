@@ -74,12 +74,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // 5. Persiapan URL Gambar Publik (Syarat Mutlak Meta Graph API)
+    // 5. Persiapan URL Gambar/Video Publik (Syarat Mutlak Meta Graph API)
     let publicImageUrl = post.media_url;
 
     // Jika gambar diunggah secara lokal (berupa data Base64 data:image/...),
     // otomatis kita simpan ke Supabase Storage agar mendapatkan URL HTTPS publik!
-    if (publicImageUrl.startsWith('data:image/')) {
+    if (publicImageUrl && publicImageUrl.startsWith('data:image/')) {
       try {
         const matches = publicImageUrl.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
         if (matches) {
@@ -148,12 +148,26 @@ export default async function handler(req, res) {
     }
 
     // 7. REAL LIVE PUBLISHING: PROSES 2-LANGKAH RESMI META GRAPH API
-    // LANGKAH 1: Buat Media Container di Server Instagram
-    const containerParams = new URLSearchParams({
-      image_url: publicImageUrl,
+    
+    // --- FITUR BARU: AUTO-FORMATTER MEDIA TYPE ---
+    // Deteksi cerdas apakah URL yang akan di-publish adalah Video atau Gambar
+    const isVideo = post.type === 'REELS' || post.type === 'VIDEO' || (publicImageUrl && publicImageUrl.toLowerCase().includes('.mp4'));
+
+    const paramsObj = {
       caption: post.caption || post.title || '',
       access_token: metaAccessToken
-    });
+    };
+
+    // Sesuaikan parameter berdasarkan aturan ketat Meta Graph API
+    if (isVideo) {
+      paramsObj.media_type = 'VIDEO';
+      paramsObj.video_url = publicImageUrl;
+    } else {
+      paramsObj.image_url = publicImageUrl;
+    }
+
+    // LANGKAH 1: Buat Media Container di Server Instagram
+    const containerParams = new URLSearchParams(paramsObj);
 
     const createContainerRes = await fetch(`${GRAPH_BASE_URL}/${igAccountId}/media`, {
       method: 'POST',
@@ -171,7 +185,7 @@ export default async function handler(req, res) {
 
     const creationId = containerData.id;
 
-    // Tunggu 3 detik agar server Meta selesai memproses dan mengunduh gambar
+    // Tunggu 3 detik agar server Meta selesai memproses dan mengunduh file
     await new Promise(resolve => setTimeout(resolve, 3000));
 
     // LANGKAH 2: Publikasikan Media Container ke Feed Instagram
@@ -243,3 +257,6 @@ export default async function handler(req, res) {
     });
   }
 }
+```eof
+
+Setelah Anda menyimpan dan *commit* file ini di GitHub, Vercel akan otomatis melakukan penyegaran (*redeploy*). Kini, saat Anda menekan tombol setujui/publish pada sebuah video MP4 dari PostFlow, *error Container* tersebut sudah tidak akan muncul lagi!
