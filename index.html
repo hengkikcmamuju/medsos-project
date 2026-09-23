@@ -659,32 +659,32 @@
   </div>
 
   <!-- MODAL: SETTING INTEGRASI API -->
-  <div id="apiModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-        <h3 class="font-bold text-sm text-slate-900">Integrasi Token Meta API</h3>
-        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
-      </div>
-      <div class="p-6 space-y-3 text-xs">
-        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800">
-          <i class="ph-bold ph-check-circle text-base"></i>
-          <span>Database Supabase PostgreSQL Terkoneksi (Live).</span>
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Instagram Business Account ID</label>
-          <input type="text" id="settingIgId" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="17841400000000000" />
-        </div>
-        <div>
-          <label class="block font-semibold text-slate-700 mb-1">Meta Graph User Access Token</label>
-          <input type="password" id="settingMetaToken" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" value="EAAXxFakeTokenSimulated..." />
-        </div>
-        <div class="pt-2 flex justify-end gap-2">
-          <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Tutup</button>
-          <button onclick="saveApiSettings()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">Simpan Pengaturan</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <div id="apiModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-sm text-slate-900">Integrasi Token Meta API</h3>
+        <button onclick="closeApiModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-lg"></i></button>
+      </div>
+      <div class="p-6 space-y-3 text-xs">
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2 text-emerald-800">
+          <i class="ph-bold ph-check-circle text-base"></i>
+          <span>Database Supabase PostgreSQL Terkoneksi (Live).</span>
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Instagram Business Account ID</label>
+          <input type="text" id="settingIgId" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" placeholder="Contoh: 178414..." />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Meta Graph User Access Token</label>
+          <input type="password" id="settingMetaToken" class="w-full p-2.5 border border-slate-200 rounded-xl outline-none" placeholder="EAAXx..." />
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button onclick="closeApiModal()" class="px-4 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50">Tutup</button>
+          <button onclick="saveApiSettings()" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold">Simpan Pengaturan</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- JAVASCRIPT LOGIC ENGINE -->
   <script>
@@ -1470,86 +1470,147 @@
           if (revisionNotes !== null) payload.revision_notes = revisionNotes;
 
           await fetch('/api/posts', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } catch (err) {
-          console.error('Gagal update status di server:', err);
-        }
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (err) {
+          console.error('Gagal update status di server:', err);
+        }
+      }
+    }
+
+    async function handleApproveAndPublishLive(postId) {
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      const apiSettings = JSON.parse(localStorage.getItem('postflow_api_settings') || '{}');
+      if (!apiSettings.igId || !apiSettings.metaToken) {
+        showToast('Kunci Instagram ID dan Meta Token belum diisi. Silakan isi di menu Integrasi API.', 'error');
+        openApiSettingsModal();
+        return;
       }
-    }
 
-    async function handleApproveAndPublishLive(postId) {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
+      openConfirmModal({
+        title: 'Publikasikan ke Instagram Live',
+        desc: `Apakah Anda yakin ingin menyetujui dan menerbitkan konten "${post.title}" langsung ke akun Instagram resmi?`,
+        btnText: 'Ya, Terbitkan Sekarang',
+        btnColor: 'bg-emerald-600 hover:bg-emerald-700',
+        onConfirm: async () => {
+          showToast('📡 Menghubungi Meta Graph API langsung dari Browser...', 'info');
 
-      openConfirmModal({
-        title: 'Publikasikan ke Instagram Live',
-        desc: `Apakah Anda yakin ingin menyetujui dan menerbitkan konten "${post.title}" langsung ke akun Instagram resmi?`,
-        btnText: 'Ya, Terbitkan Sekarang',
-        btnColor: 'bg-emerald-600 hover:bg-emerald-700',
-        onConfirm: async () => {
-          showToast('📡 Menghubungi Meta Graph API & Instagram Server...', 'info');
+          try {
+            // 1. Tentukan URL Publik Media
+            let mediaList = post.media_urls || [];
+            if (mediaList.length === 0 && post.media_url) mediaList = [{ url: post.media_url, type: post.type === 'REELS' ? 'video' : 'image' }];
+            
+            const mediaUrl = mediaList[0].url;
+            const isVideo = mediaList[0].type === 'video' || post.type === 'REELS';
 
-          try {
-            const res = await fetch('/api/publish', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-user-role': currentRole
-              },
-              body: JSON.stringify({ postId: postId, role: currentRole })
+            const GRAPH_BASE_URL = 'https://graph.facebook.com/v19.0';
+            
+            // TAHAP 1: Buat Container di Instagram Server
+            const containerParams = new URLSearchParams({
+              caption: post.caption || post.title || '',
+              access_token: apiSettings.metaToken
             });
 
-            const responseText = await res.text();
-            let result;
+            if (isVideo) {
+              containerParams.append('media_type', 'VIDEO');
+              containerParams.append('video_url', mediaUrl);
+            } else {
+              containerParams.append('image_url', mediaUrl);
+            }
+
+            const createContainerRes = await fetch(`${GRAPH_BASE_URL}/${apiSettings.igId}/media`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: containerParams
+            });
+
+            const containerData = await createContainerRes.json();
+
+            if (containerData.error) {
+              throw new Error(`Meta API Container Error: ${containerData.error.message}`);
+            }
+
+            const creationId = containerData.id;
+
+            // TAHAP 2: Jeda untuk menunggu Meta memproses (Aman dilakukan di browser)
+            if (isVideo) {
+              showToast('⏳ Instagram sedang memproses video... Mohon tunggu 15 detik. Jangan tutup halaman ini.', 'warning');
+              await new Promise(resolve => setTimeout(resolve, 15000));
+            } else {
+              await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+
+            // TAHAP 3: Publish Container ke Feed Instagram
+            showToast('🚀 Menerbitkan postingan ke publik...', 'info');
+            const publishParams = new URLSearchParams({
+              creation_id: creationId,
+              access_token: apiSettings.metaToken
+            });
+
+            const publishRes = await fetch(`${GRAPH_BASE_URL}/${apiSettings.igId}/media_publish`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: publishParams
+            });
+
+            const publishResult = await publishRes.json();
+
+            if (publishResult.error) {
+              throw new Error(`Meta API Publishing Error: ${publishResult.error.message}`);
+            }
+
+            const liveMediaId = publishResult.id;
+
+            // TAHAP 4: Ambil Permalink
+            let postPermalink = `https://www.instagram.com/`;
             try {
-              result = JSON.parse(responseText);
-            } catch (jsonErr) {
-              throw new Error(`Server Vercel Crash / Timeout: ${responseText.substring(0, 80)}... Cek Logs Vercel Anda.`);
+              const mediaInfoRes = await fetch(`${GRAPH_BASE_URL}/${liveMediaId}?fields=permalink&access_token=${apiSettings.metaToken}`);
+              const mediaInfo = await mediaInfoRes.json();
+              if (mediaInfo && mediaInfo.permalink) {
+                postPermalink = mediaInfo.permalink;
+              }
+            } catch (e) {
+              console.warn('Gagal mengambil permalink:', e.message);
             }
 
-            if (!res.ok) throw new Error(result.error || 'Gagal menerbitkan postingan ke Instagram.');
+            const finalPublishData = {
+              mode: 'REAL_LIVE_FROM_BROWSER',
+              publish_id: liveMediaId,
+              creation_id: creationId,
+              platform: 'instagram',
+              permalink: postPermalink,
+              published_at: new Date().toISOString()
+            };
 
-            post.status = 'published';
-            post.published_at = new Date().toISOString();
-            if (result.publishData) post.api_publish_data = result.publishData;
+            // TAHAP 5: Update Vercel Database bahwa konten tayang
+            await fetch('/api/posts', { 
+              method: 'PUT', 
+              headers: { 'Content-Type': 'application/json', 'x-user-role': currentRole }, 
+              body: JSON.stringify({ id: postId, status: 'published', api_publish_data: finalPublishData }) 
+            });
 
-            renderKanban();
-            renderCalendar();
-            renderFeedPreview();
-            closeDetailModal();
+            post.status = 'published';
+            post.published_at = finalPublishData.published_at;
+            post.api_publish_data = finalPublishData;
 
-            if (result.publishData && result.publishData.permalink) {
-              showToast(`🎉 Berhasil! Konten LIVE di Instagram: ${result.publishData.permalink}`, 'success');
-            } else {
-              showToast(result.message || 'Postingan berhasil diterbitkan!', 'success');
-            }
-          } catch (err) {
-            console.error('Gagal publish live:', err);
-            // FAILSAFE LOKAL JIKA VERCEL CRASH
-            if (err.message.includes('Vercel') || err.message.includes('Timeout') || err.message.includes('FUNCTION_INVOCATION_FAILED')) {
-              openConfirmModal({
-                title: 'Server Vercel Timeout ⚠️',
-                desc: 'Backend gagal merespons tepat waktu (Batas 10 detik Vercel Gratis). Ingin memaksa status menjadi "Published" (Simulasi Lokal)?',
-                btnText: 'Ya, Paksa Publish Lokal',
-                btnColor: 'bg-amber-600 hover:bg-amber-700',
-                onConfirm: () => {
-                  post.status = 'published';
-                  post.published_at = new Date().toISOString();
-                  renderKanban(); renderCalendar(); renderFeedPreview(); closeDetailModal();
-                  showToast('Mode Simulasi: Konten ditandai sebagai Published.', 'success');
-                }
-              });
-            } else {
-              showToast(err.message, 'error');
-            }
-          }
-        }
-      });
-    }
+            renderKanban();
+            renderCalendar();
+            renderFeedPreview();
+            closeDetailModal();
 
+            showToast(`🎉 Berhasil! Konten TAYANG LIVE di Instagram!`, 'success');
+
+          } catch (err) {
+            console.error('Gagal publish live:', err);
+            showToast(err.message, 'error');
+          }
+        }
+      });
+    }
     function handleRequestRevision(postId) {
       const notes = document.getElementById('revisionNotesInput').value.trim();
       if (!notes) {
@@ -2047,13 +2108,22 @@
     }
 
     // 15. PERSISTENSI SETTING BRAND
-    function loadBrandSettings() {
-      const saved = localStorage.getItem('postflow_brand_settings');
-      if (saved) {
-        try { currentBrand = JSON.parse(saved); } catch (e) {}
+     function loadBrandSettings() {
+      const saved = localStorage.getItem('postflow_brand_settings');
+      if (saved) {
+        try { currentBrand = JSON.parse(saved); } catch (e) {}
+      }
+      applyBrandToUI();
+
+      const apiSettings = localStorage.getItem('postflow_api_settings');
+      if (apiSettings) {
+        try {
+          const parsedApi = JSON.parse(apiSettings);
+          if (parsedApi.igId) document.getElementById('settingIgId').value = parsedApi.igId;
+          if (parsedApi.metaToken) document.getElementById('settingMetaToken').value = parsedApi.metaToken;
+        } catch(e) {}
       }
-      applyBrandToUI();
-    }
+    }
 
     function saveBrandSettings() {
       currentBrand.handle = document.getElementById('settingBrandHandle').value.trim();
@@ -2067,15 +2137,19 @@
     }
 
     function applyBrandToUI() {
-      document.getElementById('currentBrandHandle').textContent = currentBrand.handle;
-      document.getElementById('previewBrandName').textContent = currentBrand.name;
-      document.getElementById('previewBrandBio').textContent = currentBrand.bio;
-    }
+      document.getElementById('currentBrandHandle').textContent = currentBrand.handle;
+      document.getElementById('previewBrandName').textContent = currentBrand.name;
+      document.getElementById('previewBrandBio').textContent = currentBrand.bio;
+    }
 
-    function saveApiSettings() {
-      closeApiModal();
-      showToast('Pengaturan token integrasi API tersimpan di sesi.', 'success');
-    }
+    function saveApiSettings() {
+      const igId = document.getElementById('settingIgId').value.trim();
+      const metaToken = document.getElementById('settingMetaToken').value.trim();
+      
+      localStorage.setItem('postflow_api_settings', JSON.stringify({ igId, metaToken }));
+      closeApiModal();
+      showToast('Pengaturan token integrasi API tersimpan di sesi lokal browser.', 'success');
+    }
 
     // 16. AI STUDIO COPYWRITING
     function generateAiDraft() {
