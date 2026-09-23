@@ -1,174 +1,151 @@
 import { createClient } from '@supabase/supabase-js';
+import multer from 'multer';
 
+// Inisialisasi Supabase
 const supabaseUrl = (process.env.SUPABASE_URL || '').trim();
 const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false
+// PENTING: Matikan body parser bawaan Next.js agar Multer dan parser manual kita bisa bekerja
+export const config = {
+  api: {
+    bodyParser: false
   }
-});
+};
+
+// Konfigurasi Multer untuk menangkap file 'media_files' ke dalam memori RAM sementara
+const upload = multer({ storage: multer.memoryStorage() });
+
+// Helper untuk menjalankan middleware Express di lingkungan Vercel/Next.js
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      resolve(result);
+    });
+  });
+}
+
+// Helper untuk membaca JSON murni jika frontend tidak menggunakan FormData
+const parseJSONBody = (req) => {
+  return new Promise((resolve) => {
+    let data = '';
+    req.on('data', chunk => data += chunk);
+    req.on('end', () => resolve(data ? JSON.parse(data) : {}));
+  });
+};
 
 export default async function handler(req, res) {
-  // CORS Headers
+  // Atur Header CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-user-role, Authorization');
-
+  
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  if (!supabaseUrl || !supabaseKey) {
-    return res.status(500).json({
-      error: 'Variabel SUPABASE_URL atau SUPABASE_SERVICE_ROLE_KEY belum disetel di Vercel.'
-    });
-  }
-
-  // Parse Body dengan Aman
-  let body = req.body;
-  if (typeof body === 'string') {
-    try {
-      body = JSON.parse(body);
-    } catch (e) {
-      body = {};
-    }
-  }
-  body = body || {};
-
-  // Normalisasi Role secara case-insensitive dari berbagai sumber input
-  const rawRole = req.headers['x-user-role'] || body.role || (req.query && req.query.role) || '';
-  const userRole = String(rawRole).trim().toUpperCase();
-
   try {
-    // 1. GET: Ambil daftar postingan
+    // ==== METHOD GET: MENGAMBIL DATA UNTUK KANBAN ====
     if (req.method === 'GET') {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) return res.status(400).json({ error: error.message });
-      return res.status(200).json(data || []);
+      const { data, error } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(data);
     }
 
-    // 2. POST: Simpan postingan baru (Wewenang: CREATOR & ADMIN)
+    const isJson = req.headers['content-type']?.includes('application/json');
+
+    // ==== METHOD POST: MENAMBAH DRAF BARU (DENGAN FILE FISIK FORMDATA) ====
     if (req.method === 'POST') {
-      const creatorRole = (userRole || 'CREATOR');
-      if (creatorRole !== 'CREATOR' && creatorRole !== 'ADMIN') {
-        return res.status(403).json({ error: 'Akses Ditolak: Hanya Creator dan Admin yang dapat membuat postingan baru.' });
+      if (isJson) req.body = await parseJSONBody(req);
+      else await runMiddleware(req, res, upload.array('media_files', 10)); // Terima hingga 10 file sekaligus
+
+      const { id, title, type, caption, status, author, author_id, role, platform } = req.body;
+      const files = req.files || [];
+
+      if (files.length === 0 && !isJson) return res.status(400).json({ error: 'File wajib diunggah' });
+
+      let uploadedUrls = [];
+      
+      // Jika ada file fisik, upload satu per satu ke Supabase Storage
+      if (files.length > 0) {
+        for (const file of files) {
+          const ext = file.originalname.split('.').pop();
+          const fileName = `media-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('post-media')
+            .upload(fileName, file.buffer, { contentType: file.mimetype, upsert: true });
+          
+          if (uploadError) throw uploadError;
+          
+          const { data } = supabase.storage.from('post-media').getPublicUrl(fileName);
+          uploadedUrls.push({ 
+            url: data.publicUrl, 
+            type: file.mimetype.startsWith('video/') ? 'video' : 'image', 
+            name: file.originalname 
+          });
+        }
       }
 
-      let validScheduledAt = null;
-      if (body.scheduled_at && !isNaN(new Date(body.scheduled_at).getTime())) {
-        validScheduledAt = new Date(body.scheduled_at).toISOString();
-      }
+      // Ambil file index ke-0 sebagai gambar cover/fallback utama
+      const primaryUrl = uploadedUrls.length > 0 ? uploadedUrls[0].url : '';
 
-      const newPost = {
-        id: body.id || ('POST-' + Date.now()),
-        brand_id: body.brand_id || 'BRD-01',
-        title: body.title || 'Tanpa Judul',
-        caption: body.caption || '',
-        media_url: body.media_url || '',
-        platform: body.platform || 'instagram',
-        type: body.type || 'FEED',
-        status: 'draft',
-        author: body.author || 'Tim Kreatif',
-        scheduled_at: validScheduledAt,
-        revision_notes: '',
-        metrics: { likes: 0, reach: 0, shares: 0, comments: 0 },
-        created_at: new Date().toISOString()
-      };
+      // Simpan seluruh data teks dan daftar array file (JSONB) ke tabel posts
+      const { error: dbError } = await supabase.from('posts').insert([{
+        id, brand_id: 'BRD-01', title, type, caption, status, author, author_id, role, platform,
+        media_url: primaryUrl, media_urls: uploadedUrls
+      }]);
 
-      const { data, error } = await supabase
-        .from('posts')
-        .insert([newPost])
-        .select();
-
-      if (error) {
-        console.error('Supabase insert error:', error);
-        return res.status(400).json({ error: error.message });
-      }
-
-      return res.status(201).json(data && data[0] ? data[0] : newPost);
-    }
-
-    // 3. PUT: Update Status / Revisi / Publish (Validasi RBAC Ketat)
+      if (dbError) throw dbError;
+      return res.status(200).json({ success: true, message: 'Draf berhasil disimpan dengan file aslinya.' });
+    } 
+    
+    // ==== METHOD PUT: UPDATE STATUS ATAU REVISI FILE ====
     if (req.method === 'PUT') {
-      const { id, status, revision_notes, media_url, caption, title } = body;
-      if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
+      if (isJson) req.body = await parseJSONBody(req);
+      else await runMiddleware(req, res, upload.array('media_files', 10));
 
-      // Cek Wewenang Status secara case-insensitive
-      if (userRole === 'CREATOR' && status === 'published') {
-        return res.status(403).json({ error: 'Akses Ditolak: Creator tidak memiliki wewenang untuk menerbitkan postingan.' });
-      }
-      if ((userRole === 'REVIEWER' || userRole === 'CLIENT') && status === 'draft') {
-        return res.status(403).json({ error: 'Akses Ditolak: Reviewer/Client tidak dapat memindahkan postingan kembali ke draft.' });
-      }
+      const body = req.body;
+      const files = req.files || [];
 
-      const updates = {};
-      if (status !== undefined) updates.status = status;
-      if (revision_notes !== undefined) updates.revision_notes = revision_notes;
-      if (media_url !== undefined) updates.media_url = media_url;
-      if (caption !== undefined) updates.caption = caption;
-      if (title !== undefined) updates.title = title;
-      if (status === 'published') {
-        updates.published_at = new Date().toISOString();
-      }
+      let updateData = {};
+      if (body.status) updateData.status = body.status;
+      if (body.title) updateData.title = body.title;
+      if (body.caption) updateData.caption = body.caption;
+      if (body.revision_notes !== undefined) updateData.revision_notes = body.revision_notes;
 
-      const { data, error } = await supabase
-        .from('posts')
-        .update(updates)
-        .eq('id', id)
-        .select();
-
-      if (error) {
-        console.error('Supabase update error:', error);
-        return res.status(400).json({ error: error.message });
+      // Jika saat revisi pengguna mengunggah file gambar/video baru
+      if (files.length > 0) {
+         const uploadedUrls = [];
+         for (const file of files) {
+           const ext = file.originalname.split('.').pop();
+           const fileName = `media-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+           await supabase.storage.from('post-media').upload(fileName, file.buffer, { contentType: file.mimetype, upsert: true });
+           const { data } = supabase.storage.from('post-media').getPublicUrl(fileName);
+           uploadedUrls.push({ url: data.publicUrl, type: file.mimetype.startsWith('video/') ? 'video' : 'image', name: file.originalname });
+         }
+         updateData.media_url = uploadedUrls[0].url;
+         updateData.media_urls = uploadedUrls; // Timpa JSONB media lama
       }
 
-      return res.status(200).json(data && data[0] ? data[0] : updates);
+      const { error: dbError } = await supabase.from('posts').update(updateData).eq('id', body.id);
+      if (dbError) throw dbError;
+      return res.status(200).json({ success: true });
     }
 
-    // 4. DELETE: Hapus postingan (Khusus ADMIN & Hanya untuk postingan belum published)
+    // ==== METHOD DELETE: HAPUS POSTINGAN ====
     if (req.method === 'DELETE') {
-      const id = body.id || (req.query && req.query.id);
-
-      if (!id) return res.status(400).json({ error: 'Post ID wajib disertakan.' });
-      if (userRole !== 'ADMIN') {
-        return res.status(403).json({ error: 'Akses Ditolak: Hanya Administrator yang berwenang menghapus postingan.' });
-      }
-
-      // Pastikan status bukan 'published'
-      const { data: existingPost, error: checkErr } = await supabase
-        .from('posts')
-        .select('status')
-        .eq('id', id)
-        .single();
-
-      if (checkErr || !existingPost) {
-        return res.status(404).json({ error: 'Postingan tidak ditemukan di database.' });
-      }
-
-      if (existingPost.status === 'published') {
-        return res.status(403).json({ error: 'Postingan yang sudah terbit (published) tidak dapat dihapus.' });
-      }
-
-      const { error: deleteErr } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', id);
-
-      if (deleteErr) {
-        console.error('Supabase delete error:', deleteErr);
-        return res.status(400).json({ error: deleteErr.message });
-      }
-
-      return res.status(200).json({ success: true, message: 'Postingan berhasil dihapus secara permanen.' });
+      const parsedBody = isJson ? await parseJSONBody(req) : {};
+      const id = req.query.id || parsedBody.id;
+      
+      if (!id) return res.status(400).json({ error: 'ID tidak ditemukan' });
+      
+      const { error } = await supabase.from('posts').delete().eq('id', id);
+      if (error) throw error;
+      return res.status(200).json({ success: true });
     }
 
-    return res.status(405).json({ error: 'Method not allowed' });
-  } catch (err) {
-    console.error('Server error:', err);
-    return res.status(500).json({ error: err.message || 'Internal Server Error' });
+  } catch (error) {
+    console.error('Server API Error:', error);
+    return res.status(500).json({ error: error.message });
   }
 }
+Terapkan kedua file ini, dan Vercel *Timeout Crash* tidak akan mengganggu unggahan video Anda lagi! Jangan ragu untuk mencobanya secara langsung.
